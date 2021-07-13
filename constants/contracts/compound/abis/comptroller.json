@@ -1,0 +1,9 @@
+[
+  "function enterMarkets(address[] calldata cTokens) returns (uint[] memory)",
+  "function exitMarket(address cToken) returns (uint)",
+  "function getAssetsIn(address account) view returns (address[] memory)",
+  "function markets(address cTokenAddress) view returns (bool, uint, bool)",
+  "function getAccountLiquidity(address account) view returns (uint, uint, uint)",
+  "event MarketEntered(vToken vToken, address account)",
+  "event MarketExited(vToken vToken, address account)"
+]

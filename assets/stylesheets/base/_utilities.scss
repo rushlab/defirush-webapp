@@ -1,0 +1,49 @@
+.clearfix {
+  // @include clearfix();
+  &::after {
+    clear: both;
+    content: "";
+    display: block;
+  }
+}
+
+.pull-left {
+  float: left !important;
+}
+
+.pull-right {
+  float: right !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.img {
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+
+.card {
+  background-color: #ffffff;
+  margin-bottom: 15px;;
+  &.card--round {
+    border-radius: 5px;
+  }
+  &.card--padding {
+    padding: 15px;
+  }
+}

@@ -1,0 +1,9 @@
+[
+  "function balanceOf(address account) view returns (uint256)",
+  "function totalSupply() external view returns (uint256)",
+  "function getSupplyData() external view returns (uint256, uint256, uint256, uint40)",
+  "function scaledBalanceOf(address user) view",
+  "function UNDERLYING_ASSET_ADDRESS() view",
+  "function approveDelegation(address delegatee, uint256 amount)",
+  "function borrowAllowance(address fromUser, address toUser)"
+]

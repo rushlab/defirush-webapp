@@ -1,0 +1,24 @@
+body,
+input,
+textarea,
+button,
+p,
+span {
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  display: block;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  font-weight: inherit;
+  color: inherit;
+}
+
+ul {
+  padding: 0;
+}
