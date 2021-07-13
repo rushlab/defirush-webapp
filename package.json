@@ -1,7 +1,7 @@
 {
-  "name": "defi_front",
+  "name": "aggregation-bank-front",
   "version": "1.0.0",
-  "description": "My superb Nuxt.js project",
+  "description": "Front project for aggregation-bank",
   "author": "liran319@gmail.com",
   "private": true,
   "scripts": {

@@ -1,4 +1,4 @@
-# defi_front
+# aggregation-bank-front
 
 > My superb Nuxt.js project
 
