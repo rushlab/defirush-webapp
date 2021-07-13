@@ -2,6 +2,12 @@
 
 > My superb Nuxt.js project
 
+## node 版本
+```
+$ node -v
+> v12.22.1
+```
+
 ## Build Setup
 
 ```bash
