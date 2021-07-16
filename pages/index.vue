@@ -2,6 +2,7 @@
   <div class="page--home">
     <el-button @click="tokenSelectDialogVisible = !tokenSelectDialogVisible">选择Token</el-button>
     <token-select-dialog
+      v-if="tokenSelectDialogVisible"
       :visible.sync="tokenSelectDialogVisible"
       @select="onSelectToken"
     />

@@ -6,13 +6,8 @@
           <div class="label-text">You Pay</div>
           <div class="token-balance">Balance: {{ fromTokenBalance }}</div>
         </div>
-        <el-input placeholder="请输入支付数量" v-model="amount" class="input-with-select">
-          <el-select v-model="fromTokenAddress" slot="prepend" placeholder="请选择" @change="handleChangeFromToken">
-            <el-option
-              v-for="opt in tokenOptions" :key="'fromTokenAddress-'+ opt.symbol"
-              :label="opt.symbol"
-              :value="opt.address"/>
-          </el-select>
+        <el-input placeholder="请输入支付数量" v-model="amount">
+          <el-button slot="append" class="input__button" type="text" @click="onClickSelect('fromToken')">{{ fromToken ? fromToken.symbol : '请选择' }}</el-button>
         </el-input>
 
       </el-form-item>
@@ -24,15 +19,8 @@
             <span v-if="estimateGasSwap"> Swap预计消耗Gas：{{ estimateGasSwap }}</span>
           </div>
         </div>
-        <el-input placeholder="返回目标Token数量" :value="quote.returnAmount" readonly class="input-with-select">
-          <el-select v-model="toTokenAddress" slot="prepend" placeholder="请选择" @change="clearQuote">
-            <el-option
-              v-for="opt in tokenOptions" :key="'toTokenAddress-'+ opt.symbol"
-              :label="opt.symbol"
-              :value="opt.address"
-              :disabled="opt.address === fromTokenAddress"
-            />
-          </el-select>
+        <el-input placeholder="返回目标Token数量" :value="quote.returnAmount" readonly>
+          <el-button slot="append" class="input__button" type="text" @click="onClickSelect('toToken')">{{ toToken ? toToken.symbol : '请选择' }}</el-button>
         </el-input>
       </el-form-item>
 
@@ -65,12 +53,18 @@
         <el-progress :percentage="+item"></el-progress>
       </div>
     </div>
+    <token-select-dialog
+      :visible.sync="tokenSelectDialogVisible"
+      @select="onSelectToken"
+    />
   </div>
 </template>
 
 <script>
 import _ from 'lodash'
+import { mapState } from 'vuex'
 import { ethers } from "ethers"
+import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
 import OneSplitAudit from '@/constants/contracts/1inch'
 import { ABI as ERC20_ABI, TOKENS as ERC20_TOKENS } from '@/constants/erc20-tokens.js'
 
@@ -84,28 +78,17 @@ const splitExchanges = [
 
 export default {
   name: 'Exchange',
-  props: {
-    provider: {
-      type: Object,
-      default: () => {
-        return {}
-      }
-    },
+  components: {
+    TokenSelectDialog
   },
   data() {
-    const tokenOptions = [
-        { symbol: 'ETH', address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', decimals: 18 },
-        ...ERC20_TOKENS
-    ]
     return {
       signer: null,
-      OneSplitAuditContract: null,
+      oneSplitAuditContract: null,
       // status
       pending: false,
       quoting: false,
       estimating: false,
-
-      tokenOptions,
       splitExchanges,
 
       senderAddress: '',
@@ -113,8 +96,8 @@ export default {
 
       fromTokenBalance: 0,
 
-      fromTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
-      toTokenAddress: '0x6b175474e89094c44da98b954eedeac495271d0f',
+      fromToken: null,
+      toToken: null,
       amount: 0,
 
       quote: {
@@ -123,78 +106,94 @@ export default {
       },
       estimateGasSwap: 0,
       estimateGasApprove: 0,
+
+      tokenSelectDialogVisible: false,
+      tokenSelectTarget: null
     }
   },
   async mounted() {
-    this.signer = this.provider.getSigner()
-    this.getSignerData()
-    this.updateContact(this.signer)
+    this.getUserWalletData()
     this.updateFromTokenBalance()
   },
   computed: {
+    ...mapState('tokens', {
+      tokenList: state => state.data
+    }),
+    fromTokenAddress() {
+      return this.formToken ? this.formToken.address : ''
+    },
+    toTokenAddress() {
+      return this.toToken ? this.toToken.address : ''
+    },
     disableQuote() {
       return this.etherBalance <= 0 ||
              this.fromTokenBalance <= 0 ||
              this.amount <= 0 ||
-             !this.fromTokenAddress ||
-             !this.toTokenAddress ||
-             !this.OneSplitAuditContract ||
+             !this.fromToken ||
+             !this.toToken ||
              !!this.quoting
     },
     disableEstimate() {
       return this.etherBalance <= 0 ||
              this.fromTokenBalance <= 0 ||
              this.amount <= 0 ||
-             !this.fromTokenAddress ||
-             !this.toTokenAddress ||
-             !this.OneSplitAuditContract ||
+             !this.fromToken ||
+             !this.toToken ||
              !!this.estimating
     },
     disableSwap() {
       return this.etherBalance <= 0 ||
              this.fromTokenBalance <= 0 ||
              this.amount <= 0 ||
-             !this.fromTokenAddress ||
-             !this.toTokenAddress ||
-             !this.OneSplitAuditContract ||
+             !this.fromToken ||
+             !this.toToken ||
              !!this.pending
     }
   },
-  watch: {
-    provider: {
-      handler: function(newProvider) {
-        if (!newProvider) return;
-        this.signer = newProvider.getSigner()
-        this.getSignerData()
-        this.updateContact(this.signer)
-      },
-    },
-  },
   methods: {
-    updateContact(signer) {
-      const { abi, contractAddress } = OneSplitAudit
-      this.OneSplitAuditContract = new ethers.Contract(contractAddress, abi, signer)
+    onClickSelect(target) {
+      this.tokenSelectTarget = target
+      this.tokenSelectDialogVisible = true
     },
-    async getSignerData() {
-      if (!this.signer) return;
-      this.senderAddress = await this.signer.getAddress()
-      const balance = await this.signer.getBalance()
+    onSelectToken(token) {
+      if (!this.tokenSelectTarget) {
+        console.log('@@@ WARNING: tokenSelectTarget is undefined')
+      } else {
+        this[this.tokenSelectTarget] = { ...token }
+        if (this.tokenSelectTarget === 'fromToken') {
+          this.handleChangeFromToken()
+        }
+        this.tokenSelectTarget = null
+      }
+      this.clearQuote()
+    },
+    getOneSplitAuditContract() {
+      if (this.oneSplitAuditContract) return this.oneSplitAuditContract;
+      const { abi, contractAddress } = OneSplitAudit
+      const oneSplitAuditContract = new ethers.Contract(contractAddress, abi, this.$userWallet)
+      this.oneSplitAuditContract = oneSplitAuditContract
+      return oneSplitAuditContract
+    },
+    async getUserWalletData() {
+      if (!this.$userWallet) return;
+      this.senderAddress = await this.$userWallet.getAddress()
+      const balance = await this.$userWallet.getBalance()
       this.etherBalance = ethers.utils.formatUnits(balance)
     },
     async getERC20TokenBalance(token) {
-      const erc20Contract = new ethers.Contract(token.address, ERC20_ABI, this.signer)
+      const erc20Contract = new ethers.Contract(token.address, ERC20_ABI, this.$userWallet)
       const balance = await erc20Contract.balanceOf(this.senderAddress)
       return ethers.utils.formatUnits(balance.toString(), token.decimals)
     },
     async updateFromTokenBalance() {
-      const token = _.find(this.tokenOptions, { address: this.fromTokenAddress })
+      const token = this.fromToken
       if (!token) {
         this.fromTokenBalance = '0.00'
         return
       }
       if (token.symbol.toLowerCase() === 'eth') {
         // return ETH balance
-        const balance = await this.signer.getBalance()
+        const balance = await this.$userWallet.getBalance()
         this.fromTokenBalance = ethers.utils.formatUnits(balance)
       } else {
         this.fromTokenBalance = await this.getERC20TokenBalance(token)  // return erc20 token balance
@@ -204,9 +203,8 @@ export default {
       this.updateFromTokenBalance()
       if (this.fromTokenAddress === this.toTokenAddress) {
         // 如果两者相同，理论上不允许兑换相同的代币
-        this.toTokenAddress = ''
+        this.toToken = null
       }
-      this.clearQuote()
     },
     clearQuote() {
       this.quote = {
@@ -219,24 +217,34 @@ export default {
     },
     parseTxAmount(amount) {
       // int => Big Number
-      const token = _.find(this.tokenOptions, { address: this.fromTokenAddress })
+      const token = _.find(this.tokenList, { address: this.fromTokenAddress })
       if (!token) return null
       const _amount = ethers.utils.parseUnits(amount + '', token.decimals)
       return _amount
     },
+    getTxAmount(amount, decimals) {
+      // int => Big Number
+      const _amount = ethers.utils.parseUnits(amount + '', decimals)
+      return _amount
+    },
     async _getQuote() {
-      const fromTokenAddress = this.fromTokenAddress
-      const toTokenAddress = this.toTokenAddress
-      const amount = this.parseTxAmount(this.amount)
+      const amount = this.getTxAmount(this.amount, this.fromToken.decimals)
       const parts = 100
       const flags = 0
 
       let quote = null
       this.quoting = true
       try {
-        quote = await this.OneSplitAuditContract.callStatic.getExpectedReturn(fromTokenAddress, toTokenAddress, amount, parts, flags)
-        const { decimals } = _.find(this.tokenOptions, { address: toTokenAddress })
-        const returnAmount = ethers.utils.formatUnits(quote.returnAmount.toString(), decimals)
+        const oneSplitAuditContract = this.getOneSplitAuditContract()
+        const payload = [
+          this.fromToken.address,
+          this.toToken.address,
+          amount,
+          parts,
+          flags
+        ]
+        quote = await oneSplitAuditContract.callStatic.getExpectedReturn(...payload)
+        const returnAmount = ethers.utils.formatUnits(quote.returnAmount.toString(), this.toToken.decimals)
         this.quote = {
           returnAmount,
           distribution: quote.distribution || []
@@ -262,11 +270,11 @@ export default {
       this.pending = false
     },
     async getApprovePayload() {
-      const fromTokenAddress = this.fromTokenAddress
-      const amount = this.parseTxAmount(this.amount)
-      const token = _.find(this.tokenOptions, { address: fromTokenAddress })
-      const erc20Contract = new ethers.Contract(token.address, ERC20_ABI, this.signer)
-      const allowance = await erc20Contract.callStatic.allowance(this.senderAddress, this.OneSplitAuditContract.address)
+      const { address, decimals } = this.fromToken
+      const amount = this.getTxAmount(this.amount, decimals)
+      const erc20Contract = new ethers.Contract(address, ERC20_ABI, this.$userWallet)
+      const oneSplitAuditContract = this.getOneSplitAuditContract()
+      const allowance = await erc20Contract.callStatic.allowance(this.senderAddress, oneSplitAuditContract.address)
       if (allowance.lt(amount)) {
         // allowance 已经足够完成这次交易的 amount, 则不再发起本次 approve
         return [erc20Contract, amount]
@@ -274,12 +282,12 @@ export default {
       return [erc20Contract, null]
     },
     async handleApprove() {
-      const fromToken = _.find(this.tokenOptions, { address: this.fromTokenAddress })
-      if (!fromToken || fromToken.symbol.toLowerCase() === 'eth') return;
+      if (!this.fromToken || this.fromToken.symbol.toLowerCase() === 'eth') return;
       try {
+        const oneSplitAuditContract = this.getOneSplitAuditContract()
         const [erc20Contract, approveAmount] = await this.getApprovePayload()
         if (!approveAmount) return;
-        const res = await erc20Contract.approve(this.OneSplitAuditContract.address, approveAmount)
+        const res = await erc20Contract.approve(oneSplitAuditContract.address, approveAmount)
         await res.wait()  // 等待交易确认
       } catch (error) {
         console.log('@@@@@ handleApprove error', error)
@@ -287,16 +295,13 @@ export default {
       }
     },
     async getSwapPayload() {
-      const fromTokenAddress = this.fromTokenAddress
-      const toTokenAddress = this.toTokenAddress
-      const amount = this.parseTxAmount(this.amount)
+      const amount = this.getTxAmount(this.amount, this.fromToken.decimals)
       const parts = 100
       const flags = 0
       const quote = await this._getQuote()
 
-      const nonce = await this.signer.getTransactionCount('latest')
-      const token = _.find(this.tokenOptions, { address: fromTokenAddress })
-      const isETHSwap = token.symbol.toLowerCase() === 'eth'
+      const nonce = await this.$userWallet.getTransactionCount('latest')
+      const isETHSwap = this.fromToken.symbol.toLowerCase() === 'eth'
       const txMsg = {
         nonce
       }
@@ -305,8 +310,8 @@ export default {
         txMsg.value = amount
       }
       return [
-        fromTokenAddress,
-        toTokenAddress,
+        this.fromToken.address,
+        this.toToken.address,
         amount,
         quote.returnAmount,
         quote.distribution,
@@ -317,11 +322,10 @@ export default {
     async handleSwap() {
       await this._getEstimateGasSwap()
       const payload = await this.getSwapPayload()
-      const transaction = await this.OneSplitAuditContract.swap(...payload)
+      const oneSplitAuditContract = this.getOneSplitAuditContract()
+      const transaction = await oneSplitAuditContract.swap(...payload)
       const receipt = await transaction.wait()
-      this.$emit('success', {receipt, fromTokenAddress: this.fromTokenAddress, toTokenAddress: this.tokenOptions})
-
-
+      this.$emit('success', {receipt, fromTokenAddress: this.fromTokenAddress, toTokenAddress: this.tokenList})
       this.handleSwapSuccess()
     },
     async handleEstimateGas() {
@@ -330,9 +334,7 @@ export default {
       this.estimateGasSwap = 0
       this.estimateGasApprove = 0
 
-      const fromToken = _.find(this.tokenOptions, { address: this.fromTokenAddress })
-      if (!fromToken) return
-      if (fromToken.symbol.toLowerCase() === 'eth') {
+      if (this.fromToken.symbol.toLowerCase() === 'eth') {
         // eth => erc20, 不需要 approve
         await this._getEstimateGasSwap()
       } else {
@@ -342,21 +344,23 @@ export default {
       this.estimating = false
     },
     async _getEstimateGasApprove() {
+      const oneSplitAuditContract = this.getOneSplitAuditContract()
       const [erc20Contract, approveAmount] = await this.getApprovePayload()
       if (approveAmount) {
-        let estimateGasApprove = await erc20Contract.estimateGas.approve(this.OneSplitAuditContract.address, approveAmount)
+        let estimateGasApprove = await erc20Contract.estimateGas.approve(oneSplitAuditContract.address, approveAmount)
         estimateGasApprove = ethers.utils.parseUnits(estimateGasApprove.toString(), 'wei')
         this.estimateGasApprove = estimateGasApprove
       }
     },
     async _getEstimateGasSwap() {
+      const oneSplitAuditContract = this.getOneSplitAuditContract()
       const payload = await this.getSwapPayload()
-      const res = await this.OneSplitAuditContract.estimateGas.swap(...payload)
+      const res = await oneSplitAuditContract.estimateGas.swap(...payload)
       const estimateGasSwap = ethers.utils.parseUnits(res.toString(), 'wei')
       this.estimateGasSwap = estimateGasSwap
     },
     handleSwapSuccess() {
-      this.getSignerData()
+      this.getUserWalletData()
       this.updateFromTokenBalance()
       this.amount = ''
       this.quote.returnAmount = ''
@@ -413,11 +417,11 @@ export default {
   .el-form-item__label {
     width: 100%;
   }
-  .input-with-select .el-input-group__prepend {
-    background-color: #ffffff;
-    // background-color: #34495e;
-    // color: #ffffff;
-  }
+}
+.input__button {
+  min-width: 100px;
+  text-align: center;
+  padding: 12px 20px;
 }
 </style>
 

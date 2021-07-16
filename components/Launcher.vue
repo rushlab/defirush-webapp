@@ -2,17 +2,12 @@
   <div class="launcher">
     <div class="metamask">
       <metamask-logo class="mm-logo"/>
-      <el-button
-        v-if="!signer"
-        class="mm-btn" type="text" size="small"
-        :loading="!!connecting"
-        @click="initProviderWithMetaMask">{{ !!connecting ? '正在连接...' : '点击连接'}}</el-button>
     </div>
-    <div v-if="!!signer" class="avtive-waller"><span>已连接钱包: MetaMask</span></div>
-    <div v-if="signer" v-loading="!!pending">
-      <el-form ref="launcher" label-position="top" :disabled="disabledForm">
+    <div v-if="!!$userWallet" class="avtive-waller"><span>已连接钱包: MetaMask</span></div>
+    <div v-if="$userWallet" v-loading="!!pending">
+      <el-form ref="launcher" label-position="top">
         <el-form-item label="钱包地址">
-          <el-input :value="address" readonly></el-input>
+          <el-input :value="walletAddress" readonly></el-input>
         </el-form-item>
         <el-form-item label="钱包余额">
           <el-input :value="walletBalance" readonly>
@@ -24,12 +19,10 @@
               class="action-btn" size="mini" type="success" plain
               :disabled="!EtherFaucet"
               @click="onRequestEther">充值</el-button>
-            <!-- <el-button class="action-btn" size="mini" type="warning" plain>转账</el-button> -->
-            <!-- <el-button class="action-btn" size="mini" type="primary" plain>兑换</el-button> -->
           </div>
         </el-form-item>
       </el-form>
-      <el-form label-position="left" :disabled="disabledForm">
+      <el-form label-position="left">
         <el-form-item
           v-for="(value, symbol) in erc20TokenBalance" :key="symbol"
           class="token-item"
@@ -49,6 +42,7 @@
 
 <script>
 import _ from 'lodash'
+import { mapState } from 'vuex'
 import { ethers } from "ethers"
 import { BigNumber } from 'bignumber.js'
 import { ABI as ERC20_ABI, TOKENS as ERC20_TOKENS } from '@/constants/erc20-tokens.js'
@@ -56,12 +50,6 @@ import MetamaskLogo from '@/components/MetamaskLogo'
 
 export default {
   name: "Launcher",
-  props: {
-    provider: {
-      type: [Object, null],
-      default: null
-    },
-  },
   components: {
     MetamaskLogo,
   },
@@ -73,10 +61,8 @@ export default {
     return {
       connecting: false,
       pending: false,
-      signer: null,
       address: '',
       walletBalance: 0,
-      canRequestEther: false,
       ERC20_TOKENS,
       ERC20_ABI,
       erc20TokenBalance: { ...erc20TokenBalance },
@@ -87,72 +73,21 @@ export default {
     this.getEtherFaucetData()
   },
   mounted() {
-    // this.initWallet()
-    // return;
-    if (window && window.ethereum) {
-      this.initProviderWithMetaMask()
-    }
-  },
-  watch: {
-    provider: {
-      handler: async function(newProvider) {
-        if (!newProvider) return
-        this.handleUpdateProvider()
-      },
-    },
+    this.handleGetBalance()
   },
   computed: {
-    disabledForm() {
-      return !this.provider || _.isEmpty(this.provider)
+    ...mapState('user', ['walletAddress']),
+    canRequestEther() {
+      return _.get(this.$userWallet, 'provider.chainId') == 71337
     }
   },
   methods: {
-    async initWallet() {
-      this.signer = new ethers.Wallet('wallet private key', this.provider)
-      await this.handleGetAddress()  // getSigner 之后更新 Ether 或者 ERC20 token 余额
-      await this.handleGetBalance()
-    },
-    initProviderWithMetaMask() {
-      if (window && window.ethereum) {
-        this.connecting = true
-        this.$emit('init')
-      } else {
-        this.$confirm('请先安装 MetaMask 扩展应用', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          window.open('https://metamask.io/download.html')
-        }).catch(() => {
-        })
-      }
-    },
-    async handleUpdateProvider() {
-      if (!this.provider) return
-      try {
-        this.connecting = false
-        this.pending = true
-        this.signer = this.provider.getSigner()
-        await this.handleGetAddress()  // getSigner 之后更新 Ether 或者 ERC20 token 余额
-        await this.handleGetBalance()
-        const { chainId } = await this.provider.getNetwork()
-        this.canRequestEther = +chainId === 71337
-      } catch (error) {
-        console.log(error)
-      }
-      this.pending = false
-    },
-    async handleGetAddress() {
-      if (!this.signer) return;
-
-      this.address = await this.signer.getAddress()
-    },
     async handleGetBalance() {
       await this.getEtherBalance()
       await this.getERC20TokensBalance()
     },
     async getEtherBalance() {
-      const balance = await this.signer.getBalance()
+      const balance = await this.$userWallet.getBalance()
       this.walletBalance = ethers.utils.formatUnits(balance)
     },
     async getERC20TokensBalance(tokenAddres) {
@@ -168,9 +103,8 @@ export default {
       }
     },
     async getTokenBalance(token) {
-      const erc20Contract = new ethers.Contract(token.address, this.ERC20_ABI, this.signer)
-      const balance = await erc20Contract.balanceOf(this.address)
-      // return ethers.utils.formatEther(balance)
+      const erc20Contract = new ethers.Contract(token.address, this.ERC20_ABI, this.$userWallet)
+      const balance = await erc20Contract.balanceOf(this.walletAddress)
 
       return (new BigNumber(balance.toString())).shiftedBy(-token.decimals).toString()
     },
@@ -191,7 +125,7 @@ export default {
     },
     async handleRequestEther() {
       try {
-        const contract = new ethers.Contract(this.EtherFaucet.address, this.EtherFaucet.abi, this.signer)
+        const contract = new ethers.Contract(this.EtherFaucet.address, this.EtherFaucet.abi, this.$userWallet)
         const amount = ethers.utils.parseEther('1')  // 获取 1 个 Ether
         const receipt = await contract.requestEther(amount, {
           gasPrice: 0,
