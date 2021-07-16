@@ -36,7 +36,7 @@ export default {
     maskedWalletAddress() {
       const walletAddress = this.walletAddress
       const l = walletAddress.length
-      return walletAddress ? (walletAddress.substring(0, 6) + '...' + walletAddress.substring(l - 5, l - 1)) : ''
+      return walletAddress ? (walletAddress.substring(0, 6) + '...' + walletAddress.substring(l - 4)) : ''
     }
   },
   methods: {
