@@ -1,23 +1,40 @@
 <template>
   <el-container>
-    <el-header>
+    <el-aside width="200px">
       <el-menu
         :router="true"
         :default-active="$route.fullPath"
-        mode="horizontal"
-        background-color="#2980b9"
-        text-color="#ffffff"
-        active-text-color="#ecf0f1">
+        background-color="#ffffff"
+        text-color="#2c3e50"
+        active-text-color="#d35400">
         <el-menu-item index="/">首页</el-menu-item>
+        <el-menu-item index="/exchanger">1INCH 兑换</el-menu-item>
         <el-menu-item index="/banks/aave">Aave</el-menu-item>
         <el-menu-item index="/banks/compound">Compound</el-menu-item>
       </el-menu>
-    </el-header>
-    <el-main>
-      <nuxt />
-    </el-main>
+    </el-aside>
+    <el-container>
+      <el-header>
+        <client-only>
+          <site-header />
+        </client-only>
+      </el-header>
+      <el-main><nuxt /></el-main>
+      <!-- <el-footer>Footer</el-footer> -->
+    </el-container>
   </el-container>
 </template>
+
+
+<script>
+import SiteHeader from '@/components/SiteHeader'
+
+export default {
+  components: {
+    SiteHeader
+  }
+}
+</script>
 
 <style lang="scss" scoped>
 html {
@@ -39,35 +56,18 @@ html {
   margin: 0;
 }
 
-.button--green {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #3b8070;
-  color: #3b8070;
-  text-decoration: none;
-  padding: 10px 30px;
-}
 
-.button--green:hover {
-  color: #fff;
-  background-color: #3b8070;
-}
-
-.button--grey {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #35495e;
-  color: #35495e;
-  text-decoration: none;
-  padding: 10px 30px;
-  margin-left: 15px;
-}
-
-.button--grey:hover {
-  color: #fff;
-  background-color: #35495e;
-}
 /deep/ {
+  .el-aside {
+    height: 100vh;
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.1);
+  }
+  .el-menu {
+    min-height: 100%;
+  }
+  .el-menu-item {
+    font-weight: 500;
+  }
   .el-header {
     padding-left: 0;
     padding-right: 0;

@@ -57,7 +57,7 @@ export default {
 .site-header {
   position: fixed;
   top: 0;
-  left: 0;
+  left: 200px;
   right: 0;
   height: 60px;
   padding: 10px 20px;

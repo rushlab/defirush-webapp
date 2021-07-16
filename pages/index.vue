@@ -12,7 +12,6 @@
 import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
 
 export default {
-  layout: 'newLayout',
   components: {
     TokenSelectDialog
   },
