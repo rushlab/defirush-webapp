@@ -29,6 +29,7 @@ Vue.mixin({
   },
   methods: {
     _handleUpdateMetaMaskProvider() {
+      this.$store.dispatch('user/resetAccount')
       this.$confirm('Current page will be reloaded by changing network or account?', 'Notice', {
         confirmButtonText: 'Yes',
         cancelButtonText: 'Cancel',
