@@ -5,7 +5,10 @@
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
     <div class="filters">
       <div class="filter-item">
-        <el-input placeholder="Search by Symbol or Address" clearable
+        <el-input
+          placeholder="Search by Symbol or Address"
+          clearable
+          autofocus
           v-model="q"></el-input>
       </div>
     </div>
@@ -18,12 +21,12 @@
           ></el-image>
         </template>
       </el-table-column>
-      <el-table-column prop="symbol" label="Symbol" width="80" align="center"></el-table-column>
+      <el-table-column prop="symbol" label="Symbol" width="120" align="center"></el-table-column>
       <el-table-column prop="name" label="Name"></el-table-column>
-      <el-table-column prop="actions" label="操作" width="60">
+      <el-table-column prop="actions" label="Actions" width="80">
         <template slot-scope="{ row }">
           <el-button
-            type="primary" size="mini" @click="handleSelectOne(row)">选择</el-button>
+            type="primary" size="mini" @click="handleSelectOne(row)">Select</el-button>
         </template>
       </el-table-column>
     </el-table>
