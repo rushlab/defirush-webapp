@@ -13,7 +13,7 @@
         <el-menu-item index="/banks/compound">Compound</el-menu-item>
       </el-menu>
     </el-aside>
-    <el-container>
+    <el-container style="height: 100vh; overflow: auto;">
       <el-header>
         <client-only>
           <site-header />
