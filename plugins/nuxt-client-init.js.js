@@ -80,6 +80,7 @@ Vue.mixin({
 
 export default async (ctx, inject) => {
   const { store } = ctx
+  store.dispatch('tokens/getTokens')
   if (typeof window === 'undefined' || !window.ethereum) return;  // 如果没有安装 metamask，不处理，由用户自己发起登录
 
   try {
