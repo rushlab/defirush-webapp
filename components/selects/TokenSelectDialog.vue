@@ -101,6 +101,7 @@ export default {
       }
     },
     onDialogClose() {
+      this.q = ''
       this.$emit('close')
       this.$emit('update:visible', false)
     },
