@@ -62,9 +62,13 @@ export default {
       let res = []
       if (!this.q) {
         res = this.data
-      } else if (/^0x\w{40}$/.test(this.q)) {
+      } else if (/^(0x)?\w{40}$/.test(this.q)) {
         // match token address
-        res = _.filter(this.data, { address: this.q })
+        let _q = this.q
+        if (!_.startsWith(_q, '0x')) {
+          _q = '0x' + _q
+        }
+        res = _.filter(this.data, { address: _q })
       } else {
         res = _.filter(this.data, token => {
           return _.startsWith(token.symbol, this.q.toUpperCase())
