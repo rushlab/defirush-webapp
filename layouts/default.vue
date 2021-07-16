@@ -19,7 +19,11 @@
           <site-header />
         </client-only>
       </el-header>
-      <el-main><nuxt /></el-main>
+      <el-main>
+        <client-only>
+          <nuxt />
+        </client-only>
+      </el-main>
       <!-- <el-footer>Footer</el-footer> -->
     </el-container>
   </el-container>
