@@ -32,7 +32,7 @@ module.exports = {
    */
   plugins: [
     '@/plugins/element-ui',
-    { src: '~/plugins/web3-providers.js', mode: 'client' }
+    { src: '~/plugins/nuxt-client-init.js', mode: 'client' }
   ],
   /*
    ** Nuxt.js dev-modules
