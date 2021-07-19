@@ -42,7 +42,6 @@ import {
   ABI_LendingPool,
   ABI_LendingPoolAddressesProvider,
   Address_LendingPoolAddressesProvider } from '@/constants/contracts/aave/index.js'
-import { Provider } from '@ethersproject/providers';
 
 
 export default {
