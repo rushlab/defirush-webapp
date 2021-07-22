@@ -18,8 +18,7 @@
           <el-slider
             :step="4" :marks="marks"
             v-model="form.amountSlideValue"
-            :disabled="!+balanceDisplay || !underlyingAssetDecimals"
-            @change="onChangeSlideValue"></el-slider>
+            :disabled="!+balanceDisplay || !underlyingAssetDecimals"></el-slider>
         </el-form-item>
       </el-form>
       <div class="dialog__hints">
@@ -33,7 +32,7 @@
     </div>
     <div slot="footer" class="dialog-footer">
       <el-button v-if="needApprove" type="warning" @click="handleApprove">Approve</el-button>
-      <el-button v-else type="primary" @click="handleSelect">Deposit</el-button>
+      <el-button v-else type="primary" @click="handleDeposit" :loading="isDepositing">{{ isDepositing ? 'Depositing' : 'Deposit' }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -90,6 +89,7 @@ export default {
       },
       allowanceMantissa: ethers.constants.Zero,
       balanceMantissa: ethers.constants.Zero,
+      isDepositing: false
     }
   },
   computed: {
@@ -169,14 +169,21 @@ export default {
       }
       this.isApproving = false
     },
-    handleSelect() {
-      console.log(this.amount)
-      this.$emit('select', this.amount)
-      this.isVisible = false
+    async handleDeposit() {
+      try {
+        this.isDepositing = true
+        const receipt = await this.bankApp.deposit(this.underlyingTokenData.address, this.form.amountDisplay)
+        console.log('@@@ receipt: ', receipt)
+        this.$message({type: 'success', message: '存款成功：' + JSON.stringify(receipt)})
+        this.handleDepositSuccess()
+      } catch (error) {
+        this.$message.error(JSON.stringify(error))
+      }
+      this.isDepositing = false
     },
-    onChangeSlideValue(val) {
-      // console.log(12345, val)
-      // this.form.amountDisplay = (+this.balanceDisplay * val / 100).toString()
+    handleDepositSuccess() {
+      this.$emit('success')
+      this.isVisible = false
     }
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="bank-item">
+  <div class="bank-item" v-loading="pending">
     <div class="item__column exchange">
       <el-image class="exchange__icon" fit="contain" :src="bankData.icon"></el-image>
       <span class="exchange__title">{{ bankData.title }}</span>
@@ -17,7 +17,7 @@
       :visible.sync="isVisible"
       :bankApp="bankApp"
       :underlying-token-data="underlyingTokenData"
-      @select="onDeposit"/>
+      @success="onDepositSuccess"/>
   </div>
 </template>
 
@@ -50,6 +50,7 @@ export default {
     return {
       isVisible: false,
       assetData: null,
+      pending: false,
     }
   },
   computed: {
@@ -89,9 +90,8 @@ export default {
       this.assetData = await this.bankApp.getAssetData(asset)
       console.log('@@@@ getAssetData', this.assetData)
     },
-    onDeposit(amountDecimals) {
-      this.amountDecimals = amountDecimals
-      console.log('@@@ $signer.address', this.$signer.address)
+    onDepositSuccess(amountDisplay) {
+      this.getAssetData(this.underlyingTokenAddress)
     }
   },
 }

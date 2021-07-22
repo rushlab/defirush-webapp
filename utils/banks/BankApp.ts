@@ -45,6 +45,7 @@ export default class BankApp implements BankAppInterface {
     console.log('tofixed', (+amountDisplay).toFixed(decimals));
     console.log('yyy', ethers.utils.parseUnits((+amountDisplay).toFixed(decimals), decimals).toString());
     console.log('xxx', ethers.utils.parseUnits(amountDisplay, decimals).toString());
+    // 这里为了保证精度和转换成功，采用replace方法，去除精度之后的字符串数字
     const re = new RegExp(`(\\d+\\.\\d{${decimals}})(\\d+)`)
     amountDisplay = amountDisplay.replace(re, '$1')
     return ethers.utils.parseUnits(amountDisplay, decimals)
