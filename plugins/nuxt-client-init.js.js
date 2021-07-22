@@ -11,7 +11,7 @@ Vue.mixin({
     }
   },
   computed: {
-    $userWallet() {
+    $signer() {
       if (!global.ethereum) return null
       const provider = new ethers.providers.Web3Provider(global.ethereum)
       return provider.getSigner()
@@ -63,7 +63,7 @@ Vue.mixin({
       if (typeof window !== 'undefined' && window.ethereum) {
         const walletAddress = this.$store.state.user.walletAddress
         const msg = `Please sign to let us verify that you are the owner of this address\n ${walletAddress}`
-        const signedMsg = await this.$userWallet.signMessage(msg)
+        const signedMsg = await this.$signer.signMessage(msg)
         console.log('signedMsg: ', signedMsg)
         const msgSender = await ethers.utils.verifyMessage(msg, signedMsg)
         console.log('msgSender is', msgSender)

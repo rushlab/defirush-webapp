@@ -2,7 +2,7 @@
   <div class="container">
     <el-row :gutter="20">
       <el-col :span="6">
-        <el-card v-if="$userWallet" >
+        <el-card v-if="$signer" >
           <launcher ref="launcher" @init="initProvider"/>
         </el-card>
       </el-col>
@@ -13,7 +13,7 @@
           <transfer :provider="provider" :signer="signer"/>
         </el-card>
 
-        <el-card v-if="$userWallet">
+        <el-card v-if="$signer">
           <div slot="header"><span class="card-header__title">兑换</span></div>
             <exchange @success="handleSwapSuccess"/>
         </el-card>

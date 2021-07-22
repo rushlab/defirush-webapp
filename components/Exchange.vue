@@ -170,18 +170,18 @@ export default {
     getOneSplitAuditContract() {
       if (this.oneSplitAuditContract) return this.oneSplitAuditContract;
       const { abi, contractAddress } = OneSplitAudit
-      const oneSplitAuditContract = new ethers.Contract(contractAddress, abi, this.$userWallet)
+      const oneSplitAuditContract = new ethers.Contract(contractAddress, abi, this.$signer)
       this.oneSplitAuditContract = oneSplitAuditContract
       return oneSplitAuditContract
     },
     async getUserWalletData() {
-      if (!this.$userWallet) return;
-      this.senderAddress = await this.$userWallet.getAddress()
-      const balance = await this.$userWallet.getBalance()
+      if (!this.$signer) return;
+      this.senderAddress = await this.$signer.getAddress()
+      const balance = await this.$signer.getBalance()
       this.etherBalance = ethers.utils.formatUnits(balance)
     },
     async getERC20TokenBalance(token) {
-      const erc20Contract = new ethers.Contract(token.address, ERC20_ABI, this.$userWallet)
+      const erc20Contract = new ethers.Contract(token.address, ERC20_ABI, this.$signer)
       const balance = await erc20Contract.balanceOf(this.senderAddress)
       return ethers.utils.formatUnits(balance.toString(), token.decimals)
     },
@@ -193,7 +193,7 @@ export default {
       }
       if (token.symbol.toLowerCase() === 'eth') {
         // return ETH balance
-        const balance = await this.$userWallet.getBalance()
+        const balance = await this.$signer.getBalance()
         this.fromTokenBalance = ethers.utils.formatUnits(balance)
       } else {
         this.fromTokenBalance = await this.getERC20TokenBalance(token)  // return erc20 token balance
@@ -272,7 +272,7 @@ export default {
     async getApprovePayload() {
       const { address, decimals } = this.fromToken
       const amount = this.getTxAmount(this.amount, decimals)
-      const erc20Contract = new ethers.Contract(address, ERC20_ABI, this.$userWallet)
+      const erc20Contract = new ethers.Contract(address, ERC20_ABI, this.$signer)
       const oneSplitAuditContract = this.getOneSplitAuditContract()
       const allowance = await erc20Contract.callStatic.allowance(this.senderAddress, oneSplitAuditContract.address)
       if (allowance.lt(amount)) {
@@ -300,7 +300,7 @@ export default {
       const flags = 0
       const quote = await this._getQuote()
 
-      const nonce = await this.$userWallet.getTransactionCount('latest')
+      const nonce = await this.$signer.getTransactionCount('latest')
       const isETHSwap = this.fromToken.symbol.toLowerCase() === 'eth'
       const txMsg = {
         nonce

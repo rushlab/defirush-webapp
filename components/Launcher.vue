@@ -3,8 +3,8 @@
     <div class="metamask">
       <metamask-logo class="mm-logo"/>
     </div>
-    <div v-if="!!$userWallet" class="avtive-waller"><span>已连接钱包: MetaMask</span></div>
-    <div v-if="$userWallet" v-loading="!!pending">
+    <div v-if="!!$signer" class="avtive-waller"><span>已连接钱包: MetaMask</span></div>
+    <div v-if="$signer" v-loading="!!pending">
       <el-form ref="launcher" label-position="top">
         <el-form-item label="钱包地址">
           <el-input :value="walletAddress" readonly></el-input>
@@ -78,7 +78,7 @@ export default {
   computed: {
     ...mapState('user', ['walletAddress']),
     canRequestEther() {
-      return _.get(this.$userWallet, 'provider.chainId') == 71337
+      return _.get(this.$signer, 'provider.chainId') == 71337
     }
   },
   methods: {
@@ -87,7 +87,7 @@ export default {
       await this.getERC20TokensBalance()
     },
     async getEtherBalance() {
-      const balance = await this.$userWallet.getBalance()
+      const balance = await this.$signer.getBalance()
       this.walletBalance = ethers.utils.formatUnits(balance)
     },
     async getERC20TokensBalance(tokenAddres) {
@@ -103,7 +103,7 @@ export default {
       }
     },
     async getTokenBalance(token) {
-      const erc20Contract = new ethers.Contract(token.address, this.ERC20_ABI, this.$userWallet)
+      const erc20Contract = new ethers.Contract(token.address, this.ERC20_ABI, this.$signer)
       const balance = await erc20Contract.balanceOf(this.walletAddress)
 
       return (new BigNumber(balance.toString())).shiftedBy(-token.decimals).toString()
@@ -125,7 +125,7 @@ export default {
     },
     async handleRequestEther() {
       try {
-        const contract = new ethers.Contract(this.EtherFaucet.address, this.EtherFaucet.abi, this.$userWallet)
+        const contract = new ethers.Contract(this.EtherFaucet.address, this.EtherFaucet.abi, this.$signer)
         const amount = ethers.utils.parseEther('1')  // 获取 1 个 Ether
         const receipt = await contract.requestEther(amount, {
           gasPrice: 0,
