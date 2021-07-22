@@ -96,7 +96,7 @@ export default {
       this.$emit('open')
       this.$emit('update:visible', true)
       // 打开 dialog 的时候再 fetch
-      if (_.isEmpty(this.data)) {
+      if (!this.data || _.isEmpty(this.data)) {
         this.$store.dispatch('tokens/getTokens')
       }
     },
