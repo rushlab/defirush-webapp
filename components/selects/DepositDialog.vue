@@ -100,6 +100,9 @@ export default {
     underlyingAssetDecimals() {
       return _.get(this.underlyingTokenData, 'decimals')
     },
+    isETH() {
+      return _.get(this.underlyingTokenData, 'address', '').toLowerCase() === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase()
+    },
     amountPrecentage() {
       return +this.balanceDisplay > 0 ? (+this.form.amountDisplay / +this.balanceDisplay) * 100 : 0
     },
@@ -111,6 +114,7 @@ export default {
     },
     needApprove() {
       console.log(`amountMantissa is ${this.amountMantissa}, allowanceMantissa is ${this.allowanceMantissa}`)
+      if (this.isETH) return false
       return this.allowanceMantissa ? this.allowanceMantissa.lt(this.amountMantissa) : (this.form.amountDisplay ? true : false)
     }
   },
@@ -136,10 +140,16 @@ export default {
       console.log('@@@@ dialog open')
     },
     async updateAllowanceMantissa() {
+      if (this.isETH) return
       this.allowanceMantissa = await this.bankApp.underlyingAllowance(this.underlyingTokenData.address)
       console.log('@@@ this.allowanceMantissa', this.allowanceMantissa)
     },
     async getBalanceMantissa() {
+      if (this.isETH) {
+        const userBalance = await this.$signer.getBalance()
+        this.balanceMantissa = userBalance
+        return
+      }
       const abi = ['function balanceOf(address account) external view returns (uint256)']
       const { address } = this.underlyingTokenData
       const erc20 = new ethers.Contract(address, abi, this.$signer)
