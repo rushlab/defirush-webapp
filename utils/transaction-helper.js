@@ -10,20 +10,26 @@ export function getTxAmount(amount, decimals) {
   return ethers.utils.parseUnits(amount + '', decimals)
 }
 
+export async function getAllowance(token, spender, signer) {
+  const abi = [ 'function allowance(address owner, address spender) external view returns (uint256)']
+  const erc20 = new ethers.Contract(token, abi, signer)
+  const msgSender = await signer.getAddress()
+  return await erc20.callStatic.allowance(msgSender, spender)
+}
 
 /**
  * @description       Handle token asset approval
  * @param             {Address} underlyingAssetAddress
- * @param             {BigNumber} amountToWei
+ * @param             {BigNumber} amountMantissa
  * @param             {Signer} signer
  */
-export async function handleApprove(underlyingAssetAddress, amountToWei, signer) {
+export async function handleApprove(underlyingAssetAddress, amountMantissa, signer) {
   const abi = [ 'function approve(address spender, uint256 amount) external returns (bool)', 'function allowance(address owner, address spender) external view returns (uint256)']
   const tokenContract = new ethers.Contract(underlyingAssetAddress, abi, signer)
   const msgSender = await signer.getAddress()
   const allowance = await tokenContract.callStatic.allowance(msgSender, this.underlyingAssetToken.cTokenAddress)
-  if (allowance.lt(amountToWei)) {
-    const tx = await tokenContract.approve(this.underlyingAssetToken.cTokenAddress, amountToWei)
+  if (allowance.lt(amountMantissa)) {
+    const tx = await tokenContract.approve(this.underlyingAssetToken.cTokenAddress, amountMantissa)
     const receipt = await tx.wait()
     console.log('@@@ ERC20 token approved', receipt)
   } else {
