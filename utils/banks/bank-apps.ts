@@ -3,56 +3,60 @@ import { ethers } from 'ethers'
 const ERC20ABI = [
   'function allowance(address owner, address spender) view returns (uint256)',
   'function approve(address spender, uint256 amount) returns (bool)',
+  'function decimals() view returns (uint256)',
+  'function balanceOf(address account) view returns (uint256)',
 ];
 
-// 类型声明参见 src/types/index.ts
-
-export default class BankApp implements BankAppInterface {
-  signer: typeof Signer;
-  provider: typeof Provider;
-  _userAddress: Address | null;
-  constructor(signer: typeof Signer) {
+export class BankApp implements BankAppInterface {
+  signer: Signer;
+  provider: Provider;
+  constructor(signer: Signer) {
     if (!signer) {
       throw new Error('signer is required');
     }
     this.signer = signer;
     this.provider = this.signer.provider;
-    this._userAddress = null;
   }
 
   _isETH(asset: Address) {
     return asset.toLowerCase() === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase();
   }
 
-  async _getUserAddress() {
-    if (!this._userAddress) this._userAddress = await this.signer.getAddress()
-    return this._userAddress
+  _displayToMantissa(amountDisplay: AmountDisplay, decimals: number) {
+    const re = new RegExp(`(\\d+\\.\\d{${decimals}})(\\d+)`);
+    const amountDisplayTruncated = amountDisplay.toString().replace(re, '$1');
+    return ethers.utils.parseUnits(amountDisplayTruncated, decimals);
+  }
+
+  _mantissaToDisplay(amountMantissa: AmountMantissa, decimals: number) {
+    return ethers.utils.formatUnits(amountMantissa, decimals);
+  }
+
+  async _userAddress() {
+    return await this.signer.getAddress();
+  }
+
+  async _decimals(asset: Address) {
+    if (this._isETH(asset)) {
+      return 18;
+    } else {
+      // 否则就认为 asset 是 erc20
+      // TODO: 配置一堆常用的 token 不需要重新计算 _decimals
+      const erc20 = new ethers.Contract(asset, ERC20ABI, this.provider);
+      const decimals = await erc20.decimals();
+      return +decimals.toString();
+    }
   }
 
   async _approve(token: Address, spender: Address, amountMantissa: AmountMantissa) {
     const erc20 = new ethers.Contract(token, ERC20ABI, this.provider);
-    return await erc20.connect(this.signer).approve(spender, amountMantissa);
+    await erc20.connect(this.signer).approve(spender, amountMantissa);
   }
 
-  async _allowance(token: Address, spender: Address): Promise<AmountMantissa> {
+  async _allowance(token: Address, spender: Address) {
     const erc20 = new ethers.Contract(token, ERC20ABI, this.provider);
-    const msgSender = await this.signer.getAddress()
-    return await erc20.allowance(msgSender, spender);
-  }
-
-  _displayToMantissa(amountDisplay: AmountDisplay, decimals: number): AmountMantissa {
-    console.log('@@@ _displayToMantissa ', amountDisplay, decimals)
-    console.log('tofixed', (+amountDisplay).toFixed(decimals));
-    console.log('yyy', ethers.utils.parseUnits((+amountDisplay).toFixed(decimals), decimals).toString());
-    console.log('xxx', ethers.utils.parseUnits(amountDisplay, decimals).toString());
-    // 这里为了保证精度和转换成功，采用replace方法，去除精度之后的字符串数字
-    const re = new RegExp(`(\\d+\\.\\d{${decimals}})(\\d+)`)
-    amountDisplay = amountDisplay.replace(re, '$1')
-    return ethers.utils.parseUnits(amountDisplay, decimals)
-  }
-
-  _mantissaToDisplay(amountMantissa: AmountMantissa, decimals: number): AmountDisplay {
-    return ethers.utils.formatUnits(amountMantissa, decimals)
+    const allowanceMantissa =  await erc20.allowance(await this._userAddress(), spender);
+    return allowanceMantissa;
   }
 
   /* 每个银行单独实现的公共方法 */
@@ -60,17 +64,17 @@ export default class BankApp implements BankAppInterface {
   /**
    * 获得资产的 APY 和 TVL 等等
    *
-   * @param      Address     asset  The underlying token
-   * @return     Object      { totalDeposits, totalBorrows, depositAPY, borrowAPY, price }
+   * @param      Address     underlyingToken  The underlying token
+   * @return     Object      { totalDeposits, totalBorrows, depositAPY, borrowAPY, priceUSD }
    */
-  async getAssetData(asset: Address): Promise<AssetData> {
+  async getAssetData(underlyingToken: Address) {
     throw new Error('getAssetData is not implemented');
   }
 
   /**
    * 获得当前用户的账户信息, 比如余额等等
    *
-   * @return     Object      {  }
+   * @return     Object      { userDepositsUSD, userBorrowsUSD, availableBorrowsUSD }
    */
   async getAccountData() {
     throw new Error('getAccountData is not implemented');
@@ -79,16 +83,16 @@ export default class BankApp implements BankAppInterface {
   /**
    * 获得当前用户对应某个资产的信息, 比如
    *
-   * @return     Object      {  }
+   * @return     Object      { userDeposits, userBorrows }
    */
-  async getAccountAssetData(asset: Address) {
+  async getAccountAssetData(underlyingToken: Address) {
     throw new Error('getAccountAssetData is not implemented');
   }
 
   /**
-   * 把数量为 amount 的 underlyingToken 授权给银行 (ERC20 方法)
+   * 把数量为 amountDisplay 的 underlyingToken 授权给银行 (ERC20 方法)
    * @param      Address     underlyingToken  The underlying token
-   * @param      String      amountDisplay   The amountDisplay
+   * @param      Number      amountDisplay    The amount in decimal
    */
   async approveUnderlying(underlyingToken: Address, amountDisplay: AmountDisplay) {
     throw new Error('approveUnderlying is not implemented');
@@ -97,7 +101,7 @@ export default class BankApp implements BankAppInterface {
   /**
    * 已经授权给银行的 underlyingToken 的数量 (ERC20 方法)
    * @param      Address     underlyingToken  The underlying token
-   * @return     BigNumber   The allowance
+   * @return     Number      The allowance
    */
   async underlyingAllowance(underlyingToken: Address) {
     throw new Error('underlyingAllowance is not implemented');
@@ -121,27 +125,27 @@ export default class BankApp implements BankAppInterface {
   }
 
   /**
-   * 存入数量为 amount 的 underlyingToken
+   * 存入数量为 amountDisplay 的 underlyingToken
    * @param      Address     underlyingToken  The underlying token
-   * @param      String      amountDisplay   The amountDisplay
+   * @param      Number      amountDisplay    The amount in decimal
    */
   async deposit(underlyingToken: Address, amountDisplay: AmountDisplay) {
     throw new Error('deposit is not implemented');
   }
 
   /**
-   * 借出数量为 amount 的 underlyingToken
+   * 借出数量为 amountDisplay 的 underlyingToken
    * @param      Address     underlyingToken  The underlying token
-   * @param      String      amountDisplay   The amountDisplay
+   * @param      Number      amountDisplay    The amount in decimal
    */
   async borrow(underlyingToken: Address, amountDisplay: AmountDisplay) {
     throw new Error('borrow is not implemented');
   }
 
   /**
-   * 偿还数量为 amount 的 underlyingToken 的借款
+   * 偿还数量为 amountDisplay 的 underlyingToken 的借款
    * @param      Address     underlyingToken  The underlying token
-   * @param      String      amountDisplay   The amountDisplay
+   * @param      Number      amountDisplay    The amount in decimal
    */
   async repay(underlyingToken: Address, amountDisplay: AmountDisplay) {
     throw new Error('repay is not implemented');
@@ -156,9 +160,9 @@ export default class BankApp implements BankAppInterface {
   }
 
   /**
-   * 取出数量为 amount 的 underlyingToken 的存款
+   * 取出数量为 amountDisplay 的 underlyingToken 的存款
    * @param      Address     underlyingToken  The underlying token
-   * @param      String      amountDisplay   The amountDisplay
+   * @param      Number      amountDisplay    The amount in decimal
    */
   async withdraw(underlyingToken: Address, amountDisplay: AmountDisplay) {
     throw new Error('withdraw is not implemented');

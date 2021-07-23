@@ -1,138 +1,88 @@
-import _ from 'lodash'
 import { ethers } from 'ethers'
-// import BankApp from '../bank-apps'
-import BankApp from '../BankApp'
+import { BankApp } from '../bank-apps.ts'
+import { addresses } from './constants'
 
-// import { getTxAmount, handleApprove, getTokenBalance, getTokenBalanceFormatted } from '@/utils/transaction-helper'
-
-import {
-  lendingPoolAddress, lendingPoolABI,
-  addressesProviderAddress, addressesProviderABI,
-  priceOracleAddress, priceOracleABI,
-  WETHGatewayAddress, WETHGatewayABI,
-  ProtocolDataProviderAddress, ProtocolDataProviderABI,
-  WethTokenAddress,
-  EthTokenAddress,
-} from './constants'
-
-import markets from './markets'
-
-
-/**
- *
- * @param {ethers.Signer}     signer
- */
- export default class AaveApp extends BankApp {
-  // 初始化 Aave 银行
+export class AaveApp extends BankApp {
   constructor(signer) {
-    super(signer)
-    // init contact instances
-    this.addressesProvider = new ethers.Contract(addressesProviderAddress, addressesProviderABI, signer)
-    this.priceOracle = new ethers.Contract(priceOracleAddress, priceOracleABI, signer)
-    this.lendingPool = new ethers.Contract(lendingPoolAddress, lendingPoolABI, signer)
-    this.dataProvider = new ethers.Contract(ProtocolDataProviderAddress, ProtocolDataProviderABI, signer)
-    this.WETHGatewayInstance = null
-    this.markets = markets
-    this.aWETH = (this.markets.find((item) => item.aTokenSymbol === 'aWETH')).aTokenAddress
+    super(signer);
+    this.addresses = addresses;
+    this.lendingPool = new ethers.Contract(this.addresses['LendingPool'], [
+      'function deposit(address asset, uint256 amount, address onBehalfOf, uint16 referralCode)',
+      'function withdraw(address asset, uint256 amount, address to)',
+      'function borrow(address asset, uint256 amount, uint256 interestRateMode, uint16 referralCode, address onBehalfOf)',
+      'function repay(address asset, uint256 amount, uint256 rateMode, address onBehalfOf)',
+      'function getUserAccountData(address) view returns (uint256,uint256,uint256,uint256,uint256,uint256)',
+    ], this.signer);
+    this.wETHGateway = new ethers.Contract(this.addresses['WETHGateway'], [
+      'function depositETH(address lendingPool, address onBehalfOf, uint16 referralCode) payable',
+      'function withdrawETH(address lendingPool, uint256 amount, address to)',
+      'function repayETH(address lendingPool, uint256 amount, uint256 rateMode, address onBehalfOf) payable',
+      'function borrowETH(address lendingPool, uint256 amount, uint256 interestRateMode, uint16 referralCode)',
+    ], this.signer);
+    this.protocolDataProvider = new ethers.Contract(this.addresses['ProtocolDataProvider'], [
+      'function getReserveData(address) view returns (uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint40)',
+      'function getUserReserveData(address,address) view returns (uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint40,bool)',
+    ], this.provider);
+  }
+
+  async _getEtherUsdPriceMantissa(asset) {
+    const chainLink = new ethers.Contract(this.addresses['ChainLink::ETHUSD'], [
+      // returns: roundId, answer, startedAt, updatedAt, answeredInRound
+      'function latestRoundData() view returns (uint80,int256,uint256,uint256,uint80)'
+    ], this.provider);
+    const [,priceETHUSD,,,] = await chainLink.latestRoundData();
+    // ChainLink::ETHUSD 的 decimals 是 8
+    return priceETHUSD;
   }
 
   /**
    * 返回 asset 的美元价格, 单位是 us dollar
    */
-   async _getAssetPrice(asset) {
-    const chainLinkETHUSDAddress = '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419'
-    const chainLinkETHUSD = new ethers.Contract(chainLinkETHUSDAddress, [
-      'function latestRoundData() view returns (uint80,int256,uint256,uint256,uint80)'
-    ], this.provider)
-    const [priceInETH, [,priceETHUSD,,,]] = await Promise.all([
-      this.priceOracle.getAssetPrice(asset),
-      chainLinkETHUSD.latestRoundData(),
-    ]);
-    // ChainLink::ETHUSD 的 decimals 是 8
-    return ethers.utils.formatUnits(priceInETH.mul(priceETHUSD), 18 + 8);
-  }
-
-  /**
-   *
-   * @param {Address} asset
-   * @returns {Decimals} 返回 token.decimals
-   */
-  async _getERC20TokenDecimals(asset) {
-    const erc20 = new ethers.Contract(asset, ['function decimals() view returns (uint256)'], this.provider)
-    return +((await erc20.decimals()).toString())
+  async _getAssetPriceMantissa(asset) {
+    if (!this._priceOracle) {
+      const addressesProvider = new ethers.Contract(this.addresses['LendingPoolAddressesProvider'], [
+        'function getPriceOracle() view returns (address)'
+      ], this.provider);
+      const _address = await addressesProvider.getPriceOracle();
+      this._priceOracle = new ethers.Contract(_address, [
+        'function getAssetPrice(address) view returns(uint256)'
+      ], this.provider);
+    }
+    const priceInETH = this._priceOracle.getAssetPrice(asset);
+    return priceInETH;
   }
 
   async getAssetData(asset) {
-    if (this._isETH(asset)) asset = WethTokenAddress
-    const [decimals, priceUSD] = await Promise.all([
-      this._getERC20TokenDecimals(asset),
-      this._getAssetPrice(asset),
+    if (this._isETH(asset)) {
+      asset = this.addresses['WETH'];
+    }
+    const [decimals, priceAssetMantissa, priceEtherUsdMantissa] = await Promise.all([
+      this._decimals(asset),
+      this._getAssetPriceMantissa(asset),
+      this._getEtherUsdPriceMantissa(),
     ]);
-
+    // ChainLink::ETHUSD 的 decimals 是 8
+    const priceUsdDisplay = ethers.utils.formatUnits(priceAssetMantissa.mul(priceEtherUsdMantissa), 18 + 8);
     const [
       availableLiquidity, totalStableDebt, totalVariableDebt,
       liquidityRate, variableBorrowRate, stableBorrowRate,
       averageStableBorrowRate, liquidityIndex, variableBorrowIndex, lastUpdateTimestamp,
-    ] = await this.dataProvider.getReserveData(asset);
+    ] = await this.protocolDataProvider.getReserveData(asset);
     const totalBorrows = totalStableDebt.add(totalVariableDebt);
     const totalDeposits = totalStableDebt.add(totalVariableDebt).add(availableLiquidity);
     const depositAPY = liquidityRate;
     const borrowAPY = variableBorrowRate;
     return {
-      totalDeposits: ethers.utils.formatUnits(totalDeposits, decimals),
-      totalBorrows: ethers.utils.formatUnits(totalBorrows, decimals),
+      totalDeposits: this._mantissaToDisplay(totalDeposits, decimals),
+      totalBorrows: this._mantissaToDisplay(totalBorrows, decimals),
       // https://docs.aave.com/developers/v/2.0/guides/apy-and-apr
-      depositAPY: ethers.utils.formatUnits(depositAPY, 27),
-      borrowAPY: ethers.utils.formatUnits(borrowAPY, 27),
-      priceUSD: priceUSD,
+      depositAPY: this._mantissaToDisplay(depositAPY, 27),
+      borrowAPY: this._mantissaToDisplay(borrowAPY, 27),
+      priceUSD: priceUsdDisplay,
     };
   }
 
-  /**
-   *
-   * @param {Address} underlyingToken
-   * @returns {aTokenAddress}
-   */
-  _getMarketOfUnderlying(underlyingToken) {
-    const result = this.markets.find((item) => {
-      return item.address.toLowerCase() === underlyingToken.toLowerCase()
-    })
-    if (result) {
-      return result.aTokenAddress
-    } else {
-      throw new Error('Invalid underlying token address');
-    }
-  }
-
-  async enableUnderlying(underlyingToken) { return true }
-
-  async underlyingEnabled(underlyingToken) { return true }
-
-  async underlyingAllowance(underlyingToken) {
-    const spender = this.lendingPool.address
-    return await super._allowance(underlyingToken, spender)
-  }
-
-  /**
-   * 把数量为 amount 的 underlyingToken 授权给银行 (ERC20 方法)
-   * @param      Address     underlyingToken  The underlying token
-   * @param      BigNumber   amount           The amount
-   */
-  async approveUnderlying(underlyingToken, amountDisplay) {
-    const spender = this.lendingPool.address
-    const decimals = await this._getERC20TokenDecimals(underlyingToken)
-    console.log(`@@@ before approve amountDisplay: ${amountDisplay}, decimals is ${decimals}`)
-    const amountMantissa = this._displayToMantissa(amountDisplay, decimals)
-    console.log(`@@@ before approve amountMantissa: ${amountMantissa}`)
-    return await super._approve(underlyingToken, spender, amountMantissa)
-  }
-
-  async getUserAccountData() {
-    const msgSender = await this.signer.getAddress()
-    return await this.lendingPool.callStatic.getUserAccountData(msgSender)
-  }
-
-  async getUserAccountDataFormatted() {
+  async getAccountData() {
     const [
       totalCollateralETH,
       totalDebtETH,
@@ -140,223 +90,135 @@ import markets from './markets'
       currentLiquidationThreshold,
       ltv,
       healthFactor,
-    ] = await this.getUserAccountData()
+    ] = await this.lendingPool.getUserAccountData(await this._userAddress());
+    const priceEtherUsdMantissa = await this._getEtherUsdPriceMantissa();
+    // ChainLink::ETHUSD 的 decimals 是 8
     return {
-      totalCollateralETH: ethers.utils.formatUnits(totalCollateralETH),
-      totalDebtETH: ethers.utils.formatUnits(totalDebtETH),
-      availableBorrowsETH: ethers.utils.formatUnits(availableBorrowsETH),
-      currentLiquidationThreshold: (+currentLiquidationThreshold.div(100).toString()).toFixed(2) + '%',
-      ltv: (+ltv.div(100).toString()).toFixed(2) + '%',
-      healthFactor: totalDebtETH.isZero() ? ' - ' : ethers.utils.formatEther(healthFactor)
+      userDepositsUSD: this._mantissaToDisplay(totalCollateralETH.mul(priceEtherUsdMantissa), 18 + 8),
+      userBorrowsUSD: this._mantissaToDisplay(totalDebtETH.mul(priceEtherUsdMantissa), 18 + 8),
+      availableBorrowsUSD: this._mantissaToDisplay(availableBorrowsETH.mul(priceEtherUsdMantissa), 18 + 8),
     }
+    // const totalCreditETH = totalDebtETH.add(availableBorrowsETH);
+    // const borrowLimitUsed = totalDebtETH.eq(0) ?
+    //   '0.00' : this._mantissaToDisplay(totalDebtETH.mul('100000000').div(totalCreditETH), 8);
+    // ltv: this._mantissaToDisplay(ltv, 4),
+    //  ltv 貌似是 4 个 decimals, 文档没明确说明
+    // healthFactor: this._mantissaToDisplay(healthFactor, 18),
+    //  borrowLimitUsed 约等于 1 / healthFactor
   }
 
-  /**
-   *
-   * @param {TokenAddress}      underlyingToken
-   * @param {BigNumber}         amountMantissa
-   * @returns {Transaction}
-   */
-   async _handleDeposit(underlyingToken, amountMantissa) {
-    const onBehalfOf = await this.signer.getAddress()
-    const payload = [
-      underlyingToken,          // address asset
-      amountMantissa,           // uint amountMantissa
-      onBehalfOf,               // address onBehalfOf
-      0                         // uint16 referralCode
-    ]
-    const tx = await this.lendingPool.connect(this.signer).deposit(...payload)
-    const receipt = await tx.wait()
-    return receipt
+  async getAccountAssetData(asset) {
+    throw new Error('getAccountAssetData is not implemented');
+    // this.protocolDataProvider.getUserReserveData(asset, user)
   }
 
-  /**
-   * @description               获取 WETHGateway 实例
-   * @returns                   WETHGatewayInstance
-   */
-   _getWETHGatewayInstance() {
-    if (!this.WETHGatewayInstance) this.WETHGatewayInstance = new ethers.Contract(WETHGatewayAddress, WETHGatewayABI, this.signer)
-    return this.WETHGatewayInstance
+  async approveUnderlying(underlyingToken, amountDisplay) {
+    const decimals = await this._decimals(underlyingToken);
+    const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
+    const spender = this.lendingPool.address;
+    await super._approve(underlyingToken, spender, amountMantissa);
   }
 
-  /**
-   *
-   * @param {BigNumber}           amountMantissa
-   * @returns {Transaction}
-   */
-   async _handleDepositWETH(amountMantissa) {
-    const onBehalfOf = await this.signer.getAddress()
-    const payload = [
-      this.lendingPool.address,   // address lendingPool contract
-      onBehalfOf,                 // address onBehalfOf
-      0,                          // uint16 referralCode
-      {
-        value: amountMantissa
-      }
-    ]
-    const wethGatewayInstance = this._getWETHGatewayInstance()
-    const tx = await wethGatewayInstance.depositETH(...payload)
-    const receipt = await tx.wait()
-    return receipt
+  async underlyingAllowance(underlyingToken) {
+    const spender = this.lendingPool.address;
+    return await super._allowance(underlyingToken, spender);
   }
 
-  /**
-   *
-   * @description                 执行 deposit 之前，应该对 erc20 token 进行 allowance 检查或者 approve
-   * @param {TokenAddress}        underlyingAssetToken
-   * @param {Decimals}            amountDisplay
-   */
-   async deposit(underlyingToken, amountDisplay) {
-    // 如果是 eth 存款，则使用 WETHGatewai.depositETH
+  async enableUnderlying(underlyingToken) {}
+  async underlyingEnabled(underlyingToken) { return true; }
+
+  async deposit(underlyingToken, amountDisplay) {
+    const onBehalfOf = await this._userAddress();
     if (this._isETH(underlyingToken)) {
-      const amountMantissa = ethers.utils.parseEther(amountDisplay.toString())
-      return await this._handleDepositWETH(amountMantissa)
+      const amountMantissa = this._displayToMantissa(amountDisplay, 18);
+      // depositETH(lendingPool, onBehalfOf, referralCode) payable
+      const payload = [this.lendingPool.address, onBehalfOf, 0, { value: amountMantissa }];
+      await this.wETHGateway.depositETH(...payload).then((tx) => tx.wait());
     } else {
-      const decimals = await this._getERC20TokenDecimals(underlyingToken)
-      const amountMantissa = this._displayToMantissa(amountDisplay, decimals)
-      return await this._handleDeposit(underlyingToken, amountMantissa)
+      const decimals = await this._decimals(underlyingToken);
+      const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
+      // deposit(asset, amount, onBehalfOf, referralCode)
+      const payload = [underlyingToken, amountMantissa, onBehalfOf, 0];
+      await this.lendingPool.deposit(...payload).then((tx) => tx.wait());
     }
   }
 
-  /**
-   * @description                 withdraw weth 之前需要对 aWETH 进行 allowance 检车或者 approve，以便lendingPool 销毁 aweth
-   * @param                       {BigNumber} amount
-   */
-  async _handleWithdrawWETH(amount) {
-    const to = await this.signer.getAddress()
-    const payload = [
-      this.lendingPool.address,
-      amount,
-      to,
-    ]
-    const wethGatewayInstance = this._getWETHGatewayInstance()
-    const tx = await wethGatewayInstance.withdrawETH(...payload)
-    const receipt = await tx.wait()
-    return receipt
-  }
-
-  /**
-   *
-   * @param                       {TokenAddress} underlyingToken
-   * @param                       {*} amount
-   * @returns
-   */
-  async _handleWithdraw(underlyingToken, amount) {
-    const to = await this.signer.getAddress()
-    const tx = await this.lendingPool.connect(this.signer).withdraw(underlyingToken, amount, to)
-    const receipt = await tx.wait()
-    return receipt
-  }
-
-  /**
-   * 取出数量为 amount 的 underlyingToken 的存款
-   * @param      Address     underlyingToken  The underlying token
-   * @param      BigNumber   amount           The amount
-   */
-  async withdraw(underlyingToken, amount) {
-    if (!amount) {
-      throw new Error('Amount is required when withdraw')
-    }
+  async borrow(underlyingToken, amountDisplay) {
+    const rateMode = 2;
+    const onBehalfOf = await this._userAddress();
     if (this._isETH(underlyingToken)) {
-      return await this._handleWithdrawWETH(amount)
+      /*
+       * WETHGateway.borrowETH 需要先 approveDelegation 才行,
+       * 目前暂不支持直接借 ETH, 直接 borrow WETH 就行了, 然后自己兑换成 ETH
+       */
+      throw new Error('Borrow ETH is not supported for the moment');
+      const amountMantissa = this._displayToMantissa(amountDisplay, 18);
+      // borrowETH(lendingPool, amount, interestRateMode, referralCode)
+      const payload = [this.lendingPool.address, amountMantissa, rateMode, 0];
+      await this.wETHGateway.borrowETH(...payload).then((tx) => tx.wait());
     } else {
-      return await this._handleWithdraw(underlyingToken, amount)
+      const decimals = await this._decimals(underlyingToken);
+      const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
+      // borrow(asset, amount, interestRateMode, referralCode, onBehalfOf)
+      const payload = [underlyingToken, amountMantissa, rateMode, 0, onBehalfOf];
+      await this.lendingPool.borrow(...payload).then((tx) => tx.wait());
     }
   }
 
-  /**
-   * 取出所有 underlyingToken 的存款
-   * @param      Address     underlyingToken  The underlying token
-   */
+  async repay(underlyingToken, amountDisplay) {
+    const rateMode = 2;
+    const onBehalfOf = await this._userAddress();
+    if (this._isETH(underlyingToken)) {
+      const amountMantissa = this._displayToMantissa(amountDisplay, 18);
+      // repayETH(address lendingPool, uint256 amount, uint256 rateMode, address onBehalfOf)
+      const payload = [this.lendingPool.address, amountMantissa, rateMode, onBehalfOf, { value: amountMantissa }];
+      await this.wETHGateway.repayETH(...payload).then((tx) => tx.wait());
+    } else {
+      const decimals = await this._decimals(underlyingToken);
+      const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
+      // repay(address asset, uint256 amount, uint256 rateMode, address onBehalfOf)
+      const payload = [underlyingToken, amountMantissa, rateMode, onBehalfOf];
+      await this.lendingPool.repay(...payload).then((tx) => tx.wait());
+    }
+  }
+
+  async repayAll(underlyingToken) {
+    // 不支持 ETH 的 repayAll
+    const rateMode = 2;
+    const onBehalfOf = await this._userAddress();
+    const _max = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+    // repay(address asset, uint256 amount, uint256 rateMode, address onBehalfOf)
+    const payload = [underlyingToken, _max, rateMode, onBehalfOf];
+    await this.lendingPool.repay(...payload).then((tx) => tx.wait());
+  }
+
+  async withdraw(underlyingToken, amountDisplay) {
+    const to = await this._userAddress();
+    if (this._isETH(underlyingToken)) {
+      /*
+       * WETHGateway.withdrawETH 需要先 approve aWETH 给 WETHGateway 才行,
+       * 目前暂不支持直接 withdraw ETH, 直接 withdraw WETH 就行了, 然后兑换成 ETH
+       */
+      throw new Error('Borrow ETH is not supported for the moment');
+      const amountMantissa = this._displayToMantissa(amountDisplay, 18);
+      // withdrawETH(lendingPool, amount, to)
+      const payload = [this.lendingPool.address, amountMantissa, to];
+      await this.wETHGateway.withdrawETH(...payload).then((tx) => tx.wait());
+    } else {
+      const decimals = await this._decimals(underlyingToken);
+      const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
+      // withdraw(asset, amount, to)
+      const payload = [underlyingToken, amountMantissa, to];
+      await this.lendingPool.withdraw(...payload).then((tx) => tx.wait());
+    }
+  }
+
   async withdrawAll(underlyingToken) {
-    const amount = ethers.constants.MaxUint256
-    if (this._isETH(underlyingToken)) {
-      return await this._handleWithdrawWETH(amount)
-    } else {
-      return await this._handleWithdraw(underlyingToken, amount)
-    }
-  }
-
-  async _handleBorrowWETH(amount, interestRateMode, referralCode) {
-    const payload = [
-      this.lendingPool.address,   // lendingPool
-      amount,                // uint amount
-      interestRateMode,           // unit interestRateMode
-      referralCode,               // referralCode
-    ]
-    const wethGatewayInstance = this._getWETHGatewayInstance()
-    const tx = await wethGatewayInstance.borrowETH(...payload)
-    const receipt = await tx.wait()
-    return receipt
-  }
-
-  async _handleBorrow(underlyingAssetAddress, amount, referralCode = 0, interestRateMode) {
-    const payload = [
-      underlyingAssetAddress,     // address asset
-      amount,                // uint amount
-      interestRateMode,           // unit interestRateMode
-      referralCode,               // referralCode
-      onBehalfOf,                 // address onBehalfOf
-    ]
-    const tx = await this.lendingPool.connect(this.signer).borrow(...payload)
-    const receipt = await tx.wait()
-    return receipt
-  }
-
-  async borrow(underlyingAssetAddress, amount, referralCode = 0, interestRateMode) {
-    if (underlyingAssetAddress.toLowerCase() === WethTokenAddress || underlyingAssetAddress.toLowerCase() === EthTokenAddress) {
-      return await this._handleBorrowWETH(amount, interestRateMode)
-    } else {
-      return await this._handleBorrow(underlyingAssetAddress, amount, referralCode, interestRateMode)
-    }
-  }
-
-
-  async _handleRepayWETH(amount, interestRateMode) {
-    const payload = [
-      this.lendingPool.address,   // lendingPool
-      amount,                // uint amount
-      interestRateMode,           // unit interestRateMode
-      onBehalfOf,                 // address onBehalfOf
-      {
-        value: amount
-      }
-    ]
-
-    const wethGatewayInstance = this._getWETHGatewayInstance()
-    const tx = await wethGatewayInstance.borrowETH(...payload)
-    const receipt = await tx.wait()
-    return receipt
-  }
-
-  async _handleRepay(underlyingAssetAddress, amount, referralCode = 0, interestRateMode) {
-    const payload = [
-      underlyingAssetAddress,     // address asset
-      amount,                // uint amount
-      interestRateMode,           // unit interestRateMode
-      referralCode,               // referralCode
-      onBehalfOf,                 // address onBehalfOf
-    ]
-    const tx = await this.lendingPool.connect(this.signer).borrow(...payload)
-    const receipt = await tx.wait()
-    return receipt
-  }
-
-  /**
-   *
-   * @description 如果是 ERC20 的还款，需要提前进行 allowance 检查或者 approve
-   * @param {Token Address}       underlyingAssetAddress
-   * @param {BigNumber}           amount
-   * @param {Integer}             referralCode
-   * @param {Integer}             interestRateMode
-   * @param {Wallet Address}      onBehalfOf
-   * @returns {Receipt}
-   */
-  async repay(underlyingAssetAddress, amount, referralCode = 0, interestRateMode) {
-    if (underlyingAssetAddress.toLowerCase() === WethTokenAddress || underlyingAssetAddress.toLowerCase() === EthTokenAddress) {
-      return await this._handleRepayWETH(amount, interestRateMode)
-    } else {
-      return await this._handleRepay(underlyingAssetAddress, amount, referralCode, interestRateMode)
-    }
+    // 同 withdraw, 目前暂不支持 withdraw ETH
+    const to = await this._userAddress();
+    const _max = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+    // withdraw(asset, amount, to)
+    const payload = [underlyingToken, _max, to];
+    await this.lendingPool.withdraw(...payload).then((tx) => tx.wait());
   }
 }
