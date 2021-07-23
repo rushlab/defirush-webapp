@@ -1,6 +1,6 @@
 <template>
-  <div class="bank-item" v-loading="pending">
-    <div class="item__column exchange">
+  <div class="bank-item" >
+    <!-- <div class="item__column exchange">
       <el-image class="exchange__icon" fit="contain" :src="bankData.icon"></el-image>
       <span class="exchange__title">{{ bankData.title }}</span>
     </div>
@@ -12,7 +12,45 @@
     <div class="item__column actions">
       <el-button type="primary" @click="isVisible = true" :disabled="disabledDeposit">Deposit</el-button>
       <el-button type="primary" @click="handleWithdraw" :disabled="disabledWithdraw">Withdraw</el-button>
-    </div>
+    </div> -->
+    <el-table :data="[bankData]" style="width: 100%" v-loading="pending" :show-header="false">
+      <el-table-column label="Bank" width="180">
+        <div slot-scope="scope" class="table-cell">
+          <el-image class="exchange__icon" fit="contain" :src="scope.row.icon"></el-image>
+          <span class="exchange__title">{{ scope.row.title }}</span>
+        </div>
+      </el-table-column>
+      <el-table-column label="Total Deposit">
+        <template slot-scope="scope">
+          <span>{{ totalDepositsInUSD || '-' }} USD</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="Deposit APY">
+        <template slot-scope="scope">
+          <span>{{ depositAPY || '-' }} %</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="Total Borrow">
+        <template slot-scope="scope">
+          <span>{{ totalBorrowsInISD || '-' }} USD</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="Borrow APY">
+        <template slot-scope="scope">
+          <span>{{ borrowAPY || '-' }} %</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="Gas Fee" width="180">
+        <template slot-scope="scope">
+          <span>-</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="action" width="180">
+        <template slot-scope="scope">
+          <el-button type="primary" @click="isVisible = true" :disabled="disabledDeposit">Deposit</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
     <deposit-dialog
       v-if="isVisible && bankApp"
       :visible.sync="isVisible"
@@ -92,8 +130,10 @@ export default {
   },
   methods: {
     async getAssetData(asset) {
+      this.pending = true
       this.assetData = await this.bankApp.getAssetData(asset)
       console.log('@@@@ getAssetData', this.assetData)
+      this.pending = false
     },
     onDepositSuccess(amountDisplay) {
       this.getAssetData(this.underlyingTokenAddress)
@@ -141,5 +181,10 @@ export default {
 }
 .actions {
   flex: 1;
+}
+.table-cell {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
 </style>
