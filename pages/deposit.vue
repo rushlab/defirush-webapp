@@ -12,7 +12,7 @@
         v-for="bank in banksList" :key="bank.title"
         :underlying-token-data="underlyingToken"
         :bank-data="bank"
-        :bank-app="aaveApp"/>
+        :bank-app="bank.app"/>
     </div>
     <token-select-dialog
       v-if="tokenSelectDialogVisible"
@@ -25,7 +25,9 @@
 <script>
 import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
 import DepositBankItem from '@/components/banks/DepositBankItem'
-import AaveApp from '@/utils/banks/aave-app'
+import { AaveApp } from '@/utils/banks/aave-app'
+import { CompoundApp } from '@/utils/banks/compound-app'
+import { CreamApp } from '@/utils/banks/cream-app'
 
 export default {
   components: {
@@ -35,19 +37,28 @@ export default {
   data() {
     return {
       aaveApp: null,
+      compoundApp: null,
+      creamApp: null,
       tokenSelectDialogVisible: false,
       underlyingToken: null,
-      banksList: [
-        { icon: "https://aave.com/favicon64.png", title: 'AAVE' }
+    }
+  },
+  computed: {
+    banksList() {
+      return [
+        { icon: "https://aave.com/favicon64.png", title: 'Aave', app: this.aaveApp },
+        { icon: "https://compound.finance/compound-components/assets/compound-mark.svg", title: 'Compound', app: this.compoundApp },
+        { icon: "https://aave.com/favicon64.png", title: 'Cream', app: this.creamApp }
       ]
     }
   },
   mounted() {
     this.aaveApp = new AaveApp(this.$signer)
+    this.compoundApp = new CompoundApp(this.$signer)
+    this.creamApp = new CreamApp(this.$signer)
   },
   methods: {
     onSelectToken(token) {
-      console.log(12345, token)
       this.underlyingToken = token
     }
   },

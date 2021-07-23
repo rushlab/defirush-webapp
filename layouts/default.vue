@@ -7,7 +7,8 @@
         background-color="#ffffff"
         text-color="#2c3e50"
         active-text-color="#d35400">
-        <el-menu-item index="/">首页</el-menu-item>
+        <el-menu-item index="/">HOME</el-menu-item>
+        <el-menu-item index="/deposit">Deposit</el-menu-item>
         <el-menu-item index="/exchanger">1INCH 兑换</el-menu-item>
         <el-menu-item index="/banks/aave">Aave</el-menu-item>
         <el-menu-item index="/banks/compound">Compound</el-menu-item>

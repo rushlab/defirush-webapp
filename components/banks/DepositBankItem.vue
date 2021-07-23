@@ -4,13 +4,14 @@
       <el-image class="exchange__icon" fit="contain" :src="bankData.icon"></el-image>
       <span class="exchange__title">{{ bankData.title }}</span>
     </div>
-    <div class="item__column total-deposit">{{ totalDepositsInUSD }} USD</div>
-    <div class="item__column total-borrow">{{ totalBorrowsInISD }} USD</div>
-    <div class="item__column apy">{{ depositAPY }}%</div>
-    <div class="item__column tvl">{{ borrowAPY }}%</div>
-    <div class="item__column gas-fee"></div>
+    <div class="item__column total-deposit">{{ totalDepositsInUSD || '-' }} USD</div>
+    <div class="item__column total-borrow">{{ totalBorrowsInISD || '-' }} USD</div>
+    <div class="item__column apy">{{ depositAPY || '-' }}%</div>
+    <div class="item__column tvl">{{ borrowAPY || '-' }}%</div>
+    <div class="item__column gas-fee"> - </div>
     <div class="item__column actions">
       <el-button type="primary" @click="isVisible = true" :disabled="disabledDeposit">Deposit</el-button>
+      <el-button type="primary" @click="handleWithdraw" :disabled="disabledWithdraw">Withdraw</el-button>
     </div>
     <deposit-dialog
       v-if="isVisible && bankApp"
@@ -19,6 +20,7 @@
       :underlying-token-data="underlyingTokenData"
       @success="onDepositSuccess"/>
   </div>
+
 </template>
 
 <script>
@@ -57,6 +59,9 @@ export default {
     disabledDeposit() {
       return _.isEmpty(this.bankData) || !this.bankApp || _.isEmpty(this.underlyingTokenData)
     },
+    disabledWithdraw() {
+      return _.isEmpty(this.bankData) || !this.bankApp || _.isEmpty(this.underlyingTokenData)
+    },
     underlyingTokenAddress() {
       return _.get(this.underlyingTokenData, 'address')
     },
@@ -92,6 +97,9 @@ export default {
     },
     onDepositSuccess(amountDisplay) {
       this.getAssetData(this.underlyingTokenAddress)
+    },
+    handleWithdraw() {
+
     }
   },
 }

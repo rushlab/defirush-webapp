@@ -171,10 +171,10 @@ export default {
     async handleApprove() {
       try {
         this.isApproving = true
-        const tx = await this.bankApp.approveUnderlying(this.underlyingTokenData.address, this.form.amountDisplay)
-        await tx.wait()
+        await this.bankApp.approveUnderlying(this.underlyingTokenData.address, this.form.amountDisplay)
         await this.updateAllowanceMantissa()
       } catch (error) {
+        console.log('handleApprove error: ', error)
         this.$message.error(JSON.stringify(error))
       }
       this.isApproving = false
@@ -182,11 +182,11 @@ export default {
     async handleDeposit() {
       try {
         this.isDepositing = true
-        const receipt = await this.bankApp.deposit(this.underlyingTokenData.address, this.form.amountDisplay)
-        console.log('@@@ receipt: ', receipt)
-        this.$message({type: 'success', message: '存款成功：' + JSON.stringify(receipt)})
+        await this.bankApp.deposit(this.underlyingTokenData.address, this.form.amountDisplay)
+        this.$message({type: 'success', message: '存款成功!'})
         this.handleDepositSuccess()
       } catch (error) {
+        console.log('handleDeposit error: ', error)
         this.$message.error(JSON.stringify(error))
       }
       this.isDepositing = false
