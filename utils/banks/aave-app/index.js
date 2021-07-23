@@ -1,8 +1,9 @@
-import { ethers } from 'ethers'
-import { BankApp } from '../bank-apps.ts'
-import { addresses } from './constants'
+const { ethers } = require('ethers');
+const { BankApp } = require('../bank-apps');
+const { addresses } = require('./constants');
 
-export class AaveApp extends BankApp {
+
+class AaveApp extends BankApp {
   constructor(signer) {
     super(signer);
     this.addresses = addresses;
@@ -25,7 +26,7 @@ export class AaveApp extends BankApp {
     ], this.provider);
   }
 
-  async _getEtherUsdPriceMantissa(asset) {
+  async _getEtherUsdPriceMantissa() {
     const chainLink = new ethers.Contract(this.addresses['ChainLink::ETHUSD'], [
       // returns: roundId, answer, startedAt, updatedAt, answeredInRound
       'function latestRoundData() view returns (uint80,int256,uint256,uint256,uint80)'
@@ -36,7 +37,7 @@ export class AaveApp extends BankApp {
   }
 
   /**
-   * 返回 asset 的美元价格, 单位是 us dollar
+   * 返回 asset 的 ETH 价格
    */
   async _getAssetPriceMantissa(asset) {
     if (!this._priceOracle) {
@@ -52,13 +53,13 @@ export class AaveApp extends BankApp {
     return priceInETH;
   }
 
-  async getAssetData(asset) {
-    if (this._isETH(asset)) {
-      asset = this.addresses['WETH'];
+  async getAssetData(underlyingToken) {
+    if (this._isETH(underlyingToken)) {
+      underlyingToken = this.addresses['WETH'];
     }
     const [decimals, priceAssetMantissa, priceEtherUsdMantissa] = await Promise.all([
-      this._decimals(asset),
-      this._getAssetPriceMantissa(asset),
+      this._decimals(underlyingToken),
+      this._getAssetPriceMantissa(underlyingToken),
       this._getEtherUsdPriceMantissa(),
     ]);
     // ChainLink::ETHUSD 的 decimals 是 8
@@ -67,7 +68,7 @@ export class AaveApp extends BankApp {
       availableLiquidity, totalStableDebt, totalVariableDebt,
       liquidityRate, variableBorrowRate, stableBorrowRate,
       averageStableBorrowRate, liquidityIndex, variableBorrowIndex, lastUpdateTimestamp,
-    ] = await this.protocolDataProvider.getReserveData(asset);
+    ] = await this.protocolDataProvider.getReserveData(underlyingToken);
     const totalBorrows = totalStableDebt.add(totalVariableDebt);
     const totalDeposits = totalStableDebt.add(totalVariableDebt).add(availableLiquidity);
     const depositAPY = liquidityRate;
@@ -107,9 +108,27 @@ export class AaveApp extends BankApp {
     //  borrowLimitUsed 约等于 1 / healthFactor
   }
 
-  async getAccountAssetData(asset) {
-    throw new Error('getAccountAssetData is not implemented');
-    // this.protocolDataProvider.getUserReserveData(asset, user)
+  async getAccountAssetData(underlyingToken) {
+    if (this._isETH(underlyingToken)) {
+      underlyingToken = this.addresses['WETH'];
+    }
+    // aToken 和 debtToken 的 decimals 是和 underlyingToken 一样的
+    const decimals = await this._decimals(underlyingToken);
+    const [
+      currentATokenBalance,
+      currentStableDebt,
+      currentVariableDebt,
+      principalStableDebt,
+      scaledVariableDebt,
+      stableBorrowRate,
+      liquidityRate,
+      stableRateLastUpdated,
+      usageAsCollateralEnabled,
+    ] = await this.protocolDataProvider.getUserReserveData(underlyingToken, await this._userAddress());
+    return {
+      userDeposits: this._mantissaToDisplay(currentATokenBalance, decimals),
+      userBorrows: this._mantissaToDisplay(currentVariableDebt.add(currentStableDebt), decimals),
+    }
   }
 
   async approveUnderlying(underlyingToken, amountDisplay) {
@@ -221,4 +240,8 @@ export class AaveApp extends BankApp {
     const payload = [underlyingToken, _max, to];
     await this.lendingPool.withdraw(...payload).then((tx) => tx.wait());
   }
+}
+
+module.exports = {
+  AaveApp
 }

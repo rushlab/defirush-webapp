@@ -2,6 +2,17 @@ const { ethers } = require('ethers');
 const { BankApp } = require('../bank-apps');
 const { addresses, markets } = require('./constants');
 
+const _rateToApyDisplay = (rateMantissa) => {
+  // APY = ((((Rate / ETH Mantissa * Blocks Per Day + 1) ^ Days Per Year)) - 1) * 100
+  const blocksPerDay = 6570; // 13.15 seconds per block
+  const daysPerYear = 365;
+  const ethMantissa = 1e18;
+  const rate = +rateMantissa.toString();
+  // 这里不返回百分比, 最后不需要除以 100
+  const apy = (((Math.pow((rate / ethMantissa * blocksPerDay) + 1, daysPerYear))) - 1);
+  return apy.toString();
+}
+
 class CreamApp extends BankApp {
   constructor(signer) {
     super(signer);
@@ -14,6 +25,7 @@ class CreamApp extends BankApp {
       'function getAssetsIn(address account) view returns (address[] memory)',
       'function getAccountLiquidity(address account) view returns (uint, uint, uint)',
       'function markets(address vTokenAddress) view returns (bool, uint, bool)',
+      'function oracle() view returns (address)',
     ], this.signer);
   }
 
@@ -32,7 +44,68 @@ class CreamApp extends BankApp {
     }
   }
 
+  async _getEtherUsdPriceMantissa(asset) {
+    const chainLink = new ethers.Contract(this.addresses['ChainLink::ETHUSD'], [
+      // returns: roundId, answer, startedAt, updatedAt, answeredInRound
+      'function latestRoundData() view returns (uint80,int256,uint256,uint256,uint80)'
+    ], this.provider);
+    const [,priceETHUSD,,,] = await chainLink.latestRoundData();
+    // ChainLink::ETHUSD 的 decimals 是 8
+    return priceETHUSD;
+  }
+
+  /**
+   * 返回 underlyingToken 的价格 in eth
+   */
+  async _getUnderlyingPriceMantissa(underlyingToken) {
+    const priceOracle = new ethers.Contract(this.addresses['PriceOracleProxy'], [
+      'function getUnderlyingPrice(address crToken) view returns (uint)',
+    ], this.provider);
+    const crTokenAddr = this._getMarketOfUnderlying(underlyingToken);
+    const priceMantissa = await priceOracle.getUnderlyingPrice(crTokenAddr);
+    return priceMantissa;
+  }
+
   async getAssetData(underlyingToken) {
+    const crTokenAddr = this._getMarketOfUnderlying(underlyingToken);
+    const crToken = new ethers.Contract(crTokenAddr, [
+      'function supplyRatePerBlock() view returns (uint)',
+      'function borrowRatePerBlock() view returns (uint)',
+      'function getCash() view returns (uint)',
+      'function totalBorrows() view returns (uint)',
+    ], this.provider);
+    const [decimals, priceMantissa, priceEtherUsdMantissa] = await Promise.all([
+      this._decimals(underlyingToken),
+      this._getUnderlyingPriceMantissa(underlyingToken),
+      this._getEtherUsdPriceMantissa(),
+    ]);
+    // getUnderlyingPrice 返回的价格是 scale 过的, price decimals + token decimals = 36
+    // ChainLink::ETHUSD 的 decimals 是 8
+    const priceUsdDisplay = ethers.utils.formatUnits(
+      priceMantissa.mul(priceEtherUsdMantissa), 36 - decimals + 8);
+    const [supplyRate, borrowRate, totalLiquidity, totalBorrows] = await Promise.all([
+      crToken.supplyRatePerBlock(),
+      crToken.borrowRatePerBlock(),
+      crToken.getCash(),
+      crToken.totalBorrows(),
+    ]);
+    const totalDeposits = totalLiquidity.add(totalBorrows);
+    const depositAPY = _rateToApyDisplay(supplyRate);
+    const borrowAPY = _rateToApyDisplay(borrowRate);
+    return {
+      totalDeposits: this._mantissaToDisplay(totalDeposits, decimals),
+      totalBorrows: this._mantissaToDisplay(totalBorrows, decimals),
+      depositAPY: depositAPY,
+      borrowAPY: borrowAPY,
+      priceUSD: priceUsdDisplay,
+    };
+  }
+
+  async getAccountData() {
+    return {}
+  }
+
+  async getAccountAssetData(underlyingToken) {
     return {}
   }
 

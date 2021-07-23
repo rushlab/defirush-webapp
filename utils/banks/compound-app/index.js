@@ -2,6 +2,17 @@ const { ethers } = require('ethers');
 const { BankApp } = require('../bank-apps');
 const { addresses, markets } = require('./constants');
 
+const _rateToApyDisplay = (rateMantissa) => {
+  // APY = ((((Rate / ETH Mantissa * Blocks Per Day + 1) ^ Days Per Year)) - 1) * 100
+  const blocksPerDay = 6570; // 13.15 seconds per block
+  const daysPerYear = 365;
+  const ethMantissa = 1e18;
+  const rate = +rateMantissa.toString();
+  // 这里不返回百分比, 最后不需要除以 100
+  const apy = (((Math.pow((rate / ethMantissa * blocksPerDay) + 1, daysPerYear))) - 1);
+  return apy.toString();
+}
+
 class CompoundApp extends BankApp {
   constructor(signer) {
     super(signer);
@@ -14,6 +25,7 @@ class CompoundApp extends BankApp {
       'function getAssetsIn(address account) view returns (address[] memory)',
       'function getAccountLiquidity(address account) view returns (uint, uint, uint)',
       'function markets(address vTokenAddress) view returns (bool, uint, bool)',
+      'function oracle() view returns (address)',
     ], this.signer);
   }
 
@@ -32,7 +44,57 @@ class CompoundApp extends BankApp {
     }
   }
 
+  /**
+   * 返回 underlyingToken 的价格 in usd
+   */
+  async _getUnderlyingPriceMantissa(underlyingToken) {
+    if (!this._priceOracle) {
+      const _address = await this.comptroller.oracle();
+      this._priceOracle = new ethers.Contract(_address, [
+        'function getUnderlyingPrice(address cToken) view returns (uint)',
+      ], this.provider);
+    }
+    const cTokenAddr = this._getMarketOfUnderlying(underlyingToken);
+    const priceMantissa = await this._priceOracle.getUnderlyingPrice(cTokenAddr);
+    return priceMantissa;
+  }
+
   async getAssetData(underlyingToken) {
+    const cTokenAddr = this._getMarketOfUnderlying(underlyingToken);
+    const cToken = new ethers.Contract(cTokenAddr, [
+      'function supplyRatePerBlock() view returns (uint)',
+      'function borrowRatePerBlock() view returns (uint)',
+      'function getCash() view returns (uint)',
+      'function totalBorrows() view returns (uint)',
+    ], this.provider);
+    const [decimals, priceUsdMantissa] = await Promise.all([
+      this._decimals(underlyingToken),
+      this._getUnderlyingPriceMantissa(underlyingToken),
+    ]);
+    const [supplyRate, borrowRate, totalLiquidity, totalBorrows] = await Promise.all([
+      cToken.supplyRatePerBlock(),
+      cToken.borrowRatePerBlock(),
+      cToken.getCash(),
+      cToken.totalBorrows(),
+    ]);
+    const totalDeposits = totalLiquidity.add(totalBorrows);
+    const depositAPY = _rateToApyDisplay(supplyRate);
+    const borrowAPY = _rateToApyDisplay(borrowRate);
+    return {
+      totalDeposits: this._mantissaToDisplay(totalDeposits, decimals),
+      totalBorrows: this._mantissaToDisplay(totalBorrows, decimals),
+      depositAPY: depositAPY,
+      borrowAPY: borrowAPY,
+      // getUnderlyingPrice 返回的价格是 scale 过的, price decimals + token decimals = 36
+      priceUSD: this._mantissaToDisplay(priceUsdMantissa, 36 - decimals),
+    };
+  }
+
+  async getAccountData() {
+    return {}
+  }
+
+  async getAccountAssetData(underlyingToken) {
     return {}
   }
 
