@@ -33,7 +33,8 @@ module.exports = {
    */
   plugins: [
     '@/plugins/element-ui',
-    { src: '~/plugins/nuxt-client-init.js', mode: 'client' }
+    '@/plugins/nuxt-client-init.js',
+    '@/plugins/provider.js',
   ],
   /*
    ** Nuxt.js dev-modules
