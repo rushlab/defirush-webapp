@@ -10,14 +10,6 @@ declare type Address = string;
 declare type AmountDisplay = string;
 declare type AmountMantissa = typeof BigNumberish;
 
-declare type AssetData = {
-  totalDeposits: string;
-  totalBorrows: string;
-  depositAPY: string;
-  borrowAPY: string;
-  priceUSD: string;
-}
-
 declare interface BankAppInterface {
   signer: typeof Signer;
   provider: typeof Provider;
