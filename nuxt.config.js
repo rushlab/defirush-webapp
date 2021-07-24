@@ -1,5 +1,6 @@
 module.exports = {
-  mode: 'universal',
+  telemetry: false,
+  ssr: false,
   /*
    ** Headers of the page
    */
@@ -61,9 +62,8 @@ module.exports = {
      */
     extend(config, ctx) {}
   },
-  telemetry: false,
   server: {
-    port: process.env.NODE_PORT || 3000, // default: 3000
-    host: 'localhost' // default: localhost,
+    port: process.env.PORT || 3000, // default: 3000
+    host: process.env.HOSTNAME || 'localhost' // default: localhost,
   }
 }

@@ -30,20 +30,3 @@
 .hidden {
   display: none !important;
 }
-
-.img {
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
-}
-
-.card {
-  background-color: #ffffff;
-  margin-bottom: 15px;;
-  &.card--round {
-    border-radius: 5px;
-  }
-  &.card--padding {
-    padding: 15px;
-  }
-}
