@@ -21,10 +21,10 @@ class CompoundApp extends BankApp {
     this.markets = markets;
     this.cETH = (this.markets.find((item) => item.symbol === 'cETH')).address;
     this.comptroller = new ethers.Contract(this.addresses['Comptroller'], [
-      'function enterMarkets(address[] calldata vTokens) returns (uint[] memory)',
+      'function enterMarkets(address[] calldata cTokens) returns (uint[] memory)',
       'function getAssetsIn(address account) view returns (address[] memory)',
       'function getAccountLiquidity(address account) view returns (uint, uint, uint)',
-      'function markets(address vTokenAddress) view returns (bool, uint, bool)',
+      'function markets(address cTokenAddress) view returns (bool, uint, bool)',
       'function oracle() view returns (address)',
     ], this.signer);
   }
@@ -45,16 +45,15 @@ class CompoundApp extends BankApp {
   }
 
   /**
-   * 返回 underlyingToken 的价格 in usd
+   * 返回 cToken 的 underlyingToken 的价格 in usd
    */
-  async _getUnderlyingPriceMantissa(underlyingToken) {
+  async _getUnderlyingPriceMantissa(cTokenAddr) {
     if (!this._priceOracle) {
       const _address = await this.comptroller.oracle();
       this._priceOracle = new ethers.Contract(_address, [
         'function getUnderlyingPrice(address cToken) view returns (uint)',
       ], this.provider);
     }
-    const cTokenAddr = this._getMarketOfUnderlying(underlyingToken);
     const priceMantissa = await this._priceOracle.getUnderlyingPrice(cTokenAddr);
     return priceMantissa;
   }
@@ -69,7 +68,7 @@ class CompoundApp extends BankApp {
     ], this.provider);
     const [decimals, priceUsdMantissa] = await Promise.all([
       this._decimals(underlyingToken),
-      this._getUnderlyingPriceMantissa(underlyingToken),
+      this._getUnderlyingPriceMantissa(cTokenAddr),
     ]);
     const [supplyRate, borrowRate, totalLiquidity, totalBorrows] = await Promise.all([
       cToken.supplyRatePerBlock(),
@@ -91,11 +90,53 @@ class CompoundApp extends BankApp {
   }
 
   async getAccountData() {
-    return {}
+    const _userAddress = await this._userAddress();
+    const _1e18 = ethers.utils.parseUnits('1', 18);
+    let totalBorrows = ethers.constants.Zero;
+    let totalDeposits = ethers.constants.Zero;
+    const [,liquidity,] = await this.comptroller.getAccountLiquidity(_userAddress);
+    const cTokens = await this.comptroller.getAssetsIn(_userAddress);
+    const _promises = cTokens.map(async (cTokenAddr) => {
+      const {
+        underlyingBalance, borrowBalance, underlyingValue, borrowValue
+      } = await this._getCTokenData(cTokenAddr);
+      // 不管 underlying 是啥, balance * price 的 decimals 始终是 36, 这里可以直接累加, 最后统一除以 1e36
+      totalBorrows = totalBorrows.add(borrowValue);
+      totalDeposits = totalDeposits.add(underlyingValue);
+    });
+    await Promise.all(_promises);
+    // const availableCredit = totalBorrows.add(liquidity);
+    return {
+      userDepositsUSD: this._mantissaToDisplay(totalDeposits, 36),
+      userBorrowsUSD: this._mantissaToDisplay(totalBorrows, 36),
+      availableBorrowsUSD: this._mantissaToDisplay(liquidity, 18),
+    }
+  }
+
+  async _getCTokenData(cTokenAddr) {
+    const _userAddress = await this._userAddress();
+    const _1e18 = ethers.utils.parseUnits('1', 18);
+    const cToken = new ethers.Contract(cTokenAddr, [
+      'function getAccountSnapshot(address) view returns (uint,uint,uint,uint)',
+    ], this.provider);
+    const [
+      _error, cTokenBalance, borrowBalance, exchangeRateMantissa
+    ] = await cToken.getAccountSnapshot(_userAddress);
+    const underlyingBalance = cTokenBalance.mul(exchangeRateMantissa).div(_1e18);
+    const underlyingPriceMantissa = await this._getUnderlyingPriceMantissa(cTokenAddr);
+    const borrowValue = borrowBalance.mul(underlyingPriceMantissa);
+    const underlyingValue = underlyingBalance.mul(underlyingPriceMantissa);
+    return { underlyingBalance, borrowBalance, underlyingValue, borrowValue };
   }
 
   async getAccountAssetData(underlyingToken) {
-    return {}
+    const decimals = await this._decimals(underlyingToken);
+    const cTokenAddr = this._getMarketOfUnderlying(underlyingToken);
+    const { underlyingBalance, borrowBalance } = await this._getCTokenData(cTokenAddr);
+    return {
+      userDeposits: this._mantissaToDisplay(underlyingBalance, decimals),
+      userBorrows: this._mantissaToDisplay(borrowBalance, decimals),
+    }
   }
 
   async enableUnderlying(underlyingToken) {
