@@ -6,7 +6,6 @@
           <launcher ref="launcher" @init="initProvider"/>
         </el-card>
       </el-col>
-
       <el-col :span="18">
         <el-card v-if="provider && signer" >
           <div slot="header"><span class="card-header__title">ETH转账(Address1 => Address2)</span></div>
@@ -19,26 +18,18 @@
         </el-card>
       </el-col>
     </el-row>
-
   </div>
 </template>
 
 <script>
 import { ethers } from "ethers"
-// import Provider from '@/components/Provider'
 import Launcher from '@/components/Launcher'
-// import Wallet from '@/components/Wallet'
-// import Transfer from '@/components/Transfer'
-// import Swap from '@/components/Swap'
 import Exchange from '@/components/Exchange'
 
 export default {
   components: {
     Launcher,
     // Provider,
-    // Wallet,
-    // Transfer,
-    // Swap,
     Exchange,
   },
   data() {
@@ -46,16 +37,10 @@ export default {
       providerType: '',
       provider: null,
       signer: null,
-      wallet: null
     }
   },
-  mounted() {
-    // this.initRpcProvider()
-  },
+  mounted() {},
   methods: {
-    async initRpcProvider() {
-      this.provider = new ethers.providers.JsonRpcProvider('https://hardhat-dev.heidian.io', { chainId: 31337 } )
-    },
     async initProvider() {
       if (window && window.ethereum) {
         this._addEthereumListeners()

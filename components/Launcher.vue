@@ -212,5 +212,3 @@ export default {
   }
 }
 </style>
-
-

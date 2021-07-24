@@ -63,17 +63,17 @@
 <script>
 import _ from 'lodash'
 import { mapState } from 'vuex'
-import { ethers } from "ethers"
+import { ethers } from 'ethers'
 import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
 import OneSplitAudit from '@/constants/contracts/1inch'
 import { ABI as ERC20_ABI, TOKENS as ERC20_TOKENS } from '@/constants/erc20-tokens.js'
 
 const splitExchanges = [
-    "Uniswap", "Kyber", "Bancor", "Oasis", "CurveCompound",
-    "CurveUsdt", "CurveY", "CurveBinance", "CurveSynthetix",
-    "UniswapCompound", "UniswapChai", "UniswapAave", "Mooniswap",
-    "UniswapV2", "UniswapV2ETH", "UniswapV2DAI", "UniswapV2USDC",
-    "CurvePax", "CurveRenBtc", "CurveTBtc", "DforceSwap", "Shellexchangers"
+    'Uniswap', 'Kyber', 'Bancor', 'Oasis', 'CurveCompound',
+    'CurveUsdt', 'CurveY', 'CurveBinance', 'CurveSynthetix',
+    'UniswapCompound', 'UniswapChai', 'UniswapAave', 'Mooniswap',
+    'UniswapV2', 'UniswapV2ETH', 'UniswapV2DAI', 'UniswapV2USDC',
+    'CurvePax', 'CurveRenBtc', 'CurveTBtc', 'DforceSwap', 'Shellexchangers'
 ]
 
 export default {
