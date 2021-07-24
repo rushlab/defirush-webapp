@@ -65,8 +65,20 @@ import _ from 'lodash'
 import { mapState } from 'vuex'
 import { ethers } from 'ethers'
 import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
-import OneSplitAudit from '@/constants/contracts/1inch'
-import { ABI as ERC20_ABI, TOKENS as ERC20_TOKENS } from '@/constants/erc20-tokens.js'
+
+import OneSplitAuditABI from './oneSplitAudit.json'
+const OneSplitAuditContractAddress = '0xC586BeF4a0992C495Cf22e1aeEE4E446CECDee0E'
+
+const ERC20_ABI = [
+  'function totalSupply() external view returns (uint256)',
+  'function balanceOf(address account) external view returns (uint256)',
+  'function transfer(address recipient, uint256 amount) external returns (bool)',
+  'function allowance(address owner, address spender) external view returns (uint256)',
+  'function approve(address spender, uint256 amount) external returns (bool)',
+  'function transferFrom(address sender, address recipient, uint256 amount) external returns (bool)',
+  'event Transfer(address indexed from, address indexed to, uint256 value)',
+  'event Approval(address indexed owner, address indexed spender, uint256 value)',
+]
 
 const splitExchanges = [
     'Uniswap', 'Kyber', 'Bancor', 'Oasis', 'CurveCompound',
@@ -169,8 +181,8 @@ export default {
     },
     getOneSplitAuditContract() {
       if (this.oneSplitAuditContract) return this.oneSplitAuditContract;
-      const { abi, contractAddress } = OneSplitAudit
-      const oneSplitAuditContract = new ethers.Contract(contractAddress, abi, this.$signer)
+      const oneSplitAuditContract = new ethers.Contract(
+        OneSplitAuditContractAddress, OneSplitAuditABI, this.$signer)
       this.oneSplitAuditContract = oneSplitAuditContract
       return oneSplitAuditContract
     },

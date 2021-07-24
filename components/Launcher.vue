@@ -45,11 +45,29 @@ import _ from 'lodash'
 import { mapState } from 'vuex'
 import { ethers } from "ethers"
 import { BigNumber } from 'bignumber.js'
-import { ABI as ERC20_ABI, TOKENS as ERC20_TOKENS } from '@/constants/erc20-tokens.js'
 import MetamaskLogo from '@/components/MetamaskLogo'
 
+const ERC20_TOKENS = [
+  { symbol: 'WETH', address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', decimals: 18 },
+  { symbol: 'USDT', address: '0xdac17f958d2ee523a2206206994597c13d831ec7', decimals: 6 },
+  { symbol: 'DAI', address: '0x6b175474e89094c44da98b954eedeac495271d0f', decimals: 18 },
+  { symbol: '1INCH', address: '0x111111111117dc0aa78b770fa6a738034120c302', decimals: 18 },
+  { symbol: "UNI", address: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984", decimals: 18 }
+]
+
+const ERC20_ABI = [
+  'function totalSupply() external view returns (uint256)',
+  'function balanceOf(address account) external view returns (uint256)',
+  'function transfer(address recipient, uint256 amount) external returns (bool)',
+  'function allowance(address owner, address spender) external view returns (uint256)',
+  'function approve(address spender, uint256 amount) external returns (bool)',
+  'function transferFrom(address sender, address recipient, uint256 amount) external returns (bool)',
+  'event Transfer(address indexed from, address indexed to, uint256 value)',
+  'event Approval(address indexed owner, address indexed spender, uint256 value)',
+]
+
 export default {
-  name: "Launcher",
+  name: 'Launcher',
   components: {
     MetamaskLogo,
   },

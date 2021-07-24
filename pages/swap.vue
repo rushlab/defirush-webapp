@@ -24,7 +24,7 @@
 <script>
 import { ethers } from "ethers"
 import Launcher from '@/components/Launcher'
-import Exchange from '@/components/Exchange'
+import Exchange from '@/components/SwapBox'
 
 export default {
   components: {
