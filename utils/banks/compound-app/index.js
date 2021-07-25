@@ -1,5 +1,5 @@
 const { ethers } = require('ethers');
-const { BankApp } = require('../bank-apps');
+const { BankApp } = require('../bank-app');
 const { addresses, markets } = require('./constants');
 
 const _rateToApyDisplay = (rateMantissa) => {
@@ -14,8 +14,8 @@ const _rateToApyDisplay = (rateMantissa) => {
 }
 
 class CompoundApp extends BankApp {
-  constructor(signer) {
-    super(signer);
+  constructor($wallet) {
+    super($wallet);
     /* 都放到 this 下面, 代码里就不需要使用全局变量了, 避免和局部变量命名冲突 */
     this.addresses = addresses;
     this.markets = markets;
@@ -26,7 +26,7 @@ class CompoundApp extends BankApp {
       'function getAccountLiquidity(address account) view returns (uint, uint, uint)',
       'function markets(address cTokenAddress) view returns (bool, uint, bool)',
       'function oracle() view returns (address)',
-    ], this.signer);
+    ], this.$wallet.getProvider());
   }
 
   _isCETH(cToken) {
@@ -52,7 +52,7 @@ class CompoundApp extends BankApp {
       const _address = await this.comptroller.oracle();
       this._priceOracle = new ethers.Contract(_address, [
         'function getUnderlyingPrice(address cToken) view returns (uint)',
-      ], this.provider);
+      ], this.$wallet.getProvider());
     }
     const priceMantissa = await this._priceOracle.getUnderlyingPrice(cTokenAddr);
     return priceMantissa;
@@ -65,7 +65,7 @@ class CompoundApp extends BankApp {
       'function borrowRatePerBlock() view returns (uint)',
       'function getCash() view returns (uint)',
       'function totalBorrows() view returns (uint)',
-    ], this.provider);
+    ], this.$wallet.getProvider());
     const [decimals, priceUsdMantissa] = await Promise.all([
       this._decimals(underlyingToken),
       this._getUnderlyingPriceMantissa(cTokenAddr),
@@ -90,7 +90,7 @@ class CompoundApp extends BankApp {
   }
 
   async getAccountData() {
-    const _userAddress = await this._userAddress();
+    const _userAddress = this.$wallet.getAddress();
     const _1e18 = ethers.utils.parseUnits('1', 18);
     let totalBorrows = ethers.constants.Zero;
     let totalDeposits = ethers.constants.Zero;
@@ -114,14 +114,13 @@ class CompoundApp extends BankApp {
   }
 
   async _getCTokenData(cTokenAddr) {
-    const _userAddress = await this._userAddress();
     const _1e18 = ethers.utils.parseUnits('1', 18);
     const cToken = new ethers.Contract(cTokenAddr, [
       'function getAccountSnapshot(address) view returns (uint,uint,uint,uint)',
-    ], this.provider);
+    ], this.$wallet.getProvider());
     const [
       _error, cTokenBalance, borrowBalance, exchangeRateMantissa
-    ] = await cToken.getAccountSnapshot(_userAddress);
+    ] = await cToken.getAccountSnapshot(this.$wallet.getAddress());
     const underlyingBalance = cTokenBalance.mul(exchangeRateMantissa).div(_1e18);
     const underlyingPriceMantissa = await this._getUnderlyingPriceMantissa(cTokenAddr);
     const borrowValue = borrowBalance.mul(underlyingPriceMantissa);
@@ -140,13 +139,14 @@ class CompoundApp extends BankApp {
   }
 
   async enableUnderlying(underlyingToken) {
+    const signer = this.$wallet.getSigner();
     const cTokenAddr = this._getMarketOfUnderlying(underlyingToken);
-    await this.comptroller.enterMarkets([cTokenAddr]);
+    await this.comptroller.connect(signer).enterMarkets([cTokenAddr]);
   }
 
   async underlyingEnabled(underlyingToken) {
     const cTokenAddr = this._getMarketOfUnderlying(underlyingToken);
-    const userMarkets = await this.comptroller.getAssetsIn(await this._userAddress());
+    const userMarkets = await this.comptroller.getAssetsIn(this.$wallet.getAddress());
     return userMarkets.map(a=>a.toLowerCase()).indexOf(cTokenAddr.toLowerCase()) >= 0;
   }
 
@@ -168,14 +168,14 @@ class CompoundApp extends BankApp {
     const cTokenAddr = this._getMarketOfUnderlying(underlyingToken);
     // 这里最好检查 this.underlyingEnabled, 建议用户存款的同时也 enterMarket, 不然也没啥意义, 但先不这么做
     if (this._isCETH(cTokenAddr)) {
-      const cToken = new ethers.Contract(cTokenAddr, ['function mint() payable'], this.signer);
+      const cToken = new ethers.Contract(cTokenAddr, ['function mint() payable'], this.$wallet.getSigner());
       await cToken.mint({ value: amountMantissa }).then((tx) => tx.wait());
     } else {
       const allowanceMantissa = await this.underlyingAllowance(underlyingToken);
       if (allowanceMantissa.lt(amountMantissa)) {
         throw new Error('allowance of underlying token is not enough');
       }
-      const cToken = new ethers.Contract(cTokenAddr, ['function mint(uint256)'], this.signer);
+      const cToken = new ethers.Contract(cTokenAddr, ['function mint(uint256)'], this.$wallet.getSigner());
       await cToken.mint(amountMantissa).then((tx) => tx.wait());
     }
   }
@@ -186,7 +186,7 @@ class CompoundApp extends BankApp {
     const cTokenAddr = this._getMarketOfUnderlying(underlyingToken);
     const cToken = new ethers.Contract(cTokenAddr, [
       'function borrow(uint borrowAmount) returns (uint)',
-    ], this.signer);
+    ], this.$wallet.getSigner());
     await cToken.borrow(amountMantissa).then((tx) => tx.wait());
   }
 
@@ -197,12 +197,12 @@ class CompoundApp extends BankApp {
     if (this._isCETH(cTokenAddr)) {
       const cToken = new ethers.Contract(cTokenAddr, [
         'function repayBorrow() payable',
-      ], this.signer);
+      ], this.$wallet.getSigner());
       await cToken.repayBorrow({ value: amountMantissa }).then((tx) => tx.wait());
     } else {
       const cToken = new ethers.Contract(cTokenAddr, [
         'function repayBorrow(uint borrowAmount) returns (uint)',
-      ], this.signer);
+      ], this.$wallet.getSigner());
       await cToken.repayBorrow(amountMantissa).then((tx) => tx.wait());
     }
   }
@@ -212,7 +212,7 @@ class CompoundApp extends BankApp {
     const cTokenAddr = this._getMarketOfUnderlying(underlyingToken);
     const cToken = new ethers.Contract(cTokenAddr, [
       'function repayBorrow(uint borrowAmount) returns (uint)',
-    ], this.signer);
+    ], this.$wallet.getSigner());
     const _max = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
     await cToken.repayBorrow(_max).then((tx) => tx.wait());
   }
@@ -223,7 +223,7 @@ class CompoundApp extends BankApp {
     const cTokenAddr = this._getMarketOfUnderlying(underlyingToken);
     const cToken = new ethers.Contract(cTokenAddr, [
       'function redeemUnderlying(uint redeemAmount) returns (uint)',
-    ], this.signer);
+    ], this.$wallet.getSigner());
     await cToken.redeemUnderlying(amountMantissa).then((tx) => tx.wait());
   }
 
@@ -232,8 +232,8 @@ class CompoundApp extends BankApp {
     const cToken = new ethers.Contract(cTokenAddr, [
       'function balanceOf(address account) view returns (uint)',
       'function redeem(uint redeemTokens) returns (uint)',
-    ], this.signer);
-    const balanceMantissa = await cToken.balanceOf(await this._userAddress());
+    ], this.$wallet.getSigner());
+    const balanceMantissa = await cToken.balanceOf(this.$wallet.getAddress());
     await cToken.redeem(balanceMantissa).then((tx) => tx.wait());
   }
 

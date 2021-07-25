@@ -8,14 +8,10 @@ const ERC20ABI = [
 ];
 
 export class BankApp implements BankAppInterface {
-  signer: Signer;
-  provider: Provider;
-  constructor(signer: Signer) {
-    if (!signer) {
-      throw new Error('signer is required');
-    }
-    this.signer = signer;
-    this.provider = this.signer.provider;
+  $wallet: WalletInterface;
+
+  constructor($wallet: WalletInterface) {
+    this.$wallet = $wallet;
   }
 
   _isETH(asset: Address) {
@@ -32,30 +28,26 @@ export class BankApp implements BankAppInterface {
     return ethers.utils.formatUnits(amountMantissa, decimals);
   }
 
-  async _userAddress() {
-    return await this.signer.getAddress();
-  }
-
   async _decimals(asset: Address) {
     if (this._isETH(asset)) {
       return 18;
     } else {
       // 否则就认为 asset 是 erc20
       // TODO: 配置一堆常用的 token 不需要重新计算 _decimals
-      const erc20 = new ethers.Contract(asset, ERC20ABI, this.provider);
+      const erc20 = new ethers.Contract(asset, ERC20ABI, this.$wallet.getProvider());
       const decimals = await erc20.decimals();
       return +decimals.toString();
     }
   }
 
   async _approve(token: Address, spender: Address, amountMantissa: AmountMantissa) {
-    const erc20 = new ethers.Contract(token, ERC20ABI, this.provider);
-    await erc20.connect(this.signer).approve(spender, amountMantissa);
+    const erc20 = new ethers.Contract(token, ERC20ABI, this.$wallet.getProvider());
+    await erc20.connect(this.$wallet.getSigner()).approve(spender, amountMantissa);
   }
 
   async _allowance(token: Address, spender: Address) {
-    const erc20 = new ethers.Contract(token, ERC20ABI, this.provider);
-    const allowanceMantissa =  await erc20.allowance(await this._userAddress(), spender);
+    const erc20 = new ethers.Contract(token, ERC20ABI, this.$wallet.getProvider());
+    const allowanceMantissa =  await erc20.allowance(this.$wallet.getAddress(), spender);
     return allowanceMantissa;
   }
 

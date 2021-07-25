@@ -10,10 +10,15 @@ declare type Address = string;
 declare type AmountDisplay = string;
 declare type AmountMantissa = typeof BigNumberish;
 
+declare interface WalletInterface {
+  getAddress(): Address;
+  getSigner(): Signer;
+  getProvider(): Provider;
+  getBalance(asset: Address): Promise<AmountDisplay>;
+}
+
 declare interface BankAppInterface {
-  signer: typeof Signer;
-  provider: typeof Provider;
-  _userAddress(): Promise<any>;
+  $wallet: WalletInterface;
   _approve(token: Address, spender: Address, amount: AmountMantissa): Promise<any>;
   _allowance(token: Address, spender: Address): Promise<AmountMantissa>;
   _displayToMantissa(amountDisplay: AmountDisplay, decimals: number): AmountMantissa;
