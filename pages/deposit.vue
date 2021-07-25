@@ -46,26 +46,25 @@ export default {
   },
   data() {
     return {
-      aaveApp: null,
-      compoundApp: null,
-      creamApp: null,
+      banksList: [],
       tokenSelectDialogVisible: false,
       underlyingToken: null,
     }
   },
   computed: {
-    banksList() {
-      return [
-        { icon: "https://aave.com/favicon64.png", title: 'Aave', app: this.aaveApp },
-        { icon: "https://compound.finance/compound-components/assets/compound-mark.svg", title: 'Compound', app: this.compoundApp },
-        { icon: "https://app.cream.finance/static/media/cream.29138554.svg", title: 'Cream', app: this.creamApp }
-      ]
-    }
+    //
   },
   mounted() {
-    this.aaveApp = new AaveApp(this.$wallet)
-    this.compoundApp = new CompoundApp(this.$wallet)
-    this.creamApp = new CreamApp(this.$wallet)
+    this.banksList = [{
+      icon: 'https://aave.com/favicon64.png', title: 'Aave',
+      app: new AaveApp(this.$wallet)
+    }, {
+      icon: 'https://compound.finance/compound-components/assets/compound-mark.svg', title: 'Compound',
+      app: new CompoundApp(this.$wallet)
+    }, {
+      icon: 'https://app.cream.finance/static/media/cream.29138554.svg', title: 'Cream',
+      app: new CreamApp(this.$wallet)
+    }]
   },
   methods: {
     onSelectToken(token) {
