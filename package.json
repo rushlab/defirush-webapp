@@ -16,6 +16,7 @@
     "@nuxtjs/axios": "^5.13.6",
     "bignumber.js": "^9.0.1",
     "cross-env": "^5.2.0",
+    "dayjs": "^1.10.6",
     "element-ui": "^2.4.11",
     "ethers": "^5.3.1",
     "express": "^4.16.4",
