@@ -5,8 +5,13 @@
     <template v-if="isAuthenticated">
       <div class="wallet-address">{{ walletAddress }}</div>
       <div class="wallet-status">
-        <el-tag v-if="isSignerAlive" type="success">Connected</el-tag>
-        <el-tag v-else type="danger">Disconnected</el-tag>
+        <el-tag
+          v-if="isSignerAlive" size="small" type="success" plain
+        >Connected</el-tag>
+        <el-button
+          v-else @click="connectCurrentWallet"
+          size="mini" type="danger" plain round
+        >Disconnected</el-button>
       </div>
       <el-button class="logout-button" type="text" @click="handleLogout">Logout</el-button>
     </template>
@@ -101,6 +106,13 @@ export default {
         this.$message.error('Wrong signature ...... ')
       }
     },
+    async connectCurrentWallet() {
+      if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
+        try {
+          await global.ethereum.request({ method: 'eth_requestAccounts' })
+        } catch(error) {}
+      }
+    },
     openConnectDialog() {
       this.connectDialog = {
         visible: true,
@@ -131,6 +143,7 @@ export default {
   //
 }
 .wallet-status {
+  /deep/ .el-button,
   /deep/ .el-tag {
     margin-left: 1em;
   }

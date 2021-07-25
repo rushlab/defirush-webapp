@@ -9,14 +9,15 @@ const AUTH_STORAGE_KEY = 'web3-wallet-auth'
  * isSignerAlive: 浏览器钱包可用, 可以发送交易, 并且和 walletAddress 对应
  */
 export const state = () => ({
-  chainId: 1,
+  walletChainId: 1,
   walletAddress: '',
   isAuthenticated: false,
   isSignerAlive: false,
 })
 
 export const mutations = {
-  setWallet(state, { chainId, walletAddress }) {
+  setWallet(state, { walletChainId, walletAddress }) {
+    state.walletChainId = +walletChainId
     state.walletAddress = walletAddress
     state.isAuthenticated = !!walletAddress
   },
@@ -35,11 +36,11 @@ export const actions = {
       timestamp: (new Date()).valueOf()
     })
     global.localStorage.setItem(AUTH_STORAGE_KEY, content)
-    commit('setWallet', { chainId: chainId, walletAddress: address })
+    commit('setWallet', { walletChainId: chainId, walletAddress: address })
     commit('setSignerStatus', true)
   },
   async logout({ dispatch, commit }) {
-    commit('setWallet', { chainId: 1, walletAddress: '' })
+    commit('setWallet', { walletChainId: 1, walletAddress: '' })
     commit('setSignerStatus', false)
     global.localStorage.removeItem(AUTH_STORAGE_KEY)
   },

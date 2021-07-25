@@ -1,3 +1,13 @@
+declare namespace NodeJS {
+  interface Global {
+    document: Document;
+    window: Window;
+    navigator: Navigator;
+    // 新增一个 ethereum
+    ethereum: any;
+  }
+}
+
 const { Provider } = require("@ethersproject/abstract-provider")
 const { Signer } = require("@ethersproject/abstract-signer")
 const { BigNumberish } = require("@ethersproject/bignumber")

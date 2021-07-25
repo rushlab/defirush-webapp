@@ -34,7 +34,7 @@ module.exports = {
   plugins: [
     '@/plugins/element-ui',
     '@/plugins/nuxt-client-init.js',
-    '@/plugins/wallet.js',
+    '@/plugins/wallet/index.js',
   ],
   /*
    ** Nuxt.js dev-modules
