@@ -7,6 +7,7 @@ export const state = () => {
   return {
     pending: false,
     data: []
+    // [ { symbol, name, address, decimals, logoURI }, ... ]
   }
 }
 

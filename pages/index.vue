@@ -5,7 +5,7 @@
       v-if="tokenSelectDialogVisible"
       :visible.sync="tokenSelectDialogVisible"
       @select="onSelectToken"
-    />
+    ></token-select-dialog>
   </div>
 </template>
 

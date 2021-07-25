@@ -30,8 +30,8 @@
         <el-button type="success" plain @click="verifyUserWallet">Verify</el-button>
       </div>
       <div v-if="connectDialog.verified" class="step-verified">
-        <p>成功!!!!!!</p>
-        <el-button type="success" plain @click="connectDialog.visible=false">Close</el-button>
+        <p>成功</p>
+        <el-button type="default" plain @click="connectDialog.visible=false">Close</el-button>
       </div>
     </el-dialog>
   </div>
@@ -85,8 +85,9 @@ export default {
       const { signer, address } = this.connectDialog
       const tip = 'Please sign to let us verify that you are the owner of this address'
       const message = `${tip}\n${address}`
-      let signature, signerAddress
+      let signature, signerAddress, chainId
       try {
+        chainId = (await signer.provider.getNetwork()).chainId
         signature = await signer.signMessage(message)
         signerAddress = await ethers.utils.verifyMessage(message, signature)
       } catch(error) {
@@ -95,7 +96,7 @@ export default {
       }
       if (signerAddress.toLowerCase() === address.toLowerCase()) {
         this.connectDialog.verified = true
-        await this.$store.dispatch('auth/login', { address, message, signature })
+        await this.$store.dispatch('auth/login', { chainId, address, message, signature })
       } else {
         this.$message.error('Wrong signature ...... ')
       }
