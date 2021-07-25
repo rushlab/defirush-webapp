@@ -5,15 +5,39 @@
 </template>
 
 <script>
+import { createBankApp } from '@/utils/banks/factory'
+
 export default {
-  asyncData({ store, params }) {
+  // asyncData({ store, params }) {
+  //   return {
+  //     bankName: params.bankName,
+  //   }
+  // },
+  data() {
+    const bankName = this.$route.params.bankName
+    const { app, title, logo } = createBankApp(bankName, this.$wallet)
     return {
-      bankName: params.bankName
+      bankName,
+      bankApp: app,
+      bankTitle: title,
+      bankLogo: logo,
     }
   },
-  data() {
-    return {
-      //
+  mounted() {
+    this.getAccountData()
+  },
+  methods: {
+    async getAccountData() {
+      try {
+        const [
+          userDepositsUSD, userBorrowsUSD, availableBorrowsUSD
+        ] = await this.bankApp.getAccountData()
+      } catch(error) {
+        //
+      }
+    },
+    handleRefresh() {
+      this.getAccountData()
     }
   }
 }
