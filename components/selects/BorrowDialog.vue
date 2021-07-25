@@ -94,7 +94,6 @@ export default {
     }
   },
   computed: {
-    ...mapState('tokens', ['data', 'pending']),
     underlyingAssetSymbol() {
       return this.underlyingTokenData ? this.underlyingTokenData.symbol : ''
     },

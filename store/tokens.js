@@ -12,27 +12,36 @@ export const state = () => {
 }
 
 export const mutations = {
-  START_INIT(state) {
+  START_REQUEST(state) {
     state.pending = true
   },
-  COMPLETE_INIT(state) {
+  COMPLETE_REQUEST(state) {
     state.pending = false
   },
-  set_data(state, payload = []) {
+  SET_DATA(state, payload = []) {
     state.data = payload
   }
 }
 
 export const actions = {
   getTokens({ commit }) {
-    commit('START_INIT')
+    commit('START_REQUEST')
     return this.$axios.get(URL).then(({ data }) => {
-      const { tokens = {} } = data
-      const list = _.values(tokens)
-      commit('set_data', list)
-      commit('COMPLETE_INIT')
+      // { tokens: { [address]: { symbol, address } } }
+      commit('COMPLETE_REQUEST')
+      const common = []
+      const rest = []
+      for (const address in data.tokens) {
+        const tokenData = data.tokens[address]
+        if (/^(BTC|ETH|WBTC|WETH|USDC|USDT|DAI)$/.test(tokenData.symbol)) {
+          common.push(tokenData)
+        } else {
+          rest.push(tokenData)
+        }
+      }
+      commit('SET_DATA', [ ...common, ...rest ])
     }).catch(err => {
-      commit('COMPLETE_INIT')
+      commit('COMPLETE_REQUEST')
       throw err
     })
   }

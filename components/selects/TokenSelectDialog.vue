@@ -23,7 +23,7 @@
       </el-table-column>
       <el-table-column prop="symbol" label="Symbol" width="120" align="center"></el-table-column>
       <el-table-column prop="name" label="Name"></el-table-column>
-      <el-table-column prop="actions" label="Actions" width="80">
+      <el-table-column prop="actions" label="Actions" width="100">
         <template slot-scope="{ row }">
           <el-button
             type="primary" size="mini" @click="handleSelectOne(row)">Select</el-button>
@@ -60,20 +60,23 @@ export default {
     }
   },
   computed: {
-    ...mapState('tokens', ['data', 'pending']),
+    ...mapState('tokens', {
+      tokenList: state => state.data,
+      pending: state => state.pending,
+    }),
     filteredResults() {
       let res = []
       if (!this.q) {
-        res = this.data
+        res = this.tokenList
       } else if (/^(0x)?\w{40}$/.test(this.q)) {
         // match token address
         let _q = this.q
         if (!_.startsWith(_q, '0x')) {
           _q = '0x' + _q
         }
-        res = _.filter(this.data, { address: _q })
+        res = _.filter(this.tokenList, { address: _q })
       } else {
-        res = _.filter(this.data, token => {
+        res = _.filter(this.tokenList, token => {
           return _.startsWith(token.symbol, this.q.toUpperCase())
         })
       }
@@ -96,7 +99,7 @@ export default {
       this.$emit('open')
       this.$emit('update:visible', true)
       // 打开 dialog 的时候再 fetch
-      if (!this.data || _.isEmpty(this.data)) {
+      if (!this.tokenList || _.isEmpty(this.tokenList)) {
         this.$store.dispatch('tokens/getTokens')
       }
     },
