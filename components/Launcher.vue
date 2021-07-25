@@ -3,8 +3,8 @@
     <div class="metamask">
       <metamask-logo class="mm-logo"/>
     </div>
-    <div v-if="!!$signer" class="avtive-waller"><span>已连接钱包: MetaMask</span></div>
-    <div v-if="$signer" v-loading="!!pending">
+    <div v-if="isSignerAlive" class="avtive-waller"><span>已连接钱包: MetaMask</span></div>
+    <div v-if="isSignerAlive" v-loading="!!pending">
       <el-form ref="launcher" label-position="top">
         <el-form-item label="钱包地址">
           <el-input :value="walletAddress" readonly></el-input>
@@ -15,7 +15,6 @@
           </el-input>
           <div class="token__actions">
             <el-button
-              v-if="canRequestEther"
               class="action-btn" size="mini" type="success" plain
               :disabled="!EtherFaucet"
               @click="onRequestEther">充值</el-button>
@@ -50,6 +49,7 @@ import MetamaskLogo from '@/components/MetamaskLogo'
 const ERC20_TOKENS = [
   { symbol: 'WETH', address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', decimals: 18 },
   { symbol: 'USDT', address: '0xdac17f958d2ee523a2206206994597c13d831ec7', decimals: 6 },
+  { symbol: 'USDC', address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', decimals: 6 },
   { symbol: 'DAI', address: '0x6b175474e89094c44da98b954eedeac495271d0f', decimals: 18 },
   { symbol: '1INCH', address: '0x111111111117dc0aa78b770fa6a738034120c302', decimals: 18 },
   { symbol: "UNI", address: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984", decimals: 18 }
@@ -94,10 +94,7 @@ export default {
     this.handleGetBalance()
   },
   computed: {
-    ...mapState('user', ['walletAddress']),
-    canRequestEther() {
-      return _.get(this.$signer, 'provider.chainId') == 71337
-    }
+    ...mapState('auth', ['walletAddress', 'isAuthenticated', 'isSignerAlive']),
   },
   methods: {
     async handleGetBalance() {
@@ -105,8 +102,7 @@ export default {
       await this.getERC20TokensBalance()
     },
     async getEtherBalance() {
-      const balance = await this.$signer.getBalance()
-      this.walletBalance = ethers.utils.formatUnits(balance)
+      this.walletBalance = await this.$wallet.getBalance()
     },
     async getERC20TokensBalance(tokenAddres) {
       if (tokenAddres) {
@@ -121,9 +117,8 @@ export default {
       }
     },
     async getTokenBalance(token) {
-      const erc20Contract = new ethers.Contract(token.address, this.ERC20_ABI, this.$signer)
+      const erc20Contract = new ethers.Contract(token.address, this.ERC20_ABI, this.$wallet.getProvider())
       const balance = await erc20Contract.balanceOf(this.walletAddress)
-
       return (new BigNumber(balance.toString())).shiftedBy(-token.decimals).toString()
     },
     async getEtherFaucetData() {
@@ -143,7 +138,8 @@ export default {
     },
     async handleRequestEther() {
       try {
-        const contract = new ethers.Contract(this.EtherFaucet.address, this.EtherFaucet.abi, this.$signer)
+        const contract = new ethers.Contract(
+          this.EtherFaucet.address, this.EtherFaucet.abi, this.$wallet.getSigner())
         const amount = ethers.utils.parseEther('1')  // 获取 1 个 Ether
         const receipt = await contract.requestEther(amount, {
           gasPrice: 0,

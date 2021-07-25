@@ -139,8 +139,10 @@ class AaveApp extends BankApp {
   }
 
   async underlyingAllowance(underlyingToken) {
+    const decimals = await this._decimals(underlyingToken);
     const spender = this.lendingPool.address;
-    return await super._allowance(underlyingToken, spender);
+    const allowanceMantissa = await super._allowance(underlyingToken, spender);
+    return this._mantissaToDisplay(allowanceMantissa, decimals);
   }
 
   async enableUnderlying(underlyingToken) {}

@@ -83,7 +83,7 @@ export default {
   },
   computed: {
     disabled() {
-      return !this.$signer || _.isEmpty(this.bankData) || !this.bankApp || _.isEmpty(this.underlyingTokenData)
+      return _.isEmpty(this.bankData) || !this.bankApp || _.isEmpty(this.underlyingTokenData)
     },
     underlyingTokenAddress() {
       return _.get(this.underlyingTokenData, 'address')
@@ -102,22 +102,16 @@ export default {
   },
   methods: {
     async getAssetData() {
-      if (!this.$signer) return;
       const assetData = await this.bankApp.getAssetData(this.underlyingTokenAddress)
       this.assetData = assetData
-      console.log('@@@ assetData', assetData)
     },
     async getAccountAssetData() {
-      if (!this.$signer) return;
       const accountAssetData = await this.bankApp.getAccountAssetData(this.underlyingTokenAddress)
       this.accountAssetData = accountAssetData
-      console.log('@@@ accountAssetData', accountAssetData)
     },
     async getAccountData() {
-      if (!this.$signer) return;
       const accountData = await this.bankApp.getAccountData()
       this.accountData = accountData
-      console.log('@@@ accountData', accountData)
     },
     onBorrowSuccess() {
       Promise.all([

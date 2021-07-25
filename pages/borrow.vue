@@ -7,7 +7,7 @@
         </el-input>
       </el-form-item>
     </el-form>
-    <div class="bank-list" v-if="$signer && aaveApp">
+    <div class="bank-list">
       <el-table :data="[]" style="width: 100%">
         <el-table-column label="Bank" width="180"></el-table-column>
         <el-table-column label="Total Deposits"></el-table-column>
@@ -62,9 +62,9 @@ export default {
     }
   },
   mounted() {
-    this.aaveApp = new AaveApp(this.$signer)
-    this.compoundApp = new CompoundApp(this.$signer)
-    this.creamApp = new CreamApp(this.$signer)
+    this.aaveApp = new AaveApp(this.$wallet)
+    this.compoundApp = new CompoundApp(this.$wallet)
+    this.creamApp = new CreamApp(this.$wallet)
   },
   methods: {
     onSelectToken(token) {

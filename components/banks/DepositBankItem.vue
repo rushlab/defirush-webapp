@@ -95,10 +95,10 @@ export default {
   },
   computed: {
     disabledDeposit() {
-      return !this.$signer || _.isEmpty(this.bankData) || !this.bankApp || _.isEmpty(this.underlyingTokenData)
+      return _.isEmpty(this.bankData) || !this.bankApp || _.isEmpty(this.underlyingTokenData)
     },
     disabledWithdraw() {
-      return !this.$signer || _.isEmpty(this.bankData) || !this.bankApp || _.isEmpty(this.underlyingTokenData)
+      return _.isEmpty(this.bankData) || !this.bankApp || _.isEmpty(this.underlyingTokenData)
     },
     underlyingTokenAddress() {
       return _.get(this.underlyingTokenData, 'address')
@@ -136,12 +136,9 @@ export default {
       this.pending = false
     },
     onDepositSuccess(amountDisplay) {
-      if (!this.$signer) return;
       this.getAssetData(this.underlyingTokenAddress)
     },
-    handleWithdraw() {
-
-    }
+    handleWithdraw() {}
   },
 }
 </script>

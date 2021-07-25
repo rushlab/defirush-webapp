@@ -2,17 +2,12 @@
   <div class="container">
     <el-row :gutter="20">
       <el-col :span="6">
-        <el-card v-if="$signer" >
+        <el-card>
           <launcher ref="launcher" @init="initProvider"/>
         </el-card>
       </el-col>
       <el-col :span="18">
-        <el-card v-if="provider && signer" >
-          <div slot="header"><span class="card-header__title">ETH转账(Address1 => Address2)</span></div>
-          <transfer :provider="provider" :signer="signer"/>
-        </el-card>
-
-        <el-card v-if="$signer">
+        <el-card>
           <div slot="header"><span class="card-header__title">兑换</span></div>
             <exchange @success="handleSwapSuccess"/>
         </el-card>
@@ -29,14 +24,11 @@ import Exchange from '@/components/SwapBox'
 export default {
   components: {
     Launcher,
-    // Provider,
     Exchange,
   },
   data() {
     return {
-      providerType: '',
       provider: null,
-      signer: null,
     }
   },
   mounted() {},

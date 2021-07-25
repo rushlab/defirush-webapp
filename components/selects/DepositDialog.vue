@@ -87,8 +87,8 @@ export default {
           { validator: validationAmount, trigger: 'blur' }
         ]
       },
-      allowanceMantissa: ethers.constants.Zero,
-      balanceMantissa: ethers.constants.Zero,
+      allowanceDisplay: '0.00',
+      balanceDisplay: '0.00',
       isDepositing: false
     }
   },
@@ -105,16 +105,9 @@ export default {
     amountPrecentage() {
       return +this.balanceDisplay > 0 ? (+this.form.amountDisplay / +this.balanceDisplay) * 100 : 0
     },
-    balanceDisplay() {
-      return (this.balanceMantissa && this.underlyingAssetDecimals) ? ethers.utils.formatUnits(this.balanceMantissa, this.underlyingAssetDecimals) : '0'
-    },
-    amountMantissa() {
-      return (this.underlyingAssetDecimals && this.form.amountDisplay) ? ethers.utils.parseUnits(this.form.amountDisplay || '0', this.underlyingAssetDecimals) : '0'
-    },
     needApprove() {
-      console.log(`amountMantissa is ${this.amountMantissa}, allowanceMantissa is ${this.allowanceMantissa}`)
       if (this.isETH) return false
-      return this.allowanceMantissa ? this.allowanceMantissa.lt(this.amountMantissa) : (this.form.amountDisplay ? true : false)
+      return +this.allowanceDisplay < +this.form.amountDisplay
     }
   },
   watch: {
@@ -123,39 +116,30 @@ export default {
     },
     'form.amountSlideValue': {
       handler(newVal) {
-        const amountMantissa = this.balanceMantissa.mul(ethers.BigNumber.from(newVal)).div(ethers.BigNumber.from(100))
-        this.form.amountDisplay = ethers.utils.formatUnits(amountMantissa, this.underlyingAssetDecimals)
+        this.form.amountDisplay = (+this.balanceDisplay) * newVal / 100
       }
     }
   },
   mounted() {
-    this.updateAllowanceMantissa()
-    this.getBalanceMantissa()
+    this.updateAllowanceDisplay()
+    this.getBalanceDisplay()
   },
   methods: {
     async onDialogOpen() {
       this.$emit('open')
       this.$emit('update:visible', true)
-      console.log('@@@@ dialog open')
     },
-    async updateAllowanceMantissa() {
+    async updateAllowanceDisplay() {
       if (this.isETH) return
-      this.allowanceMantissa = await this.bankApp.underlyingAllowance(this.underlyingTokenData.address)
-      console.log('@@@ this.allowanceMantissa', this.allowanceMantissa)
+      this.allowanceDisplay = await this.bankApp.underlyingAllowance(this.underlyingTokenData.address)
     },
-    async getBalanceMantissa() {
+    async getBalanceDisplay() {
       if (this.isETH) {
-        const userBalance = await this.$signer.getBalance()
-        this.balanceMantissa = userBalance
-        return
+        this.balanceDisplay = await this.$wallet.getBalance()
+      } else {
+        const { address } = this.underlyingTokenData
+        this.balanceDisplay = await this.$wallet.getBalance(address)
       }
-      const abi = ['function balanceOf(address account) external view returns (uint256)']
-      const { address } = this.underlyingTokenData
-      const erc20 = new ethers.Contract(address, abi, this.$signer)
-      const msgSender = await this.$signer.getAddress()
-      const balanceMantissa = await erc20.balanceOf(msgSender)
-      console.log('@@@ balanceMantissa ', balanceMantissa)
-      this.balanceMantissa = balanceMantissa
     },
     onDialogClose() {
       this.form.amountDisplay = ''
@@ -171,7 +155,7 @@ export default {
       try {
         this.isApproving = true
         await this.bankApp.approveUnderlying(this.underlyingTokenData.address, this.form.amountDisplay)
-        await this.updateAllowanceMantissa()
+        await this.updateAllowanceDisplay()
       } catch (error) {
         console.log('handleApprove error: ', error)
         this.$message.error(JSON.stringify(error))

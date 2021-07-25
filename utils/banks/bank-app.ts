@@ -41,8 +41,8 @@ export class BankApp implements BankAppInterface {
   }
 
   async _approve(token: Address, spender: Address, amountMantissa: AmountMantissa) {
-    const erc20 = new ethers.Contract(token, ERC20ABI, this.$wallet.getProvider());
-    await erc20.connect(this.$wallet.getSigner()).approve(spender, amountMantissa);
+    const erc20 = new ethers.Contract(token, ERC20ABI, this.$wallet.getSigner());
+    await erc20.approve(spender, amountMantissa).then((tx: any) => tx.wait());;
   }
 
   async _allowance(token: Address, spender: Address) {

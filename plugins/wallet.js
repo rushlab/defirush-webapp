@@ -3,16 +3,6 @@ import _ from 'lodash'
 import { ethers } from 'ethers'
 import { MessageBox } from 'element-ui';
 
-Vue.mixin({
-  computed: {
-    $signer() {
-      if (!global.ethereum) return null
-      const provider = new ethers.providers.Web3Provider(global.ethereum)
-      return provider.getSigner()
-    }
-  }
-})
-
 
 async function verifyLoginData({ chainId, address, message, signature, timestamp }) {
   // TODO 还需要验证一下 chainID 对不对
@@ -113,7 +103,7 @@ class WalletApp {
   async getBalance(asset) {
     const provider = this.getProvider();
     const address = this.getAddress();
-    if (this._isETH(asset)) {
+    if (!asset || this._isETH(asset)) {
       const balance = await provider.getBalance(address);
       return ethers.utils.formatEther(balance);
     } else {

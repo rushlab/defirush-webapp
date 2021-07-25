@@ -158,8 +158,10 @@ class CompoundApp extends BankApp {
   }
 
   async underlyingAllowance(underlyingToken) {
+    const decimals = await this._decimals(underlyingToken);
     const spender = this._getMarketOfUnderlying(underlyingToken);
-    return await super._allowance(underlyingToken, spender);
+    const allowanceMantissa = await super._allowance(underlyingToken, spender);
+    return this._mantissaToDisplay(allowanceMantissa, decimals);
   }
 
   async deposit(underlyingToken, amountDisplay) {
@@ -171,7 +173,8 @@ class CompoundApp extends BankApp {
       const cToken = new ethers.Contract(cTokenAddr, ['function mint() payable'], this.$wallet.getSigner());
       await cToken.mint({ value: amountMantissa }).then((tx) => tx.wait());
     } else {
-      const allowanceMantissa = await this.underlyingAllowance(underlyingToken);
+      // const allowanceMantissa = await this.underlyingAllowance(underlyingToken);
+      const allowanceMantissa = await super._allowance(underlyingToken, cTokenAddr);
       if (allowanceMantissa.lt(amountMantissa)) {
         throw new Error('allowance of underlying token is not enough');
       }
