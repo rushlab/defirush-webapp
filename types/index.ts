@@ -8,9 +8,9 @@ declare namespace NodeJS {
   }
 }
 
-const { Provider } = require("@ethersproject/abstract-provider")
-const { Signer } = require("@ethersproject/abstract-signer")
-const { BigNumberish } = require("@ethersproject/bignumber")
+const { Provider } = require('@ethersproject/abstract-provider')
+const { Signer } = require('@ethersproject/abstract-signer')
+const { BigNumberish } = require('@ethersproject/bignumber')
 
 declare type Provider = typeof Provider;
 declare type Signer = typeof Signer;
@@ -35,6 +35,7 @@ declare interface BankAppInterface {
   _mantissaToDisplay(amountMantissa: AmountMantissa, decimals: number): AmountDisplay;
   getAssetData(underlyingToken: Address): Promise<any>;
   getAccountData(): Promise<any>;
+  getAccountAssets(): Promise<any>;
   getAccountAssetData(underlyingToken: Address): Promise<any>;
   approveUnderlying(underlyingToken: Address, amountDisplay: AmountDisplay): Promise<any>;
   underlyingAllowance(underlyingToken: Address): Promise<any>;

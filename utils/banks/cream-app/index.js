@@ -44,6 +44,18 @@ class CreamApp extends BankApp {
     }
   }
 
+  _getUnderlyingOfMarket(crTokenAddr) {
+    const result = this.markets.find((item) => {
+      return item.address.toLowerCase() === crTokenAddr.toLowerCase()
+    });
+    if (result) {
+      return result.underlyingAddress;
+    } else {
+      throw new Error('Invalid crToken address');
+    }
+  }
+
+
   async _getEtherUsdPriceMantissa() {
     const chainLink = new ethers.Contract(this.addresses['ChainLink::ETHUSD'], [
       // returns: roundId, answer, startedAt, updatedAt, answeredInRound
@@ -122,6 +134,29 @@ class CreamApp extends BankApp {
       userBorrowsUSD: this._mantissaToDisplay(totalBorrows, 36),
       availableBorrowsUSD: this._mantissaToDisplay(liquidity, 18),
     }
+  }
+
+  async getAccountAssets() {
+    const _userAddress = this.$wallet.getAddress();
+    const crTokens = await this.comptroller.getAssetsIn(_userAddress);
+    const deposits = [];
+    const borrows = [];
+    const _promises = crTokens.map(async (crTokenAddr) => {
+      const crToken = new ethers.Contract(crTokenAddr, [
+        'function underlying() view returns (address)',
+        'function getAccountSnapshot(address) view returns (uint,uint,uint,uint)',
+      ], this.$wallet.getProvider());
+      const [,crTokenBalance,borrowBalance,] = await crToken.getAccountSnapshot(_userAddress);
+      const underlyingToken = this._getUnderlyingOfMarket(crTokenAddr);
+      if (crTokenBalance.gt(0)) {
+        deposits.push(underlyingToken);
+      }
+      if (borrowBalance.gt(0)) {
+        borrows.push(underlyingToken);
+      }
+    });
+    await Promise.all(_promises);
+    return { deposits, borrows };
   }
 
   async _getCrTokenData(crTokenAddr) {

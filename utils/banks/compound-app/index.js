@@ -44,6 +44,17 @@ class CompoundApp extends BankApp {
     }
   }
 
+  _getUnderlyingOfMarket(cTokenAddr) {
+    const result = this.markets.find((item) => {
+      return item.address.toLowerCase() === cTokenAddr.toLowerCase()
+    });
+    if (result) {
+      return result.underlyingAddress;
+    } else {
+      throw new Error('Invalid cToken address');
+    }
+  }
+
   /**
    * 返回 cToken 的 underlyingToken 的价格 in usd
    */
@@ -111,6 +122,29 @@ class CompoundApp extends BankApp {
       userBorrowsUSD: this._mantissaToDisplay(totalBorrows, 36),
       availableBorrowsUSD: this._mantissaToDisplay(liquidity, 18),
     }
+  }
+
+  async getAccountAssets() {
+    const _userAddress = this.$wallet.getAddress();
+    const cTokens = await this.comptroller.getAssetsIn(_userAddress);
+    const deposits = [];
+    const borrows = [];
+    const _promises = cTokens.map(async (cTokenAddr) => {
+      const cToken = new ethers.Contract(cTokenAddr, [
+        'function underlying() view returns (address)',
+        'function getAccountSnapshot(address) view returns (uint,uint,uint,uint)',
+      ], this.$wallet.getProvider());
+      const [,cTokenBalance,borrowBalance,] = await cToken.getAccountSnapshot(_userAddress);
+      const underlyingToken = this._getUnderlyingOfMarket(cTokenAddr);
+      if (cTokenBalance.gt(0)) {
+        deposits.push(underlyingToken);
+      }
+      if (borrowBalance.gt(0)) {
+        borrows.push(underlyingToken);
+      }
+    });
+    await Promise.all(_promises);
+    return { deposits, borrows };
   }
 
   async _getCTokenData(cTokenAddr) {

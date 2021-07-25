@@ -73,6 +73,15 @@ export class BankApp implements BankAppInterface {
   }
 
   /**
+   * 返回用户有头寸的资产
+   *
+   * @return     Array      { deposits: [address1, ...], borrows: [address1, ...] }
+   */
+  async getAccountAssets() {
+    throw new Error('getAccountAssets is not implemented');
+  }
+
+  /**
    * 获得当前用户对应某个资产的信息, 比如
    *
    * @return     Object      { userDeposits, userBorrows }

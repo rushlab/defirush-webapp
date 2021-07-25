@@ -12,7 +12,9 @@ class AaveApp extends BankApp {
       'function withdraw(address asset, uint256 amount, address to)',
       'function borrow(address asset, uint256 amount, uint256 interestRateMode, uint16 referralCode, address onBehalfOf)',
       'function repay(address asset, uint256 amount, uint256 rateMode, address onBehalfOf)',
-      'function getUserAccountData(address) view returns (uint256,uint256,uint256,uint256,uint256,uint256)',
+      'function getUserAccountData(address user) view returns (uint256,uint256,uint256,uint256,uint256,uint256)',
+      'function getUserConfiguration(address user) view returns (uint256)',
+      'function getReservesList() view returns (address[])',
     ], this.$wallet.getProvider());
     this.wETHGateway = new ethers.Contract(this.addresses['WETHGateway'], [
       'function depositETH(address lendingPool, address onBehalfOf, uint16 referralCode) payable',
@@ -106,6 +108,24 @@ class AaveApp extends BankApp {
     //  ltv 貌似是 4 个 decimals, 文档没明确说明
     // healthFactor: this._mantissaToDisplay(healthFactor, 18),
     //  borrowLimitUsed 约等于 1 / healthFactor
+  }
+
+  async getAccountAssets() {
+    let bitmask = await this.lendingPool.getUserConfiguration(this.$wallet.getAddress())
+    const reserves = await this.lendingPool.getReservesList()
+    const deposits = [];
+    const borrows = [];
+    for (const asset of reserves) {
+      if (bitmask.mod(2).eq(1)) {
+        borrows.push(asset);
+      }
+      bitmask = bitmask.div(2);
+      if (bitmask.mod(2).eq(1)) {
+        deposits.push(asset);
+      }
+      bitmask = bitmask.div(2);
+    }
+    return { deposits, borrows };
   }
 
   async getAccountAssetData(underlyingToken) {
