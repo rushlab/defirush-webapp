@@ -1,7 +1,7 @@
 <template>
   <el-container>
-    <el-aside width="200px" class="sidebar-wrapper">
-      <sidebar />
+    <el-aside class="sidebar-wrapper" :width="!!isCollasped ? '64px' : '300px'">
+      <sidebar :isCollasped.sync="isCollasped"/>
     </el-aside>
     <el-container style="height: 100vh; overflow: auto;">
       <el-header class="side-header-wrapper">
@@ -22,7 +22,12 @@ export default {
   components: {
     Sidebar,
     SiteHeader,
-  }
+  },
+  data() {
+    return {
+      isCollasped: false
+    }
+  },
 }
 </script>
 
@@ -32,5 +37,6 @@ export default {
 }
 .sidebar-wrapper {
   box-shadow: 1px 0 0 0px #E6E6E6;
+  background-color: #000000;
 }
 </style>
