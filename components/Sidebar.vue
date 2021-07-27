@@ -87,12 +87,12 @@ export default {
   height: 104px;
 }
 .sidebar__logo {
-  width: 96px;
+  width: 133px;
   height: 64px;
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  background-image: url('~/assets/icons/logo.png');
+  background-image: url('~/assets/icons/logo-white.png');
 }
 .sidebar__toggle {
   position: absolute;
