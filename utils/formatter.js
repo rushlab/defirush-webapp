@@ -1,4 +1,6 @@
 import dayjs from 'dayjs'
+const relativeTime = require('dayjs/plugin/relativeTime')
+dayjs.extend(relativeTime)
 
 export const formatCurrency = (value, symbol = '$') => {
   value = (+value).toFixed(2)
@@ -30,3 +32,7 @@ export const formatDateTime = (value) => {
   return v.isValid() ? v.format('YYYY-MM-DD HH:mm') : '-'
 }
 
+export const toNow = (value) => {
+  const v = dayjs(value)
+  return v.isValid() ? v.toNow() : '-'
+}

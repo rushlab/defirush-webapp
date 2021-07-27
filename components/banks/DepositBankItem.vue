@@ -1,43 +1,25 @@
 <template>
-  <div class="bank-item" >
-    <!-- <div class="item__column exchange">
-      <el-image class="exchange__icon" fit="contain" :src="bankData.icon"></el-image>
-      <span class="exchange__title">{{ bankData.title }}</span>
-    </div>
-    <div class="item__column total-deposit">{{ totalDepositsInUSD || '-' }} USD</div>
-    <div class="item__column total-borrow">{{ totalBorrowsInISD || '-' }} USD</div>
-    <div class="item__column apy">{{ depositAPY || '-' }}%</div>
-    <div class="item__column tvl">{{ borrowAPY || '-' }}%</div>
-    <div class="item__column gas-fee"> - </div>
-    <div class="item__column actions">
-      <el-button type="primary" @click="isVisible = true" :disabled="disabledDeposit">Deposit</el-button>
-      <el-button type="primary" @click="handleWithdraw" :disabled="disabledWithdraw">Withdraw</el-button>
-    </div> -->
-    <el-table :data="[bankData]" style="width: 100%" v-loading="pending" :show-header="false">
+  <div class="bank-item">
+    <el-table :data="[bankData]" style="width: 100%" v-loading="!!pending" element-loading-spinner="el-icon-loading" :show-header="false">
       <el-table-column label="Bank" width="180">
         <div slot-scope="scope" class="table-cell">
           <el-image class="exchange__icon" fit="contain" :src="scope.row.icon"></el-image>
           <span class="exchange__title">{{ scope.row.title }}</span>
         </div>
       </el-table-column>
-      <el-table-column label="Total Deposit">
+      <el-table-column label="锁仓量">
         <template slot-scope="scope">
           <span>{{ totalDepositsInUSD || '-' }} USD</span>
         </template>
       </el-table-column>
-      <el-table-column label="Deposit APY">
+      <el-table-column label="APY">
         <template slot-scope="scope">
           <span>{{ depositAPY || '-' }} %</span>
         </template>
       </el-table-column>
-      <el-table-column label="Total Borrow">
+      <el-table-column label="已存款金额">
         <template slot-scope="scope">
-          <span>{{ totalBorrowsInISD || '-' }} USD</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Borrow APY">
-        <template slot-scope="scope">
-          <span>{{ borrowAPY || '-' }} %</span>
+          <span>{{ userDepositsInUSD || '-' }} USD</span>
         </template>
       </el-table-column>
       <el-table-column label="Gas Fee" width="180">
@@ -47,7 +29,7 @@
       </el-table-column>
       <el-table-column label="action" width="180">
         <template slot-scope="scope">
-          <el-button type="primary" @click="isVisible = true" :disabled="disabledDeposit">Deposit</el-button>
+          <el-button type="primary" size="small" round @click="isVisible = true" :disabled="disabledDeposit">Deposit</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -91,11 +73,13 @@ export default {
       isVisible: false,
       assetData: null,
       pending: false,
+      disabled: false,
+      userDeposits: '0'
     }
   },
   computed: {
     disabledDeposit() {
-      return _.isEmpty(this.bankData) || !this.bankApp || _.isEmpty(this.underlyingTokenData)
+      return _.isEmpty(this.bankData) || !this.bankApp || _.isEmpty(this.underlyingTokenData) || this.disabled
     },
     disabledWithdraw() {
       return _.isEmpty(this.bankData) || !this.bankApp || _.isEmpty(this.underlyingTokenData)
@@ -108,7 +92,7 @@ export default {
       if (!totalDeposits || !priceUSD) return '-'
       return (+totalDeposits * +priceUSD).toString()
     },
-    totalBorrowsInISD() {
+    totalBorrowsInUSD() {
       const { totalBorrows, priceUSD } = this.assetData || {}
       if (!totalBorrows || !priceUSD) return '-'
       return (+totalBorrows * +priceUSD).toString()
@@ -119,24 +103,52 @@ export default {
     borrowAPY() {
       return this.assetData ? ((+this.assetData.borrowAPY || 0) * 100).toFixed(2) : '-'
     },
+    userDepositsInUSD() {
+      const { priceUSD } = this.assetData || {}
+      const userDeposits = +this.userDeposits || 0
+      if (!userDeposits || !priceUSD) return '-'
+      return (+userDeposits * +priceUSD).toString()
+    }
   },
   watch: {
     underlyingTokenAddress: {
       handler(newVal) {
-        !!newVal && this.getAssetData(newVal)
+        if (!newVal) return;
+        this.getAllData()
       },
       immediate: true
     }
   },
   methods: {
-    async getAssetData(asset) {
-      this.pending = true
-      this.assetData = await this.bankApp.getAssetData(asset)
-      console.log('@@@@ getAssetData', this.assetData)
+    getAllData() {
+      this.getAssetData()
+      this.getAccountAssetData()
+    },
+    async getAssetData() {
+      try {
+        this.pending = true
+        this.assetData = await this.bankApp.getAssetData(this.underlyingTokenAddress)
+        this.disabled = false
+      } catch (error) {
+        console.log('@GetAssetData error', error)
+        this.disabled = true
+      }
       this.pending = false
     },
+    async getAccountAssetData() {
+      try {
+        const { userDeposits } = await this.bankApp.getAccountAssetData(this.underlyingTokenAddress)
+        this.userDeposits = userDeposits
+      } catch (error) {
+        console.log('@@@ getAccountAssetData error', error)
+        this.userDeposits = '0'
+      }
+    },
     onDepositSuccess(amountDisplay) {
-      this.getAssetData(this.underlyingTokenAddress)
+      this.getAllData()
+    },
+    estimateGas() {
+
     },
     handleWithdraw() {}
   },
@@ -184,5 +196,11 @@ export default {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+}
+/deep/ {
+  .el-loading-spinner {
+    margin-top: 0;
+    transform: translateY(-50%);
+  }
 }
 </style>

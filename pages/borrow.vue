@@ -74,9 +74,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '@/assets/stylesheets/variables.scss';
 /deep/ {
   .el-table__empty-block {
     display: none;
   }
+}
+.bank-list {
+  border: 1px solid $color-border;
 }
 </style>
