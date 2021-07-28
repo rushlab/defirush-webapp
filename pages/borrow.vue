@@ -69,7 +69,6 @@ import BorrowBankItem from '@/components/banks/BorrowBankItem'
 import { AaveApp } from '@/utils/banks/aave-app'
 import { CompoundApp } from '@/utils/banks/compound-app'
 import { CreamApp } from '@/utils/banks/cream-app'
-import { toNow } from '@/utils/formatter'
 
 export default {
   components: {
@@ -95,14 +94,16 @@ export default {
       underlyingTokenPriceUSD: 0,
       availableBorrowsDisplay: 0,
       lastUpdatedAt: dayjs(),
-      lastUpdatedAtDisplay: '',
-      timer: null
+      currentTime: 0
     }
   },
   computed: {
     amountToUSD() {
       return (+this.amountDisplay * +this.underlyingTokenPriceUSD).toFixed(6)
     },
+    lastUpdatedAtDisplay() {
+      return this.lastUpdatedAt ? this.lastUpdatedAt.to(this.currentTime) : '-'
+    }
   },
   mounted() {
     this.banksList = [{
@@ -118,9 +119,6 @@ export default {
     this.getAvailableBorrowsDisplay()
     this.getUnderlyingAssetPriceUSD()
     this.getBalanceDisplay()
-    this.timer = setInterval(() => {
-      this.updateLastUpdatedAt()
-    }, 10000)
   },
   beforeRouteLeave (to, from, next) {
     this.timer && clearInterval(this.timer)
@@ -159,7 +157,7 @@ export default {
       this.refreshTable()
     },
     updateLastUpdatedAt() {
-      this.lastUpdatedAtDisplay = toNow(this.lastUpdatedAt)
+      return this.lastUpdatedAt ? this.lastUpdatedAt.to(this.currentTime) : '-'
     },
     async getUnderlyingAssetPriceUSD() {
       const underlyingAssetAddress = this.underlyingToken.address
@@ -188,6 +186,16 @@ export default {
       this.lastUpdatedAt = dayjs()
     }
   },
+  watch: {
+    currentTime: {
+      handler() {
+        setTimeout(() => {
+          this.currentTime = dayjs()
+        }, 1000)
+      },
+      immediate: true
+    }
+  }
 }
 </script>
 
