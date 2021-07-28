@@ -34,7 +34,7 @@
       </el-table-column>
       <el-table-column label="action" width="180">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" round @click="isVisible = true" :disabled="disabledBorrow">Borrow</el-button>
+          <el-button type="success" size="small" round @click="isVisible = true" :disabled="disabledBorrow">Borrow</el-button>
         </template>
       </el-table-column>
     </el-table>

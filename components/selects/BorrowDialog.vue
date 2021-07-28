@@ -1,18 +1,19 @@
 <template>
   <el-dialog class="dialog--borrow" title="Borrow"
-    width="500px" top="5vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
+    width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
     <div class="dialog__inner">
       <el-form :model="form" v-loading="isApproving">
         <el-form-item>
-          <small>How much collateral do you want to borrow?</small>
+          <div class="input-hint">How much collateral do you want to borrow?</div>
           <el-input
+            class="dialog-input"
             v-model="form.amountDisplay"
             @input="onInputAmountDisplay"
             :disabled="!+availableBorrowsDisplay || !underlyingAssetDecimals">
             <div slot="append">{{ underlyingAssetSymbol }}</div>
           </el-input>
-          <small class="balance-hint">Available: <span class="balance__value">{{ availableBorrowsDisplay }} {{ underlyingAssetSymbol }}</span></small>
+          <div class="balance-hint">Available: <strong class="balance__value">{{ availableBorrowsDisplay }} {{ underlyingAssetSymbol }}</strong></div>
         </el-form-item>
         <el-form-item>
           <el-slider
@@ -29,8 +30,8 @@
       </div>
     </div>
     <div slot="footer" class="dialog-footer">
-      <el-button v-if="needApprove" type="warning" @click="handleApprove">Approve</el-button>
-      <el-button v-else type="primary" @click="handleDeposit" :loading="isBorrowing  ">{{ isBorrowing   ? 'Borrowing' : 'Borrow' }}</el-button>
+      <button class="footer__btn" v-if="needApprove" @click="handleApprove">APPROVE</button>
+      <button class="footer__btn" v-else @click="handleBorrow" :loading="isBorrowing">{{ isBorrowing   ? 'BORROWING' : 'BORROW' }}</button>
     </div>
   </el-dialog>
 </template>
@@ -154,19 +155,19 @@ export default {
       }
       this.isApproving = false
     },
-    async handleDeposit() {
+    async handleBorrow() {
       try {
         this.isBorrowing   = true
         await this.bankApp.borrow(this.underlyingTokenData.address, this.form.amountDisplay)
         this.$message({type: 'success', message: '借款成功!'})
-        this.handleDepositSuccess()
+        this.handleBorrowSuccess()
       } catch (error) {
-        console.log('handleDeposit error: ', error)
+        console.log('handleBorrow error: ', error)
         this.$message.error(JSON.stringify(error))
       }
       this.isBorrowing   = false
     },
-    handleDepositSuccess() {
+    handleBorrowSuccess() {
       this.$emit('success')
       this.isVisible = false
     }
@@ -176,12 +177,17 @@ export default {
 
 
 <style lang="scss" scoped>
+@import "@/assets/stylesheets/variables.scss";
 
+.input-hint {
+  font-size: 16px;
+}
 .balance-hint {
   display: block;
   text-align: right;
   line-height: 20px;
   margin: 5px 0 10px;
+  color: #777E90;
 }
 /deep/ {
   .el-form-item {
@@ -199,10 +205,70 @@ export default {
     width: 32px;
     left: auto !important;
     right: -16px !important;
+    color: #3ACB6E;
+  }
+  .el-input-group--append .el-input__inner {
+    border-right: none;
+  }
+  .el-input-group__append {
+    background-color: transparent;
+    border-left: none;
+    font-size: 15px;
+  }
+}
+/deep/ .el-input.dialog-input  {
+  .el-input__inner {
+    height: 72px;
+    line-height: 72px;
+    font-size: 20px;
   }
 }
 .dialog__hints {
+  padding: 0;
+  margin-top: 60px;
+  h3 {
+    font-size: 18px;
+  }
+  ul {
+    padding-left: 20px;
+    margin-top: 10px;
+  }
+  li {
+    line-height: 1.7;
+  }
+}
+.dialog-footer {
+  height: 80px;
+  // border-top: 1px solid $color-border;
+}
+.footer__btn {
+  display: block;
+  height: 80px;
+  width: 100%;
+  background-color: transparent;
+  line-height: 40px;
   padding: 20px;
-  font-size: 0.8em;
+  text-align: center;
+  outline: none;
+  appearance: none;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  font-size: 28px;
+  font-weight: 400;
+  text-transform: uppercase;
+  &:hover,
+  &:active {
+    // background-color: orange;
+    opacity: 0.7;
+  }
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-top: 1px solid $color-border;
+  }
 }
 </style>

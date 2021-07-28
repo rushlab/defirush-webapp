@@ -1,0 +1,13 @@
+.dialog--deposit,
+.dialog--borrow {
+  .el-dialog__title {
+    font-size: 24px;
+  }
+  .el-dialog__body {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  .el-dialog__footer {
+    padding: 0;
+  }
+}
