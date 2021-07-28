@@ -120,9 +120,6 @@ export default {
     this.getUnderlyingAssetPriceUSD()
     this.getBalanceDisplay()
   },
-  beforeRouteLeave (to, from, next) {
-    this.timer && clearInterval(this.timer)
-  },
   methods: {
     async getAvailableBorrowsDisplay() {
       /**
