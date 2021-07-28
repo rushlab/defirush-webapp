@@ -92,16 +92,8 @@ export default {
       if (!totalDeposits || !priceUSD) return '-'
       return (+totalDeposits * +priceUSD).toString()
     },
-    totalBorrowsInUSD() {
-      const { totalBorrows, priceUSD } = this.assetData || {}
-      if (!totalBorrows || !priceUSD) return '-'
-      return (+totalBorrows * +priceUSD).toString()
-    },
     depositAPY() {
       return this.assetData ? ((+this.assetData.depositAPY || 0) * 100).toFixed(2) : '-'
-    },
-    borrowAPY() {
-      return this.assetData ? ((+this.assetData.borrowAPY || 0) * 100).toFixed(2) : '-'
     },
     userDepositsInUSD() {
       const { priceUSD } = this.assetData || {}
@@ -125,6 +117,9 @@ export default {
       this.getAccountAssetData()
     },
     async getAssetData() {
+      /**
+       * trycatch 包一下，这样对于当前bankApp不支持的 underlyingAsset，可以直接将状态置为 disabled
+       */
       try {
         this.pending = true
         this.assetData = await this.bankApp.getAssetData(this.underlyingTokenAddress)

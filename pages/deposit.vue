@@ -1,5 +1,5 @@
 <template>
-  <div class="page--home">
+  <div class="page--deposit">
     <el-form>
       <el-form-item>
         <chain-select :value.sync="currentChain"/>
