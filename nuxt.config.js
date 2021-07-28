@@ -34,7 +34,8 @@ module.exports = {
   plugins: [
     '@/plugins/element-ui',
     '@/plugins/nuxt-client-init.js',
-    '@/plugins/wallet/index.js',
+    '@/plugins/wallet/account.js',
+    '@/plugins/wallet/transaction.js',
     '@/plugins/filters.js',
   ],
   /*

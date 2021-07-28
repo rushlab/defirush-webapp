@@ -90,7 +90,7 @@ export default {
       balanceDisplay: '0',
       underlyingTokenPriceUSD: 0,
       lastUpdatedAt: dayjs(),
-      currentTime: 0
+      currentTime: dayjs(),
     }
   },
   computed: {

@@ -141,11 +141,9 @@ export default {
         const contract = new ethers.Contract(
           this.EtherFaucet.address, this.EtherFaucet.abi, this.$wallet.getSigner())
         const amount = ethers.utils.parseEther('1')  // 获取 1 个 Ether
-        const receipt = await contract.requestEther(amount, {
+        await contract.requestEther(amount, {
           gasPrice: 0,
-        })
-        console.log('@@@@@ receipt ', receipt)
-        await receipt.wait()
+        }).then(this.$waitForTx)
         await this.getEtherBalance()
       } catch (error) {
         console.log(error)
