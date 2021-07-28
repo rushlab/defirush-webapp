@@ -67,8 +67,6 @@ import ChainSelect from '@/components/ChainSelect'
 import { AaveApp } from '@/utils/banks/aave-app'
 import { CompoundApp } from '@/utils/banks/compound-app'
 import { CreamApp } from '@/utils/banks/cream-app'
-import { toNow } from '@/utils/formatter'
-import { clearInterval } from 'timers';
 
 export default {
   components: {
@@ -92,8 +90,7 @@ export default {
       balanceDisplay: '0',
       underlyingTokenPriceUSD: 0,
       lastUpdatedAt: dayjs(),
-      lastUpdatedAtDisplay: '',
-      timer: null
+      currentTime: 0
     }
   },
   computed: {
@@ -103,6 +100,9 @@ export default {
     isETH() {
       return _.get(this.underlyingToken, 'address', '').toLowerCase() === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase()
     },
+    lastUpdatedAtDisplay() {
+      return this.lastUpdatedAt ? this.lastUpdatedAt.to(this.currentTime) : '-'
+    }
   },
   mounted() {
     this.banksList = [{
@@ -117,21 +117,12 @@ export default {
     }]
     this.getUnderlyingAssetPriceUSD()
     this.getBalanceDisplay()
-    this.timer = setInterval(() => {
-      this.updateLastUpdatedAt()
-    }, 10000)
-  },
-  beforeRouteLeave (to, from, next) {
-    this.timer && clearInterval(this.timer)
   },
   methods: {
     onSelectToken(token) {
       this.underlyingToken = token
       this.getUnderlyingAssetPriceUSD()
       this.getBalanceDisplay()
-    },
-    updateLastUpdatedAt() {
-      this.lastUpdatedAtDisplay = toNow(this.lastUpdatedAt)
     },
     async getBalanceDisplay() {
       if (this.isETH) {
@@ -163,6 +154,16 @@ export default {
       this.lastUpdatedAt = dayjs()
     }
   },
+  watch: {
+    currentTime: {
+      handler() {
+        setTimeout(() => {
+          this.currentTime = dayjs()
+        }, 1000)
+      },
+      immediate: true
+    }
+  }
 }
 </script>
 
