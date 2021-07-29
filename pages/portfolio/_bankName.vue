@@ -1,9 +1,105 @@
 <template>
   <div>
-    <h1>{{ bankName }}</h1>
-    <div>userDeposits: {{ formatCurrency(accountData.userDepositsUSD) }}</div>
-    <div>userBorrows: {{ formatCurrency(accountData.userBorrowsUSD) }}</div>
-    <div>availableBorrows: {{ formatCurrency(accountData.availableBorrowsUSD) }}</div>
+    <div class="page--borrow">
+      <el-form>
+        <el-form-item>
+          <bank-select :value="bankName" @change="changeBankRoute"/>
+        </el-form-item>
+      </el-form>
+    </div>
+
+    <!-- <div class="bank-data">
+      <el-row :gutter="20">
+        <el-col :span="8">
+          <div class="bank-data-card">
+            <div class="card__title">Available Credit</div>
+            <div class="card__value">{{ formatCurrency(+accountData.userBorrowsUSD + +accountData.availableBorrowsUSD) }}</div>
+          </div>
+        </el-col>
+        <el-col :span="8">
+          <div class="bank-data-card">
+            <div class="card__title">Total Debt</div>
+            <div class="card__value">{{ formatCurrency(accountData.userBorrowsUSD) }}</div>
+          </div>
+        </el-col>
+        <el-col :span="8">
+          <div class="bank-data-card">
+            <div class="card__title">Credit Limit</div>
+            <div class="card__value">{{ formatCurrency(accountData.availableBorrowsUSD) }}</div>
+          </div>
+        </el-col>
+      </el-row>
+    </div> -->
+
+    <div class="bank-data-card">
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <div class="card__child">
+            <div class="card__row">
+              <div class="data-item">
+                <div class="data-item__label">Value locked in bank</div>
+                <div class="data-item__value text-larger">{{ formatCurrency(+accountData.userBorrowsUSD + +accountData.availableBorrowsUSD) }}</div>
+              </div>
+            </div>
+            <div class="card__row">
+              <el-row :gutter="20">
+                <el-col :span="12">
+                  <div class="data-item">
+                    <div class="data-item__label">Daily earning</div>
+                    <div class="data-item__value">{{ formatCurrency(21.56) }}</div>
+                  </div>
+                </el-col>
+                <el-col :span="12">
+                  <div class="data-item">
+                    <div class="data-item__label">APY</div>
+                    <div class="data-item__value">3.23%</div>
+                  </div>
+                </el-col>
+              </el-row>
+            </div>
+          </div>
+        </el-col>
+        <el-col :span="12">
+          <div class="card__child">
+            <div class="card__row">
+              <el-row :gutter="20">
+                <el-col :span="12">
+                  <div class="data-item">
+                    <div class="data-item__label">Total credit</div>
+                    <div class="data-item__value">{{ formatCurrency(totalCredit) }}</div>
+                  </div>
+                </el-col>
+                <el-col :span="12">
+                  <div class="data-item">
+                    <div class="data-item__label">Total borrows</div>
+                    <div class="data-item__value">{{ formatCurrency(+accountData.userBorrowsUSD) }}</div>
+                  </div>
+                </el-col>
+              </el-row>
+            </div>
+            <div class="card__row">
+              <div class="data-item">
+                <div class="data-item__label">
+                  <span>Utilization</span> <span class="utilization-tag" :class="{'is-danger': isDanger}">{{ isDanger ? 'Safe' : 'Danger' }}: {{ safetyPrecentage }}%</span>
+                </div>
+                <div class="data-item__value">
+                  <div class="utilization-progress-bar">
+                    <el-progress
+                      stroke-width="16"
+                      stroke-linecap="square"
+                      :show-text="false"
+                      :percentage="safetyPrecentage"
+                      :color="customColors"></el-progress>
+                  </div>
+                  <div class="utilization-hint">The ratio of your debt to your credit limit. If it hits 100%, your loan will be liquidated.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+
     <div style="margin-top: 1em;"></div>
     <el-card header="Deposits" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
       <el-table :data="deposits">
@@ -59,19 +155,26 @@
 
 <script>
 import _ from 'lodash'
+import dayjs from 'dayjs'
+import BankSelect from '@/components/BankSelect'
+
 import { formatCurrency } from '@/utils/formatter'
 import { createBankApp } from '@/utils/banks/factory'
 
 export default {
-  // asyncData({ store, params }) {
-  //   return {
-  //     bankName: params.bankName,
-  //   }
-  // },
+  asyncData({ store, params }) {
+    return {
+      bankName: params.bankName,
+    }
+  },
+  components: {
+    BankSelect
+  },
   data() {
     const bankName = this.$route.params.bankName
     const { app, title, logo } = createBankApp(bankName, this.$wallet)
     return {
+      currentChain: "Ethereum",
       bankName,
       bankApp: app,
       bankTitle: title,
@@ -83,6 +186,23 @@ export default {
       },
       deposits: [],
       borrows: [],
+      customColors: [
+        {color: '#0cb444', percentage: 80},
+        {color: '#e74c3c', percentage: 100},
+      ]
+    }
+  },
+  computed: {
+    totalCredit() {
+      const { userBorrowsUSD, availableBorrowsUSD } = this.accountData
+      return +userBorrowsUSD + +availableBorrowsUSD
+    },
+    safetyPrecentage() {
+      const { userBorrowsUSD } = this.accountData
+      return this.totalCredit > 0 ? (+userBorrowsUSD * 100 / this.totalCredit).toFixed(2) : 0
+    },
+    isDanger() {
+      return this.safetyPrecentage <= 80
     }
   },
   mounted() {
@@ -144,12 +264,34 @@ export default {
     },
     handleRefresh() {
       this.getAccountData()
+    },
+    changeBankRoute(bankName) {
+      this.$router.push(`/portfolio/${bankName}`)
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import '@/assets/stylesheets/variables.scss';
+.bank-data-card {
+  padding: 20px;
+  height: 240px;
+  box-shadow: 0 0 0 1px $color-border;
+}
+.card__title {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+  margin-bottom: 18px;
+  color: $color-text-light;
+}
+.card__value {
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
 /deep/ {
   .el-table__empty-block {
     display: none;
@@ -169,5 +311,58 @@ export default {
     opacity: 0.75;
     line-height: 1;
   }
+}
+.card__row + .card__row {
+  margin-top: 15px;
+}
+.data-item {
+  padding: 10px;
+}
+.data-item__label {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+  opacity: .8;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.data-item__value {
+  line-height: 1;
+  font-weight: 400;
+  font-size: 22px;
+  &.text-larger {
+    font-size: 28px;
+  }
+}
+.utilization-tag {
+  margin-left: 15px;
+  font-size: 14px;
+  color: #ffffff;
+  line-height: 16px;
+  height: 30px;
+  padding: 7px 10px;
+  background-color: rgb(12, 180, 68);
+  border-radius: 4px;
+}
+.utilization-progress-bar {
+  position: relative;
+  &::after {
+    content: "80% risky";
+    position: absolute;
+    left: 80%;
+    top: 0;
+    line-height: 16px;
+    font-size: 12px;
+    color: #777E91;
+    border-left: 1px solid;
+    padding-left: 5px;
+  }
+}
+.utilization-hint {
+  font-size: 14px;
+  color: $color-text-light;
+  margin-top: 10px;
 }
 </style>
