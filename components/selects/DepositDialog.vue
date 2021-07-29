@@ -1,9 +1,9 @@
 <template>
   <el-dialog class="dialog--deposit" title="Deposit"
-    width="600px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
+    width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
-    <div class="dialog__inner">
-      <el-form :model="form" v-loading="isApproving">
+    <div class="dialog__inner" v-loading="isApproving || isDepositing" element-loading-background="rgba(0, 0, 0, 0)">
+      <el-form :model="form">
         <el-form-item>
           <div class="input-hint">How much collateral do you want to deposit?</div>
           <el-input
@@ -23,11 +23,10 @@
         </el-form-item>
       </el-form>
       <div class="dialog__hints">
-        <h3>You Will</h3>
+        <p class="hints-title">You Will</p>
         <ul>
-          <li>Deposit {{ form.amountDisplay }} {{ underlyingAssetSymbol }}(≈ $-)</li>
-          <li>Lock - ETH for liquidation reserve</li>
-          <li>Pay - ETH for borrow fee</li>
+          <li>Deposit {{ form.amountDisplay }} {{ underlyingAssetSymbol }}(≈ {{ formatCurrency(amountToUSD) }})</li>
+          <li>Credit $20000 of borrow limit(待计算)</li>
         </ul>
       </div>
     </div>
@@ -42,6 +41,7 @@
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import { ethers } from 'ethers'
+import { formatCurrency } from '@/utils/formatter'
 
 export default {
   name: 'DepositDialog',
@@ -88,6 +88,9 @@ export default {
           { validator: validationAmount, trigger: 'blur' }
         ]
       },
+      assetData: {},
+      accountData: {},
+      accountAssetData: {},
       allowanceDisplay: '0.00',
       balanceDisplay: '0.00',
       isDepositing: false
@@ -109,7 +112,11 @@ export default {
     needApprove() {
       if (this.isETH) return false
       return +this.allowanceDisplay < +this.form.amountDisplay
-    }
+    },
+    amountToUSD() {
+      const { priceUSD = 0 } = this.assetData
+      return (+this.form.amountDisplay * +priceUSD).toString()
+    },
   },
   watch: {
     visible(newVal, oldValue) {
@@ -122,13 +129,28 @@ export default {
     }
   },
   mounted() {
+    this.getAccountAndAssetData()
     this.updateAllowanceDisplay()
     this.getBalanceDisplay()
   },
   methods: {
+    formatCurrency,
     async onDialogOpen() {
       this.$emit('open')
       this.$emit('update:visible', true)
+    },
+    async getAccountAndAssetData() {
+      const underlyingToken = this.underlyingTokenData.address
+      const [
+        accountData, assetData, accountAssetData
+      ] = await Promise.all([
+        this.bankApp.getAccountData(),  // 获取当前可借贷余额 availableBorrowsUSD
+        this.bankApp.getAssetData(underlyingToken),  // 获取 underlyingToken priceUSD
+        this.bankApp.getAccountAssetData(underlyingToken),
+      ])
+      this.accountData = accountData
+      this.assetData = assetData
+      this.accountAssetData = accountAssetData
     },
     async updateAllowanceDisplay() {
       if (this.isETH) return
@@ -185,101 +207,5 @@ export default {
 
 
 <style lang="scss" scoped>
-@import "@/assets/stylesheets/variables.scss";
-
-.input-hint {
-  font-size: 16px;
-}
-.balance-hint {
-  display: block;
-  text-align: right;
-  line-height: 20px;
-  margin: 5px 0 10px;
-  color: #777E90;
-}
-.balance__value {
-  // color: #ffffff;
-}
-/deep/ {
-  .el-form-item {
-    margin-bottom: 10px;
-  }
-  .el-slider__marks-text {
-    // width: 38px;
-    text-align: center;
-  }
-  .el-slider__marks-text:first-child {
-    left: 11px !important;
-    width: 22px;
-  }
-  .el-slider__marks-text:last-child {
-    width: 32px;
-    left: auto !important;
-    right: -16px !important;
-    color: #3ACB6E;
-  }
-  .el-input-group--append .el-input__inner {
-    border-right: none;
-  }
-  .el-input-group__append {
-    background-color: transparent;
-    border-left: none;
-    font-size: 15px;
-  }
-}
-/deep/ .el-input.dialog-input  {
-  .el-input__inner {
-    height: 72px;
-    line-height: 72px;
-    font-size: 20px;
-  }
-}
-.dialog__hints {
-  padding: 0;
-  margin-top: 60px;
-  h3 {
-    font-size: 18px;
-  }
-  ul {
-    padding-left: 20px;
-    margin-top: 10px;
-  }
-  li {
-    line-height: 1.7;
-  }
-}
-.dialog-footer {
-  height: 80px;
-  // border-top: 1px solid $color-border;
-}
-.footer__btn {
-  display: block;
-  height: 80px;
-  width: 100%;
-  background-color: transparent;
-  line-height: 40px;
-  padding: 20px;
-  text-align: center;
-  outline: none;
-  appearance: none;
-  border: none;
-  position: relative;
-  cursor: pointer;
-  font-size: 28px;
-  font-weight: 400;
-  text-transform: uppercase;
-  &:hover,
-  &:active {
-    // background-color: orange;
-    opacity: 0.7;
-  }
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    border-top: 1px solid $color-border;
-  }
-}
+@import "./-Dialog.scss";
 </style>

@@ -85,7 +85,7 @@
                 <div class="data-item__value">
                   <div class="utilization-progress-bar">
                     <el-progress
-                      stroke-width="16"
+                      :stroke-width="16"
                       stroke-linecap="square"
                       :show-text="false"
                       :percentage="safetyPrecentage"
@@ -102,31 +102,43 @@
 
     <div style="margin-top: 1em;"></div>
     <el-card header="Deposits" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
+      <h2 slot="header">Collateral</h2>
       <el-table :data="deposits">
         <el-table-column label="Asset">
           <div slot-scope="{ row }" class="asset-info">
             <img :src="row.info.logoURI">
+            <!-- <div class="asset-icon" :style="{backgroundImage: `url(${row.info.logoURI})`}"></div> -->
             <div><div>{{ row.info.symbol }}</div><div class="asset-name">{{ row.info.name }}</div></div>
           </div>
         </el-table-column>
         <el-table-column label="Supplying">
           <template slot-scope="{ row }">
-            <div>{{ row.userDeposits }}</div>
-            <div>{{ formatCurrency((+row.userDeposits) * (+row.priceUSD)) }}</div>
+            <div>{{ row.userDeposits }} {{ row.info.symbol }}</div>
+            <div class="asset-value-to-usd">{{ formatCurrency((+row.userDeposits) * (+row.priceUSD)) }}</div>
           </template>
         </el-table-column>
-        <el-table-column label="APY">
+        <el-table-column label="CF">
           <template slot-scope="{ row }">{{ formatPercentage(row.depositAPY) }}</template>
+        </el-table-column>
+        <el-table-column label="APY">
+          <div class="table-column-label" slot="header">
+            <span>APY</span><!--
+            --><el-tooltip effect="dark" content="Collateral factor" placement="top">
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+          </div>
+          <template slot-scope="{ row }">-</template>
         </el-table-column>
         <el-table-column label="Action">
           <template slot-scope="{ row }">
-            <el-button type="success" size="mini" round>Withdraw</el-button>
+            <el-button type="success" size="mini" round @click="() => onWithdraw(row.info)">Withdraw</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
     <div style="margin-top: 1em;"></div>
     <el-card header="Borrows" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
+      <h2 slot="header">Borrows</h2>
       <el-table :data="borrows">
         <el-table-column label="Asset">
           <div slot-scope="{ row }" class="asset-info">
@@ -150,6 +162,12 @@
         </el-table-column>
       </el-table>
     </el-card>
+    <withdraw-dialog
+      v-if="bankApp && withdrawDialogVisible"
+      :visible.sync="withdrawDialogVisible"
+      :bank-app="bankApp"
+      :underlying-token-data="withdrawAssetTokenData"
+    />
   </div>
 </template>
 
@@ -157,6 +175,7 @@
 import _ from 'lodash'
 import dayjs from 'dayjs'
 import BankSelect from '@/components/BankSelect'
+import WithdrawDialog from '@/components/selects/WithdrawDialog'
 
 import { formatCurrency } from '@/utils/formatter'
 import { createBankApp } from '@/utils/banks/factory'
@@ -168,7 +187,8 @@ export default {
     }
   },
   components: {
-    BankSelect
+    BankSelect,
+    WithdrawDialog
   },
   data() {
     const bankName = this.$route.params.bankName
@@ -189,7 +209,9 @@ export default {
       customColors: [
         {color: '#0cb444', percentage: 80},
         {color: '#e74c3c', percentage: 100},
-      ]
+      ],
+      withdrawDialogVisible: false,
+      withdrawAssetTokenData: null,
     }
   },
   computed: {
@@ -199,7 +221,7 @@ export default {
     },
     safetyPrecentage() {
       const { userBorrowsUSD } = this.accountData
-      return this.totalCredit > 0 ? (+userBorrowsUSD * 100 / this.totalCredit).toFixed(2) : 0
+      return this.totalCredit > 0 ? +((+userBorrowsUSD * 100 / this.totalCredit).toFixed(2)) : 0
     },
     isDanger() {
       return this.safetyPrecentage <= 80
@@ -267,6 +289,11 @@ export default {
     },
     changeBankRoute(bankName) {
       this.$router.push(`/portfolio/${bankName}`)
+    },
+    onWithdraw(tokenData) {
+      console.log(tokenData)
+      this.withdrawAssetTokenData = {...tokenData}
+      this.withdrawDialogVisible = true
     }
   }
 }
@@ -296,11 +323,15 @@ export default {
   .el-table__empty-block {
     display: none;
   }
+  .el-table__body {
+    color: $color-text;
+  }
 }
 .asset-info {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  color: $color-text;
   img {
     width: 40px;
     display: block;
@@ -308,9 +339,13 @@ export default {
   }
   .asset-name {
     font-size: 0.8em;
-    opacity: 0.75;
+    // opacity: 0.75;
+    color: $color-text-light;
     line-height: 1;
   }
+}
+.asset-value-to-usd {
+  color: $color-text-light;
 }
 .card__row + .card__row {
   margin-top: 15px;
@@ -364,5 +399,19 @@ export default {
   font-size: 14px;
   color: $color-text-light;
   margin-top: 10px;
+}
+.asset-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  clip-path: polygon(0 25%,
+                     50% 0, 100% 25%,
+                     100% 75%,
+                     50% 100%,
+                     0 75%);
+
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-aside class="sidebar-wrapper" :width="!!isCollasped ? '64px' : '300px'">
+    <el-aside class="sidebar-wrapper" :width="!!isCollasped ? '64px' : '240px'">
       <sidebar :isCollasped.sync="isCollasped"/>
     </el-aside>
     <el-container style="height: 100vh; overflow: auto;">

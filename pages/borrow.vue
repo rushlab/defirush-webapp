@@ -50,7 +50,8 @@
         :ref="bank.title"
         :underlying-token-data="underlyingToken"
         :bank-data="bank"
-        :bank-app="bank.app"/>
+        :bank-app="bank.app"
+      />
     </div>
     <token-select-dialog
       v-if="tokenSelectDialogVisible"

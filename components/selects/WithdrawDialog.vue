@@ -1,47 +1,39 @@
 <template>
-  <el-dialog class="dialog--borrow" title="Borrow"
+  <el-dialog class="dialog--withdraw" title="Withdraw"
     width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
-    <div class="dialog__inner" v-loading="isApproving || isBorrowing" element-loading-background="rgba(0, 0, 0, 0)">
+    <div class="dialog__inner" v-loading="isApproving || isWithdrawing" element-loading-background="rgba(0, 0, 0, 0)">
       <el-form :model="form">
         <el-form-item>
-          <div class="collateral-info">
-            <span class="collateral-label">Current Debt:&nbsp;</span><span class="collateral-value">{{ formatCurrency(currentDebtUSD) }}</span>
-          </div>
-          <div class="collateral-info">
-            <span class="collateral-label">Current Collateral Ratio:&nbsp;</span><span class="collateral-value">{{ collateralRatio }}</span>
-          </div>
-
-          <div class="input-hint">How much collateral do you want to borrow?</div>
+          <div class="input-hint">How much collateral do you want to widthdraw?</div>
           <el-input
             class="dialog-input"
             v-model="form.amountDisplay"
             @input="onInputAmountDisplay"
-            :disabled="!+availableBorrowsDisplay || !underlyingAssetDecimals">
-            <div slot="append">{{ underlyingAssetSymbol }}</div>
+            :disabled="!+balanceDisplay || !underlyingAssetDecimals">
+            <div slot="append" v-if="underlyingAssetSymbol">{{ underlyingAssetSymbol }}</div>
           </el-input>
-          <!-- <div class="balance-hint">Available: <strong class="balance__value">{{ availableBorrowsDisplay }} {{ underlyingAssetSymbol }}</strong></div> -->
-          <div class="balance-hint">Borrow Rate: <strong class="balance__value">{{ formatPercentage(assetData.borrowAPY) }}</strong></div>
+          <div class="balance-hint">Available: <strong class="balance__value">{{ balanceDisplay }} {{ underlyingAssetSymbol }}</strong></div>
         </el-form-item>
         <el-form-item>
           <el-slider
             :step="4" :marks="marks"
             v-model="form.amountSlideValue"
-            :disabled="!+availableBorrowsDisplay || !underlyingAssetDecimals"></el-slider>
+            :disabled="!+balanceDisplay || !underlyingAssetDecimals"></el-slider>
         </el-form-item>
       </el-form>
       <div class="dialog__hints">
-        <h3>You Will</h3>
+        <p class="hints-title">You Will</p>
         <ul>
-          <li>Borrow {{ form.amountDisplay }} {{ underlyingAssetSymbol }} (≈ {{ formatCurrency(amountToUSD) }})</li>
-          <li>Increate current debt to {{ formatCurrency(increasedTotalDebetUSD) }} USD</li>
-          <li>Decrease collateral ratio to {{ updatedCollateralRatio }}</li>
+          <li>Withdraw {{ form.amountDisplay }} {{ underlyingAssetSymbol }}(≈ $-)</li>
+          <li>Lock - ETH for liquidation reserve</li>
+          <li>Pay - ETH for borrow fee</li>
         </ul>
       </div>
     </div>
     <div slot="footer" class="dialog-footer">
-      <button class="footer__btn" v-if="needApprove" @click="handleApprove">Approve</button>
-      <button class="footer__btn" v-else @click="handleBorrow" :loading="isBorrowing">{{ isBorrowing   ? 'Borrowing' : 'Borrow' }}</button>
+      <button class="footer__btn" v-if="needApprove" type="warning" @click="handleApprove">Approve</button>
+      <button class="footer__btn" v-else type="primary" @click="handleDeposit" :loading="isWithdrawing">{{ isWithdrawing ? 'Withdrawing' : 'Withdraw' }}</button>
     </div>
   </el-dialog>
 </template>
@@ -53,7 +45,7 @@ import { ethers } from 'ethers'
 import { formatCurrency } from '@/utils/formatter'
 
 export default {
-  name: 'BorrowDialog',
+  name: 'WithdrawDialog',
   props: {
     visible: {
       type: Boolean,
@@ -72,7 +64,7 @@ export default {
     const validationAmount = (rule, value, callback) => {
       if (!value || !+value || +value < 0) {
         callback(new Error('Amount is required'))
-      } else if (value > this.availableBorrowsDisplay) {
+      } else if (value > this.balanceDisplay) {
         callback(new Error('The maximum balance was exceeded'))
       } else {
         callback()
@@ -97,14 +89,12 @@ export default {
           { validator: validationAmount, trigger: 'blur' }
         ]
       },
-      accountData: {},
       assetData: {},
+      accountData: {},
       accountAssetData: {},
-
-      userBorrowsDisplay: 0,
-      priceUSD: 0,
-      allowanceMantissa: ethers.constants.Zero,
-      isBorrowing: false
+      allowanceDisplay: '0.00',
+      balanceDisplay: '0.00',
+      isWithdrawing: false
     }
   },
   computed: {
@@ -118,33 +108,11 @@ export default {
       return _.get(this.underlyingTokenData, 'address', '').toLowerCase() === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase()
     },
     amountPrecentage() {
-      return +this.availableBorrowsDisplay > 0 ? (+this.form.amountDisplay / +this.availableBorrowsDisplay) * 100 : 0
+      return +this.balanceDisplay > 0 ? (+this.form.amountDisplay / +this.balanceDisplay) * 100 : 0
     },
     needApprove() {
-      return false
-    },
-    currentDebtUSD() {
-      return _.get(this.accountData, 'userBorrowsUSD', 0)
-    },
-    collateralRatio() {
-      const { userBorrowsUSD = 0, userDepositsUSD = 0} = this.accountData
-      return userBorrowsUSD == 0 ? '-' : ((+userDepositsUSD / +userBorrowsUSD * 100).toFixed(2) + '%')
-    },
-    availableBorrowsDisplay() {
-      const { availableBorrowsUSD = 0 } = this.accountData
-      const { priceUSD = 0 } = this.assetData
-      return priceUSD == 0 ? '-' : (+availableBorrowsUSD / +priceUSD).toString()
-    },
-    amountToUSD() {
-      const { priceUSD = 0 } = this.assetData
-      return (+this.form.amountDisplay * +priceUSD).toString()
-    },
-    increasedTotalDebetUSD() {
-      return +this.currentDebtUSD + +this.amountToUSD
-    },
-    updatedCollateralRatio() {
-      const { userDepositsUSD = 0} = this.accountData
-      return this.increasedTotalDebetUSD == 0 ? '-' : ((+userDepositsUSD / +this.increasedTotalDebetUSD * 100).toFixed(2) + '%')
+      if (this.isETH) return false
+      return +this.allowanceDisplay < +this.form.amountDisplay
     }
   },
   watch: {
@@ -153,19 +121,17 @@ export default {
     },
     'form.amountSlideValue': {
       handler(newVal) {
-        this.form.amountDisplay = (+this.availableBorrowsDisplay / 100 * newVal).toString()
+        this.form.amountDisplay = (+this.balanceDisplay) * newVal / 100
       }
     }
   },
   mounted() {
     this.getAccountAndAssetData()
-    this.updateAllowanceMantissa()
+    this.updateAllowanceDisplay()
+    this.getBalanceDisplay()
   },
   methods: {
     formatCurrency,
-    formatPercentage(val) {
-      return (+val * 100).toFixed(2) + '%'
-    },
     async onDialogOpen() {
       this.$emit('open')
       this.$emit('update:visible', true)
@@ -183,9 +149,17 @@ export default {
       this.assetData = assetData
       this.accountAssetData = accountAssetData
     },
-    async updateAllowanceMantissa() {
+    async updateAllowanceDisplay() {
       if (this.isETH) return
-      this.allowanceMantissa = await this.bankApp.underlyingAllowance(this.underlyingTokenData.address)
+      this.allowanceDisplay = await this.bankApp.underlyingAllowance(this.underlyingTokenData.address)
+    },
+    async getBalanceDisplay() {
+      if (this.isETH) {
+        this.balanceDisplay = await this.$wallet.getBalance()
+      } else {
+        const { address } = this.underlyingTokenData
+        this.balanceDisplay = await this.$wallet.getBalance(address)
+      }
     },
     onDialogClose() {
       this.form.amountDisplay = ''
@@ -201,26 +175,26 @@ export default {
       try {
         this.isApproving = true
         await this.bankApp.approveUnderlying(this.underlyingTokenData.address, this.form.amountDisplay)
-        await this.updateAllowanceMantissa()
+        await this.updateAllowanceDisplay()
       } catch (error) {
         console.log('handleApprove error: ', error)
         this.$message.error(JSON.stringify(error))
       }
       this.isApproving = false
     },
-    async handleBorrow() {
+    async handleDeposit() {
       try {
-        this.isBorrowing   = true
-        await this.bankApp.borrow(this.underlyingTokenData.address, this.form.amountDisplay)
-        this.$message({type: 'success', message: '借款成功!'})
-        this.handleBorrowSuccess()
+        this.isWithdrawing = true
+        await this.bankApp.withdraw(this.underlyingTokenData.address, this.form.amountDisplay)
+        this.$message({type: 'success', message: '存款成功!'})
+        this.handleDepositSuccess()
       } catch (error) {
-        console.log('handleBorrow error: ', error)
+        console.log('handleDeposit error: ', error)
         this.$message.error(JSON.stringify(error))
       }
-      this.isBorrowing   = false
+      this.isWithdrawing = false
     },
-    handleBorrowSuccess() {
+    handleDepositSuccess() {
       this.$emit('success')
       this.isVisible = false
     }
@@ -231,22 +205,4 @@ export default {
 
 <style lang="scss" scoped>
 @import "./-Dialog.scss";
-.collateral-info {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 20px;
-  margin-bottom: 25px;
-  &:first-child {
-    margin-bottom: 8px;
-  }
-}
-.collateral-label {
-  color: $color-text-light;
-}
-.collateral-value {
-  color: $color-text;
-}
 </style>

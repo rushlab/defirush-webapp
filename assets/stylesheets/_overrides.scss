@@ -1,13 +1,27 @@
 .dialog--deposit,
-.dialog--borrow {
+.dialog--borrow,
+.dialog--withdraw,
+.dialog--repay {
+  .el-dialog {
+    background-color: $color-dialog-bg;
+    border: 1px solid $color-dialog-border;
+    border-radius: 8px;
+    overflow: hidden;
+  }
   .el-dialog__title {
     font-size: 24px;
   }
+  .el-dialog__header {
+    padding: 15px 30px;
+    border-bottom: 1px solid $color-border;
+  }
   .el-dialog__body {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding: 20px 30px 40px;
   }
   .el-dialog__footer {
     padding: 0;
   }
+}
+.v-modal {
+  opacity: 0.9;
 }
