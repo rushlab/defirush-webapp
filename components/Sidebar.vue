@@ -4,8 +4,8 @@
     <div class="sidebar__header">
       <div v-show="!isCollasped" class="sidebar__logo"></div>
       <div class="sidebar__toggle" @click="toggleCollasped">
-        <i v-if="!isCollasped" class="el-icon-s-fold"></i>
-        <i v-else class="el-icon-s-unfold"></i>
+        <!-- <i v-if="!isCollasped" class="el-icon-s-fold"></i>
+        <i v-else class="el-icon-s-unfold"></i> -->
       </div>
     </div>
     <div class="sidebar__body">
@@ -45,8 +45,8 @@
       </el-menu>
 
       <div class="social-icons">
-        <div class="social-icon"><i class="el-icon-basketball"></i></div>
-        <div class="social-icon"><i class="el-icon-sugar"></i></div>
+        <div class="social-icon"></div>
+        <div class="social-icon"></div>
       </div>
     </div>
   </div>
@@ -105,8 +105,13 @@ export default {
   right: 20px;
   font-size: 18px;
   width: 24px;
+  height: 24px;
   text-align: center;
   cursor: pointer;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-image: url('~/assets/icons/icon-collaspe.png');
 }
 .sidebar {
   border-right: none;
@@ -140,10 +145,15 @@ export default {
   height: 40px;
   text-align: center;
   line-height: 40px;
-  border: 1px solid;
-  border-radius: 50%;
+  // border: 1px solid;
+  // border-radius: 50%;
   cursor: pointer;
   font-size: 18px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  &:nth-child(1) { background-image: url('~/assets/icons/icon-telegram.png'); }
+  &:nth-child(2) { background-image: url('~/assets/icons/icon-twitter.png'); }
   & + & {
     margin-left: 40px;
   }
