@@ -53,7 +53,7 @@ export default {
   font-size: 14px;
   height: 32px;
   line-height: 20px;
-  padding: 6px 12px;
+  padding: 6px 20px;
   text-align: center;
   background-color: transparent;
   color: $color-text;

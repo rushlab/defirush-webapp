@@ -1,23 +1,31 @@
 <template>
   <div class="site-header">
-    <div>ETH/BTC/...</div>
+    <div class="network-status" :class="{ 'signer-alive': isSignerAlive }">
+      <span>{{ networkName }}</span>
+    </div>
     <div style="margin-left: auto;"></div>
     <template v-if="isAuthenticated">
-      <div class="wallet-address">{{ walletAddress }}</div>
       <div class="wallet-status">
-        <el-tag
-          v-if="isSignerAlive" size="small" type="success" plain
-        >Connected</el-tag>
-        <el-button
-          v-else @click="connectCurrentWallet"
-          size="mini" type="danger" plain round
-        >Disconnected</el-button>
+        <el-dropdown>
+          <div class="el-dropdown-link wallet-address-btn">
+            <metamask-logo class="icon-metamask"/>
+            <span class="wallet-address">{{ maskedWalletAddress }}</span> <i class="el-icon-arrow-down el-icon--right"></i>
+          </div>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>
+              <el-button class="dropdown__btn" @click="copyWalletAddress" type="text">{{ maskedWalletAddress }} <i class="el-icon-copy-document"></i></el-button>
+            </el-dropdown-item>
+            <el-dropdown-item>
+              <el-button class="dropdown__btn" @click="handleLogout" type="text">Logout</el-button>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </div>
-      <el-button class="logout-button" type="text" @click="handleLogout">Logout</el-button>
     </template>
     <template v-else>
       <el-button
-        type="primary" round plain
+        type="primary" round
+        class="btn--dark"
         @click="openConnectDialog"
       >Connect wallet</el-button>
     </template>
@@ -46,9 +54,14 @@
 import _ from 'lodash'
 import { ethers } from 'ethers'
 import { mapState, mapGetters } from 'vuex'
+import MetamaskLogo from '@/components/MetamaskLogo'
+import { copyToClipboard } from '@/utils/copy'
 
 export default {
   name: 'SiteHeader',
+  components: {
+    MetamaskLogo
+  },
   data() {
     return {
       connectDialog: {
@@ -60,9 +73,22 @@ export default {
     }
   },
   computed: {
-    ...mapState('auth', ['walletAddress', 'isAuthenticated', 'isSignerAlive']),
+    ...mapState('auth', ['walletChainId', 'walletAddress', 'isAuthenticated', 'isSignerAlive']),
+    networkName() {
+      if (this.walletChainId == 1) {
+        return 'Etherum Mainnet Network'
+      } else {
+        'Unknown Network'
+      }
+    },
+    maskedWalletAddress() {
+      const walletAddress = this.walletAddress || ''
+      if (!walletAddress) return ''
+      return walletAddress.substring(0, 4) + '...' + walletAddress.substring(walletAddress.length - 4)
+    }
   },
   methods: {
+    copyToClipboard,
     async connectBrowserWallet() {
       if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
         try {
@@ -113,6 +139,12 @@ export default {
         } catch(error) {}
       }
     },
+    async copyWalletAddress() {
+      try {
+        await this.copyToClipboard(this.walletAddress)
+        this.$message({ type: 'success', message: 'Copied successfully!' })
+      } catch (error) {}
+    },
     openConnectDialog() {
       this.connectDialog = {
         visible: true,
@@ -133,13 +165,54 @@ export default {
 
 .site-header {
   width: 100%;
-  height: 60px;
-  padding: 10px 0;
+  height: 75px;
+  padding: 17px 0;
   display: flex;
   justify-content: flex-start;
   align-items: center;
   background-color: $color-bg-header;
   z-index: 100;
+}
+.network-status {
+  position: relative;
+  padding-left: 20px;
+  font-size: 16px;
+  line-height: 1;
+  color: $color-text-light;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0px;
+    margin-top: -5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: $color-warning;
+  }
+  &.signer-alive::before {
+    background-color: $color-success;
+  }
+}
+.wallet-address-btn {
+  position: relative;
+  height: 40px;
+  line-height: 22px;
+  padding: 9px 20px 9px 40px;
+  border-radius: 20px;
+  color: $color-text;
+  box-shadow: 0 0 1px 0 $color-border;
+  .icon-metamask {
+    position: absolute;
+    width: 24px;
+    height: 20px;
+    top: 50%;
+    left: 10px;
+    margin-top: -10px;
+  }
+}
+.dropdown__btn {
+  color: $color-text;
 }
 .wallet-address {
   //
@@ -159,6 +232,18 @@ export default {
   text-align: center;
   /deep/ .el-button {
     margin: 10px auto;
+  }
+}
+.btn--dark {
+  height: 40px;
+  line-height: 22px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  background-color: $color-text;
+  color: #ffffff;
+  &:hover,
+  &:active {
+    opacity: 0.9;
   }
 }
 </style>
