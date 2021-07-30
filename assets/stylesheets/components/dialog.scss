@@ -1,0 +1,135 @@
+@import "@/assets/stylesheets/variables.scss";
+
+.input-hint {
+  font-size: 16px;
+  line-height: 1;
+  margin-bottom: 10px;
+  color: $color-text-lighter;
+}
+.balance-hint {
+  display: block;
+  text-align: right;
+  line-height: 20px;
+  margin: 5px 0 10px;
+  color: #858E99;
+}
+.balance__value {
+  color: $color-text;
+}
+.dialog__hints {
+  padding: 0;
+  margin-top: 60px;
+  color: $color-text-light;
+  .hints-title {
+    font-size: 18px;
+    color: $color-text;
+  }
+  ul {
+    padding-left: 20px;
+    margin-top: 10px;
+  }
+  li {
+    line-height: 1.7;
+  }
+}
+.dialog-footer {
+  height: 80px;
+  // border-top: 1px solid $color-border;
+}
+.footer__btn {
+  display: block;
+  height: 80px;
+  width: 100%;
+  color: $btn-dark-text;
+  background-color: $btn-dark-bg;
+  line-height: 40px;
+  padding: 20px;
+  text-align: center;
+  outline: none;
+  appearance: none;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: 400;
+  transition: opacity .25s ease-in-out;
+  &:hover,
+  &:active {
+    opacity: 0.85;
+  }
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-top: 1px solid $color-border;
+  }
+}
+/deep/ {
+  .el-dialog__close {
+    font-size: 20px;
+    color: $color-text;
+    font-weight: 400;
+  }
+  .el-form-item {
+    margin-bottom: 10px;
+  }
+  .el-slider__marks-text {
+    text-align: center;
+  }
+  .el-slider__marks-text:first-child {
+    left: 11px !important;
+    width: 22px;
+  }
+  .el-slider__marks-text:last-child {
+    width: 32px;
+    left: auto !important;
+    right: -16px !important;
+    color: #3ACB6E;
+  }
+  .el-input-group--append .el-input__inner {
+    border-right: none;
+  }
+  .el-input-group__append {
+    background-color: $color-input-bg;
+    border-left: none;
+    font-size: 15px;
+    color: $color-text;
+  }
+
+  .el-input.dialog-input  {
+    .el-input__inner {
+      height: 72px;
+      line-height: 72px;
+      font-size: 20px;
+      padding-left: 30px;
+      padding-right: 30px;
+      background-color: $color-input-bg;
+      border: none;
+      color: $color-text;
+    }
+  }
+  .el-slider__bar {
+    background-color: transparent;
+    background-image: linear-gradient(to right, #6ebbe2, #70EEA3);
+  }
+  .el-slider__button {
+    width: 28px;
+    height: 28px;
+    border: 4px solid #70EEA3;
+  }
+  .el-slider__stop {
+    width: 12px;
+    height: 12px;
+    top: 50%;
+    margin-top: -6px;
+  }
+  .el-slider__stop:first-child {
+    left: 6px !important;
+  }
+  .el-slider__stop:last-child {
+    left: auto !important;
+    right: -6px !important;
+  }
+}

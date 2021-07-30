@@ -31,20 +31,48 @@
     </template>
     <!-- connect dialog -->
     <el-dialog
-      :append-to-body="true" :modal-append-to-body="true"
+      class="dialog--dark"
+      :title="dialogTitle"
+      width="540px" top="10vh"
+      :append-to-body="true"
+      :modal-append-to-body="true"
       :visible.sync="connectDialog.visible"
     >
-      <div v-if="!connectDialog.address" class="step-connect">
-        <el-button type="primary" plain @click="connectBrowserWallet">Connect</el-button>
+      <div class="dialog__inner" element-loading-background="rgba(0, 0, 0, 0)">
+        <template v-if="!connectDialog.address">
+          <!-- 选择钱包，点击链接 -->
+          <div class="input-hint">Please select a wallet to connect:</div>
+          <div class="wallet-items">
+            <button
+              class="wallet-btn"
+              :disabled="connectDialog.isConnecting"
+              @click="connectBrowserWallet">
+              <metamask-logo class="wallet-icon" /> <span>MetaMask</span>
+            </button>
+            <button
+              class="wallet-btn"
+              :disabled="connectDialog.isConnecting"
+              @click="connectBrowserWallet">
+              <metamask-logo class="wallet-icon" /> <span>WalletConnect</span>
+            </button>
+          </div>
+          <a href="javascript(0);" class="help-hint">What is a wallet?</a>
+        </template>
+
+        <template v-if="connectDialog.address && !connectDialog.verified">
+          <!-- 没有验证过，点击进行验证 -->
+          <div class="input-hint">Please sign to let us verify that you are the owner of this address</div>
+          <div class="dialog-verify__address">{{ connectDialog.address }}</div>
+
+        </template>
       </div>
-      <div v-if="connectDialog.address && !connectDialog.verified" class="step-verify">
-        <p>Please sign to let us verify that you are the owner of this address</p>
-        <p>{{ connectDialog.address }}</p>
-        <el-button type="success" plain @click="verifyUserWallet">Verify</el-button>
-      </div>
-      <div v-if="connectDialog.verified" class="step-verified">
-        <p>成功</p>
-        <el-button type="default" plain @click="connectDialog.visible=false">Close</el-button>
+      <div
+        v-if="connectDialog.address && !connectDialog.verified"
+        slot="footer" class="dialog-footer">
+        <button
+          class="footer__btn"
+          :disabled="connectDialog.isVerifying"
+          @click="verifyUserWallet">{{ connectDialog.isVerifying ? 'Verifying' : 'Verify' }}</button>
       </div>
     </el-dialog>
   </div>
@@ -69,12 +97,15 @@ export default {
         address: '',
         signer: null,
         verified: false,
+        isConnecting: false,
+        isVerifying: false
       },
     }
   },
   computed: {
     ...mapState('auth', ['walletChainId', 'walletAddress', 'isAuthenticated', 'isSignerAlive']),
     networkName() {
+      console.log(this.walletChainId)
       if (this.walletChainId == 1) {
         return 'Etherum Mainnet Network'
       } else {
@@ -85,12 +116,18 @@ export default {
       const walletAddress = this.walletAddress || ''
       if (!walletAddress) return ''
       return walletAddress.substring(0, 4) + '...' + walletAddress.substring(walletAddress.length - 4)
+    },
+    dialogTitle() {
+      if (!this.connectDialog.address) return 'Sellect a Wallet'
+      if (this.connectDialog.address && !this.connectDialog.verified) return 'Verify'
+      return ''
     }
   },
   methods: {
     copyToClipboard,
     async connectBrowserWallet() {
       if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
+        this.connectDialog.isConnecting = true
         try {
           await global.ethereum.request({ method: 'eth_requestAccounts' })
         } catch(error) {
@@ -102,6 +139,7 @@ export default {
         const address = await signer.getAddress()
         this.connectDialog.signer = signer
         this.connectDialog.address = address
+        this.connectDialog.isConnecting = false
       } else {
         this.$confirm('请先安装 MetaMask 扩展应用', '提示', {
           confirmButtonText: '确定',
@@ -117,6 +155,7 @@ export default {
       const tip = 'Please sign to let us verify that you are the owner of this address'
       const message = `${tip}\n${address}`
       let signature, signerAddress, chainId
+      this.connectDialog.isVerifying = true
       try {
         chainId = (await signer.provider.getNetwork()).chainId
         signature = await signer.signMessage(message)
@@ -125,7 +164,9 @@ export default {
         this.$message.error(error.message || error.toString())
         return
       }
+      this.connectDialog.isVerifying = false
       if (signerAddress.toLowerCase() === address.toLowerCase()) {
+        this.connectDialog.visible = false
         this.connectDialog.verified = true
         await this.$store.dispatch('auth/login', { chainId, address, message, signature })
       } else {
@@ -161,7 +202,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/stylesheets/variables.scss";
+// @import "@/assets/stylesheets/variables.scss";
+@import "@/assets/stylesheets/components/dialog.scss";
 
 .site-header {
   width: 100%;
@@ -244,6 +286,65 @@ export default {
   &:hover,
   &:active {
     opacity: 0.9;
+  }
+}
+
+// dialog styles
+.wallet-items {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+.wallet-btn {
+  padding: 15px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  border: none;
+  background-color: #E6E8EC;
+  flex: 1;
+  cursor: pointer;
+  &:hover,
+  &:active {
+    box-shadow: inset 0 0 1px 0px rgba(0, 0, 0, 0.2);
+  }
+  & + & {
+    margin-left: 25px;
+  }
+  .wallet-icon {
+    height: 36px;
+    width: 36px;
+    margin-right: 15px;
+  }
+  > span {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 28px;
+  }
+}
+.help-hint {
+  font-size: 16px;
+  color: #033FFF;
+  cursor: pointer;
+}
+
+.dialog-verify__address {
+  margin-top: 50px;
+  margin-bottom: 20px;
+  color: $color-text;
+  background-color: #E6E8EC;
+  font-size: 16px;
+  padding: 25px 35px;
+}
+.footer__btn[disabled] {
+  opacity: 0.7;
+}
+/deep/ {
+  .el-dialog__body {
+    padding: 30px;
   }
 }
 </style>

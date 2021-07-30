@@ -1,7 +1,8 @@
 .dialog--deposit,
 .dialog--borrow,
 .dialog--withdraw,
-.dialog--repay {
+.dialog--repay,
+.dialog--dark {
   .el-dialog {
     background-color: $color-dialog-bg;
     border: 1px solid $color-dialog-border;
