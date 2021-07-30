@@ -354,6 +354,9 @@ export default {
   .el-table th.is-leaf, .el-table td {
     border-bottom-color: $color-border;
   }
+  .el-progress-bar__outer {
+    background-color: #DFE2E8;
+  }
 }
 .asset-info {
   display: flex;

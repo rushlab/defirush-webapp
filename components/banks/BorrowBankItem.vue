@@ -1,6 +1,12 @@
 <template>
   <div class="bank-item" >
-    <el-table :data="[bankData]" style="width: 100%" v-loading="!!pending" element-loading-spinner="el-icon-loading" :show-header="false">
+    <el-table
+      :data="[bankData]"
+      style="width: 100%"
+      v-loading="!!pending"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="transparent"
+      :show-header="false">
       <el-table-column label="Bank" width="180">
         <div slot-scope="scope" class="table-cell">
           <el-image class="exchange__icon" fit="contain" :src="scope.row.icon"></el-image>
