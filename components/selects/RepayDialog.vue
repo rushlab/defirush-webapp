@@ -1,11 +1,11 @@
 <template>
-  <el-dialog class="dialog--deposit" title="Deposit"
+  <el-dialog class="dialog--repay" title="Repay"
     width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
-    <div class="dialog__inner" v-loading="isApproving || isDepositing" element-loading-background="rgba(0, 0, 0, 0)">
+    <div class="dialog__inner" v-loading="isApproving || isRepaying" element-loading-background="rgba(0, 0, 0, 0)">
       <el-form :model="form">
         <el-form-item>
-          <div class="input-hint">How much collateral do you want to deposit?</div>
+          <div class="input-hint">How much collateral do you want to repay?</div>
           <el-input
             class="dialog-input"
             v-model="form.amountDisplay"
@@ -27,14 +27,14 @@
       <div class="dialog__hints">
         <p class="hints-title">You Will</p>
         <ul>
-          <li>Deposit {{ form.amountDisplay }} {{ underlyingAssetSymbol }}(≈ {{ formatCurrency(amountToUSD) }})</li>
+          <li>Repay {{ form.amountDisplay }} {{ underlyingAssetSymbol }}(≈ {{ formatCurrency(amountToUSD) }})</li>
           <li>Credit $20000 of borrow limit(待计算)</li>
         </ul>
       </div>
     </div>
     <div slot="footer" class="dialog-footer">
       <button class="footer__btn" v-if="needApprove" type="warning" @click="handleApprove">Approve</button>
-      <button class="footer__btn" v-else type="primary" @click="handleDeposit" :loading="isDepositing">{{ isDepositing ? 'Depositing' : 'Deposit' }}</button>
+      <button class="footer__btn" v-else type="primary" @click="handleRepay" :loading="isRepaying">{{ isRepaying ? 'Repaying' : 'Repay' }}</button>
     </div>
   </el-dialog>
 </template>
@@ -46,7 +46,7 @@ import { ethers } from 'ethers'
 import { formatCurrency } from '@/utils/formatter'
 
 export default {
-  name: 'DepositDialog',
+  name: 'RepayDialog',
   props: {
     visible: {
       type: Boolean,
@@ -65,7 +65,7 @@ export default {
     const validationAmount = (rule, value, callback) => {
       if (!value || !+value || +value < 0) {
         callback(new Error('Amount is required'))
-      } else if (value > this.amountMaxDisplay) {
+      } else if (value > this.balanceDisplay) {
         callback(new Error('The maximum balance was exceeded'))
       } else {
         callback()
@@ -95,7 +95,7 @@ export default {
       accountAssetData: {},
       allowanceDisplay: '0.00',
       balanceDisplay: '0.00',
-      isDepositing: false
+      isRepaying: false
     }
   },
   computed: {
@@ -108,6 +108,9 @@ export default {
     isETH() {
       return _.get(this.underlyingTokenData, 'address', '').toLowerCase() === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase()
     },
+    amountPrecentage() {
+      return +this.balanceDisplay > 0 ? (+this.form.amountDisplay / +this.balanceDisplay) * 100 : 0
+    },
     needApprove() {
       if (this.isETH) return false
       return +this.allowanceDisplay < +this.form.amountDisplay
@@ -117,18 +120,24 @@ export default {
       return (+this.form.amountDisplay * +priceUSD).toString()
     },
     amountMaxDisplay() {
-      return this.balanceDisplay
-    }
+      // 显示最大值为： 用户借贷的数量
+      return _.get(this.accountAssetData, 'userBorrows') || 0
+    },
   },
   watch: {
     visible(newVal, oldValue) {
       this.isVisible = newVal
     },
+    // 'form.amountSlideValue': {
+    //   handler(newVal) {
+    //     this.form.amountDisplay = (+this.balanceDisplay) * newVal / 100
+    //   }
+    // }
   },
   mounted() {
     this.getAccountAndAssetData()
     this.updateAllowanceDisplay()
-    this.getBalanceDisplay()
+    // this.getBalanceDisplay()
   },
   methods: {
     formatCurrency,
@@ -153,14 +162,14 @@ export default {
       if (this.isETH) return
       this.allowanceDisplay = await this.bankApp.underlyingAllowance(this.underlyingTokenData.address)
     },
-    async getBalanceDisplay() {
-      if (this.isETH) {
-        this.balanceDisplay = await this.$wallet.getBalance()
-      } else {
-        const { address } = this.underlyingTokenData
-        this.balanceDisplay = await this.$wallet.getBalance(address)
-      }
-    },
+    // async getBalanceDisplay() {
+    //   if (this.isETH) {
+    //     this.balanceDisplay = await this.$wallet.getBalance()
+    //   } else {
+    //     const { address } = this.underlyingTokenData
+    //     this.balanceDisplay = await this.$wallet.getBalance(address)
+    //   }
+    // },
     onDialogClose() {
       this.form.amountDisplay = ''
       this.$emit('close')
@@ -192,19 +201,19 @@ export default {
       }
       this.isApproving = false
     },
-    async handleDeposit() {
+    async handleRepay() {
       try {
-        this.isDepositing = true
-        await this.bankApp.deposit(this.underlyingTokenData.address, this.form.amountDisplay)
+        this.isRepaying = true
+        await this.bankApp.repay(this.underlyingTokenData.address, this.form.amountDisplay)
         this.$message({type: 'success', message: '存款成功!'})
-        this.handleDepositSuccess()
+        this.handleRepaySuccess()
       } catch (error) {
-        console.log('handleDeposit error: ', error)
+        console.log('handleRepay error: ', error)
         this.$message.error(JSON.stringify(error))
       }
-      this.isDepositing = false
+      this.isRepaying = false
     },
-    handleDepositSuccess() {
+    handleRepaySuccess() {
       this.$emit('success')
       this.isVisible = false
     }

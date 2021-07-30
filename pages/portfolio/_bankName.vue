@@ -157,7 +157,7 @@
         </el-table-column>
         <el-table-column label="Action">
           <template slot-scope="{ row }">
-            <el-button type="primary" size="mini" round>Repay</el-button>
+            <el-button type="primary" size="mini" round @click="() => onRepay(row.info)">Repay</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -168,6 +168,12 @@
       :bank-app="bankApp"
       :underlying-token-data="withdrawAssetTokenData"
     />
+    <repay-dialog
+      v-if="bankApp && repayDialogVisible"
+      :visible.sync="repayDialogVisible"
+      :bank-app="bankApp"
+      :underlying-token-data="repayAssetTokenData"
+    />
   </div>
 </template>
 
@@ -176,6 +182,7 @@ import _ from 'lodash'
 import dayjs from 'dayjs'
 import BankSelect from '@/components/BankSelect'
 import WithdrawDialog from '@/components/selects/WithdrawDialog'
+import RepayDialog from '@/components/selects/RepayDialog'
 
 import { formatCurrency } from '@/utils/formatter'
 import { createBankApp } from '@/utils/banks/factory'
@@ -188,7 +195,8 @@ export default {
   },
   components: {
     BankSelect,
-    WithdrawDialog
+    WithdrawDialog,
+    RepayDialog
   },
   data() {
     const bankName = this.$route.params.bankName
@@ -212,6 +220,8 @@ export default {
       ],
       withdrawDialogVisible: false,
       withdrawAssetTokenData: null,
+      repayDialogVisible: false,
+      repayAssetTokenData: null,
     }
   },
   computed: {
@@ -291,9 +301,12 @@ export default {
       this.$router.push(`/portfolio/${bankName}`)
     },
     onWithdraw(tokenData) {
-      console.log(tokenData)
       this.withdrawAssetTokenData = {...tokenData}
       this.withdrawDialogVisible = true
+    },
+    onRepay(tokenData) {
+      this.repayAssetTokenData = {...tokenData}
+      this.repayDialogVisible = true
     }
   }
 }

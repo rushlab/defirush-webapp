@@ -10,17 +10,18 @@
             class="dialog-input"
             v-model="form.amountDisplay"
             @input="onInputAmountDisplay"
-            :disabled="!+balanceDisplay || !underlyingAssetDecimals">
+            :disabled="!+amountMaxDisplay || !underlyingAssetDecimals">
             <div slot="append" v-if="underlyingAssetSymbol">{{ underlyingAssetSymbol }}</div>
           </el-input>
-          <div class="balance-hint">Available: <strong class="balance__value">{{ balanceDisplay }} {{ underlyingAssetSymbol }}</strong></div>
+          <div class="balance-hint">Available: <strong class="balance__value">{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div>
         </el-form-item>
         <el-form-item class="form__slider">
           <el-slider
             :step="4" :marks="marks"
             :show-tooltip="false"
             v-model="form.amountSlideValue"
-            :disabled="!+balanceDisplay || !underlyingAssetDecimals"></el-slider>
+            @change="onChangeSlideValue"
+            :disabled="!+amountMaxDisplay || !underlyingAssetDecimals"></el-slider>
         </el-form-item>
       </el-form>
       <div class="dialog__hints">
@@ -65,7 +66,7 @@ export default {
     const validationAmount = (rule, value, callback) => {
       if (!value || !+value || +value < 0) {
         callback(new Error('Amount is required'))
-      } else if (value > this.balanceDisplay) {
+      } else if (value > this.amountMaxDisplay) {
         callback(new Error('The maximum balance was exceeded'))
       } else {
         callback()
@@ -94,7 +95,7 @@ export default {
       accountData: {},
       accountAssetData: {},
       allowanceDisplay: '0.00',
-      balanceDisplay: '0.00',
+      // balanceDisplay: '0.00',
       isWithdrawing: false
     }
   },
@@ -109,7 +110,7 @@ export default {
       return _.get(this.underlyingTokenData, 'address', '').toLowerCase() === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase()
     },
     amountPrecentage() {
-      return +this.balanceDisplay > 0 ? (+this.form.amountDisplay / +this.balanceDisplay) * 100 : 0
+      return +this.amountMaxDisplay > 0 ? (+this.form.amountDisplay / +this.amountMaxDisplay) * 100 : 0
     },
     needApprove() {
       return false
@@ -120,21 +121,19 @@ export default {
       const { priceUSD = 0 } = this.assetData
       return (+this.form.amountDisplay * +priceUSD).toString()
     },
+    amountMaxDisplay() {
+      return _.get(this.accountAssetData, 'userDeposits') || 0
+    }
   },
   watch: {
     visible(newVal, oldValue) {
       this.isVisible = newVal
     },
-    'form.amountSlideValue': {
-      handler(newVal) {
-        this.form.amountDisplay = (+this.balanceDisplay) * newVal / 100
-      }
-    }
   },
   mounted() {
     this.getAccountAndAssetData()
     this.updateAllowanceDisplay()
-    this.getBalanceDisplay()
+    // this.getBalanceDisplay()
   },
   methods: {
     formatCurrency,
@@ -159,14 +158,6 @@ export default {
       if (this.isETH) return
       this.allowanceDisplay = await this.bankApp.underlyingAllowance(this.underlyingTokenData.address)
     },
-    async getBalanceDisplay() {
-      if (this.isETH) {
-        this.balanceDisplay = await this.$wallet.getBalance()
-      } else {
-        const { address } = this.underlyingTokenData
-        this.balanceDisplay = await this.$wallet.getBalance(address)
-      }
-    },
     onDialogClose() {
       this.form.amountDisplay = ''
       this.$emit('close')
@@ -176,6 +167,16 @@ export default {
       const re = new RegExp(`(\\d+\\.\\d{${this.underlyingAssetDecimals}})(\\d+)`)
       const amountDisplay = val.replace(re, '$1')
       this.form.amountDisplay = amountDisplay
+      this._updatePrecentageFromAmount()
+    },
+    _updatePrecentageFromAmount() {
+      this.form.amountSlideValue = +this.amountMaxDisplay > 0 ? (+this.form.amountDisplay / +this.amountMaxDisplay) * 100 : 0
+    },
+    onChangeSlideValue() {
+      this._updateAmountFromPrecentage()
+    },
+    _updateAmountFromPrecentage() {
+      this.form.amountDisplay = (+this.amountMaxDisplay) * +this.form.amountSlideValue / 100
     },
     async handleApprove() {
       try {

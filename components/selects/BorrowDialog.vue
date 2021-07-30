@@ -17,10 +17,10 @@
             class="dialog-input"
             v-model="form.amountDisplay"
             @input="onInputAmountDisplay"
-            :disabled="!+availableBorrowsDisplay || !underlyingAssetDecimals">
+            :disabled="!+amountMaxDisplay || !underlyingAssetDecimals">
             <div slot="append">{{ underlyingAssetSymbol }}</div>
           </el-input>
-          <!-- <div class="balance-hint">Available: <strong class="balance__value">{{ availableBorrowsDisplay }} {{ underlyingAssetSymbol }}</strong></div> -->
+          <!-- <div class="balance-hint">Available: <strong class="balance__value">{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div> -->
           <div class="balance-hint">Borrow Rate: <strong class="balance__value">{{ formatPercentage(assetData.borrowAPY) }}</strong></div>
         </el-form-item>
         <el-form-item>
@@ -28,7 +28,8 @@
             :step="4" :marks="marks"
             :show-tooltip="false"
             v-model="form.amountSlideValue"
-            :disabled="!+availableBorrowsDisplay || !underlyingAssetDecimals"></el-slider>
+            @change="onChangeSlideValue"
+            :disabled="!+amountMaxDisplay || !underlyingAssetDecimals"></el-slider>
         </el-form-item>
       </el-form>
       <div class="dialog__hints">
@@ -73,7 +74,7 @@ export default {
     const validationAmount = (rule, value, callback) => {
       if (!value || !+value || +value < 0) {
         callback(new Error('Amount is required'))
-      } else if (value > this.availableBorrowsDisplay) {
+      } else if (value > this.amountMaxDisplay) {
         callback(new Error('The maximum balance was exceeded'))
       } else {
         callback()
@@ -118,8 +119,13 @@ export default {
     isETH() {
       return _.get(this.underlyingTokenData, 'address', '').toLowerCase() === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase()
     },
-    amountPrecentage() {
-      return +this.availableBorrowsDisplay > 0 ? (+this.form.amountDisplay / +this.availableBorrowsDisplay) * 100 : 0
+    availableBorrowsDisplay() {
+      const { availableBorrowsUSD = 0 } = this.accountData
+      const { priceUSD = 0 } = this.assetData
+      return priceUSD == 0 ? '-' : (+availableBorrowsUSD / +priceUSD).toString()
+    },
+    amountMaxDisplay() {
+      return this.availableBorrowsDisplay
     },
     needApprove() {
       return false
@@ -130,11 +136,6 @@ export default {
     collateralRatio() {
       const { userBorrowsUSD = 0, userDepositsUSD = 0} = this.accountData
       return userBorrowsUSD == 0 ? '-' : ((+userDepositsUSD / +userBorrowsUSD * 100).toFixed(2) + '%')
-    },
-    availableBorrowsDisplay() {
-      const { availableBorrowsUSD = 0 } = this.accountData
-      const { priceUSD = 0 } = this.assetData
-      return priceUSD == 0 ? '-' : (+availableBorrowsUSD / +priceUSD).toString()
     },
     amountToUSD() {
       const { priceUSD = 0 } = this.assetData
@@ -152,11 +153,6 @@ export default {
     visible(newVal, oldValue) {
       this.isVisible = newVal
     },
-    'form.amountSlideValue': {
-      handler(newVal) {
-        this.form.amountDisplay = (+this.availableBorrowsDisplay / 100 * newVal).toString()
-      }
-    }
   },
   mounted() {
     this.getAccountAndAssetData()
@@ -197,6 +193,16 @@ export default {
       const re = new RegExp(`(\\d+\\.\\d{${this.underlyingAssetDecimals}})(\\d+)`)
       const amountDisplay = val.replace(re, '$1')
       this.form.amountDisplay = amountDisplay
+      this._updatePrecentageFromAmount()
+    },
+    _updatePrecentageFromAmount() {
+      this.form.amountSlideValue = +this.amountMaxDisplay > 0 ? (+this.form.amountDisplay / +this.amountMaxDisplay) * 100 : 0
+    },
+    onChangeSlideValue() {
+      this._updateAmountFromPrecentage()
+    },
+    _updateAmountFromPrecentage() {
+      this.form.amountDisplay = (+this.amountMaxDisplay) * +this.form.amountSlideValue / 100
     },
     async handleApprove() {
       try {
