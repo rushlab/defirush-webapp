@@ -1,8 +1,13 @@
 $color-warning: #FF6838 !default;
 
+// text colors
 $color-text: #000000 !default;
 $color-text-light: #777E90 !default;
 $color-text-lighter: #858E99 !default;
+
+// bg colors
+$color-bg-page: #EEF0F4 !default;
+$color-bg-header: $color-bg-page;
 
 $btn-dark-bg: #000000 !default;
 $btn-dark-text: #ffffff !default;

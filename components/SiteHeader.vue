@@ -129,6 +129,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/assets/stylesheets/variables.scss";
+
 .site-header {
   width: 100%;
   height: 60px;
@@ -136,7 +138,7 @@ export default {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  background-color: #ffffff;
+  background-color: $color-bg-header;
   z-index: 100;
 }
 .wallet-address {

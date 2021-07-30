@@ -103,7 +103,7 @@
     <div style="margin-top: 1em;"></div>
     <el-card header="Deposits" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
       <h2 slot="header">Collateral</h2>
-      <el-table :data="deposits">
+      <el-table :data="deposits" :border="true">
         <el-table-column label="Asset">
           <div slot-scope="{ row }" class="asset-info">
             <img :src="row.info.logoURI">
@@ -139,7 +139,7 @@
     <div style="margin-top: 1em;"></div>
     <el-card header="Borrows" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
       <h2 slot="header">Borrows</h2>
-      <el-table :data="borrows">
+      <el-table :data="borrows" border>
         <el-table-column label="Asset">
           <div slot-scope="{ row }" class="asset-info">
             <img :src="row.info.logoURI">
@@ -304,6 +304,7 @@ export default {
 .bank-data-card {
   padding: 20px;
   height: 240px;
+  background-color: $color-bg-page;
   box-shadow: 0 0 0 1px $color-border;
 }
 .card__title {
@@ -320,11 +321,19 @@ export default {
   margin-bottom: 8px;
 }
 /deep/ {
+  .el-card {
+    background-color: $color-bg-page;
+    box-shadow: 0 0 0 1px $color-border;
+    border-radius: 0;
+  }
   .el-table__empty-block {
     display: none;
   }
   .el-table__body {
     color: $color-text;
+  }
+  .el-table th, .el-table tr {
+    background-color: $color-bg-page;
   }
 }
 .asset-info {
