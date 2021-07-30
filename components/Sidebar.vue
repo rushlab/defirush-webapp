@@ -43,6 +43,11 @@
           <strong v-show="!isCollasped">Swap</strong>
         </el-menu-item>
       </el-menu>
+
+      <div class="social-icons">
+        <div class="social-icon"><i class="el-icon-basketball"></i></div>
+        <div class="social-icon"><i class="el-icon-sugar"></i></div>
+      </div>
     </div>
   </div>
 </template>
@@ -111,5 +116,36 @@ export default {
 }
 .el-menu-item.is-active i {
   color: #355DFF;
+}
+.social-icons {
+  width: 100%;
+  margin-top: 40px;
+  padding: 40px 20px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 20px;
+    right: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+.social-icon {
+  color: #808191;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  line-height: 40px;
+  border: 1px solid;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  & + & {
+    margin-left: 40px;
+  }
 }
 </style>
