@@ -26,6 +26,7 @@
         <el-form-item>
           <el-slider
             :step="4" :marks="marks"
+            :show-tooltip="false"
             v-model="form.amountSlideValue"
             :disabled="!+availableBorrowsDisplay || !underlyingAssetDecimals"></el-slider>
         </el-form-item>

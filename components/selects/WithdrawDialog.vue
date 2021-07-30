@@ -15,9 +15,10 @@
           </el-input>
           <div class="balance-hint">Available: <strong class="balance__value">{{ balanceDisplay }} {{ underlyingAssetSymbol }}</strong></div>
         </el-form-item>
-        <el-form-item>
+        <el-form-item class="form__slider">
           <el-slider
             :step="4" :marks="marks"
+            :show-tooltip="false"
             v-model="form.amountSlideValue"
             :disabled="!+balanceDisplay || !underlyingAssetDecimals"></el-slider>
         </el-form-item>
@@ -25,7 +26,7 @@
       <div class="dialog__hints">
         <p class="hints-title">You Will</p>
         <ul>
-          <li>Withdraw {{ form.amountDisplay }} {{ underlyingAssetSymbol }}(≈ $-)</li>
+          <li>Withdraw {{ form.amountDisplay }} {{ underlyingAssetSymbol }}(≈ {{ formatCurrency(amountToUSD) }})</li>
           <li>Lock - ETH for liquidation reserve</li>
           <li>Pay - ETH for borrow fee</li>
         </ul>
@@ -33,7 +34,7 @@
     </div>
     <div slot="footer" class="dialog-footer">
       <button class="footer__btn" v-if="needApprove" type="warning" @click="handleApprove">Approve</button>
-      <button class="footer__btn" v-else type="primary" @click="handleDeposit" :loading="isWithdrawing">{{ isWithdrawing ? 'Withdrawing' : 'Withdraw' }}</button>
+      <button class="footer__btn" v-else type="primary" @click="handleWithdraw" :loading="isWithdrawing">{{ isWithdrawing ? 'Withdrawing' : 'Withdraw' }}</button>
     </div>
   </el-dialog>
 </template>
@@ -111,9 +112,14 @@ export default {
       return +this.balanceDisplay > 0 ? (+this.form.amountDisplay / +this.balanceDisplay) * 100 : 0
     },
     needApprove() {
-      if (this.isETH) return false
-      return +this.allowanceDisplay < +this.form.amountDisplay
-    }
+      return false
+      // if (this.isETH) return false
+      // return +this.allowanceDisplay < +this.form.amountDisplay
+    },
+    amountToUSD() {
+      const { priceUSD = 0 } = this.assetData
+      return (+this.form.amountDisplay * +priceUSD).toString()
+    },
   },
   watch: {
     visible(newVal, oldValue) {
@@ -182,19 +188,19 @@ export default {
       }
       this.isApproving = false
     },
-    async handleDeposit() {
+    async handleWithdraw() {
       try {
         this.isWithdrawing = true
         await this.bankApp.withdraw(this.underlyingTokenData.address, this.form.amountDisplay)
-        this.$message({type: 'success', message: '存款成功!'})
-        this.handleDepositSuccess()
+        this.$message({type: 'success', message: 'Success!'})
+        this.handleWithdrawSuccess()
       } catch (error) {
-        console.log('handleDeposit error: ', error)
+        console.log('handleWithdraw error: ', error)
         this.$message.error(JSON.stringify(error))
       }
       this.isWithdrawing = false
     },
-    handleDepositSuccess() {
+    handleWithdrawSuccess() {
       this.$emit('success')
       this.isVisible = false
     }

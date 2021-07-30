@@ -34,6 +34,7 @@ export default {
 <style lang="scss" scoped>
 .side-header-wrapper {
   box-shadow: 0 1px 0 0px #E6E6E6;
+  z-index: 1;
 }
 .sidebar-wrapper {
   box-shadow: 1px 0 0 0px #E6E6E6;

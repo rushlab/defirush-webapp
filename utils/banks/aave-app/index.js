@@ -170,6 +170,7 @@ class AaveApp extends BankApp {
 
   async deposit(underlyingToken, amountDisplay) {
     const signer = this.$wallet.getSigner();
+    console.log('@@@ deposit.signer', signer)
     const onBehalfOf = this.$wallet.getAddress();
     if (this._isETH(underlyingToken)) {
       const amountMantissa = this._displayToMantissa(amountDisplay, 18);

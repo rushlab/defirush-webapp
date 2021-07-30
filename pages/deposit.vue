@@ -26,7 +26,7 @@
       </el-form-item>
     </el-form>
     <div class="bank-list">
-      <el-table :data="[0]" style="width: 100%" :show-header="false">
+      <el-table :data="[0]" style="width: 100%" :show-header="false" border>
         <el-table-column>
           <div slot-scope="scope" class="table-refresh-head">
             <span>Data updated&nbsp;</span><span class="last-updated-at">{{ lastUpdatedAtDisplay }}</span><span>&nbsp;ago</span>
@@ -34,7 +34,7 @@
           </div>
         </el-table-column>
       </el-table>
-      <el-table :data="[]" style="width: 100%">
+      <el-table :data="[]" style="width: 100%" border>
         <el-table-column label="Bank" width="180"></el-table-column>
         <el-table-column label="锁仓量"></el-table-column>
         <el-table-column label="APY"></el-table-column>
@@ -175,6 +175,16 @@ export default {
   }
   .el-input-group__prepend {
     background-color: #ffffff;
+  }
+
+  .el-table th, .el-table tr {
+    background-color: $color-bg-page;
+  }
+  .el-table--border th, .el-table--border td {
+    // border-right-color: $color-border;
+  }
+  .el-table th.is-leaf, .el-table td {
+    border-bottom-color: $color-border;
   }
 }
 .token-amount /deep/ .el-form-item__content {

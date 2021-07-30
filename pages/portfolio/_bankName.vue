@@ -103,7 +103,7 @@
     <div style="margin-top: 1em;"></div>
     <el-card header="Deposits" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
       <h2 slot="header">Collateral</h2>
-      <el-table :data="deposits" :border="true">
+      <el-table :data="deposits" border>
         <el-table-column label="Asset">
           <div slot-scope="{ row }" class="asset-info">
             <img :src="row.info.logoURI">
@@ -334,6 +334,12 @@ export default {
   }
   .el-table th, .el-table tr {
     background-color: $color-bg-page;
+  }
+  .el-table--border th, .el-table--border td {
+    // border-right-color: $color-border;
+  }
+  .el-table th.is-leaf, .el-table td {
+    border-bottom-color: $color-border;
   }
 }
 .asset-info {
