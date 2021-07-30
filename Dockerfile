@@ -8,4 +8,4 @@ WORKDIR /workspace/
 RUN npm install
 RUN npm run build
 
-CMD npm start
+CMD HOSTNAME=0.0.0.0 PORT=$PORT npm start
