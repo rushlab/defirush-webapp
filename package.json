@@ -15,12 +15,16 @@
   "dependencies": {
     "@nuxtjs/axios": "^5.13.6",
     "bignumber.js": "^9.0.1",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
     "cross-env": "^5.2.0",
     "dayjs": "^1.10.6",
     "element-ui": "^2.4.11",
     "ethers": "^5.3.1",
     "express": "^4.16.4",
     "lodash": "^4.17.21",
+    "morgan": "^1.10.0",
     "nuxt": "^2.0.0",
     "vuex-persist": "^3.1.3"
   },
