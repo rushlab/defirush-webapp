@@ -90,3 +90,6 @@ sw.*
 *.swp
 
 ecosystem.config.js
+
+# secrets
+.secrets.js

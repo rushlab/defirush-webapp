@@ -13,7 +13,7 @@ import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
 export default {
   data() {
     return {
-      //
+      userProfile: {}
     }
   },
   mounted() {
@@ -23,7 +23,7 @@ export default {
     async fetchProfile() {
       try {
         const res = await this.$axios.get('/api/account/profile/')
-        console.log('fetchProfile', res.data)
+        this.userProfile = res.data
       } catch(err) {
         console.log(err)
       }
