@@ -5,8 +5,8 @@
         v-for="item in chainsOptions" :key="item.value"
         :value="item.value"
         class="btn-item"
-        :class="{ 'active': value === item.value }"
-        @click="() => onClick(item.value)"
+        :class="{ 'active': value === item.value, 'disabled': !!item.disabled }"
+        @click="() => !item.disabled && onClick(item.value)"
       >{{ item.title }}</div>
     </div>
   </div>
@@ -14,21 +14,21 @@
 
 <script>
 export default {
-  name: "ChainSelect",
+  name: 'ChainSelect',
   props: {
     value: {
       type: String,
-      default: "Ethereum"
+      default: 'Ethereum'
     }
   },
   data() {
     return {
       chainsOptions: [
-        { title: "Ethereum", value: "Ethereum" },
-        { title: "BSC", value: "BSC" },
-        { title: "XDai", value: "XDai" },
-        { title: "Polygon", value: "Polygon" },
-        { title: "Fantom", value: "Fantom" },
+        { title: 'Ethereum', value: 'Ethereum' },
+        { title: 'Polygon', value: 'Polygon', disabled: true },
+        { title: 'Arbitrum', value: 'Arbitrum', disabled: true },
+        { title: 'BSC', value: 'BSC', disabled: true },
+        { title: 'HECO', value: 'HECO', disabled: true },
       ]
     }
   },
@@ -43,7 +43,6 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/assets/stylesheets/variables.scss";
-
 .btn-group {
   display: flex;
   justify-content: flex-start;
@@ -65,6 +64,8 @@ export default {
     background-color: $btn-dark-bg;
     color: $btn-dark-text;
   }
+  &.disabled {
+    opacity: 0.5;
+  }
 }
 </style>
-

@@ -1,26 +1,26 @@
 <template>
   <!-- background-color="#ffffff" text-color="#2c3e50" active-text-color="#d35400" -->
-  <div class="sidebar-wrapper">
+  <div class="sidebar-wrapper" :class="{'collasped': isCollasped}">
     <div class="sidebar__header">
-      <div v-show="!isCollasped" class="sidebar__logo"></div>
+      <div class="sidebar__logo"></div>
       <div class="sidebar__toggle" @click="toggleCollasped">
         <!-- <i v-if="!isCollasped" class="el-icon-s-fold"></i>
         <i v-else class="el-icon-s-unfold"></i> -->
       </div>
     </div>
-    <div class="sidebar__body" :class="{'collasped': isCollasped}">
+    <div class="sidebar__body">
       <el-menu
         :router="true"
         :default-active="defaultActive"
         background-color="#000000"
         text-color="#ffffff"
         active-text-color="#ffffff"
-        class="sidebar"
         :collapse="isCollasped"
+        :collapse-transition="false"
       >
         <el-menu-item index="/">
           <i class="el-icon-menu"></i>
-          <strong v-show="!isCollasped">Home</strong>
+          <strong slot="title">Home</strong>
         </el-menu-item>
         <!-- <el-submenu index="/portfolio">
           <template slot="title">Portfolio</template>
@@ -28,35 +28,33 @@
         </el-submenu> -->
         <el-menu-item index="/portfolio">
           <i class="el-icon-data-analysis"></i>
-          <strong v-show="!isCollasped">Portfolio</strong>
+          <strong slot="title">Portfolio</strong>
         </el-menu-item>
         <el-menu-item index="/deposit">
           <i class="el-icon-money"></i>
-          <strong v-show="!isCollasped">Deposit</strong>
+          <strong slot="title">Deposit</strong>
         </el-menu-item>
         <el-menu-item index="/borrow">
           <i class="el-icon-wallet"></i>
-          <strong v-show="!isCollasped">Borrow</strong>
+          <strong slot="title">Borrow</strong>
         </el-menu-item>
         <el-menu-item index="/swap">
           <i class="el-icon-set-up"></i>
-          <strong v-show="!isCollasped">Collateral Swap</strong>
-        </el-menu-item>
-
-        <el-menu-item index="/swap">
-          <i class="el-icon-set-up"></i>
-          <strong v-show="!isCollasped">Debt Swap</strong>
+          <strong slot="title">Collateral Swap</strong>
         </el-menu-item>
         <el-menu-item index="/swap">
           <i class="el-icon-set-up"></i>
-          <strong v-show="!isCollasped">Refinance</strong>
+          <strong slot="title">Debt Swap</strong>
         </el-menu-item>
         <el-menu-item index="/swap">
           <i class="el-icon-set-up"></i>
-          <strong v-show="!isCollasped">Settings</strong>
+          <strong slot="title">Refinance</strong>
+        </el-menu-item>
+        <el-menu-item index="/settings">
+          <i class="el-icon-set-up"></i>
+          <strong slot="title">Settings</strong>
         </el-menu-item>
       </el-menu>
-
       <div class="social-icons">
         <div class="social-icon"></div>
         <div class="social-icon"></div>
@@ -108,6 +106,21 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  /deep/ {
+    .el-menu {
+      border-right: none;
+    }
+    .el-menu-item.is-active {
+      background: rgba(228, 228, 228, 0.1) !important;
+      border-radius: 8px;
+    }
+    .el-menu-item i {
+      font-size: 22px;
+    }
+    .el-menu-item.is-active i {
+      color: #355DFF;
+    }
+  }
 }
 .sidebar__header {
   width: 100%;
@@ -142,19 +155,6 @@ export default {
   padding: 20px;
   position: relative;
   flex: 1;
-  &.collasped {
-    padding-left: 0;
-    padding-right: 0;
-  }
-}
-.sidebar {
-  border-right: none;
-}
-.el-menu-item i {
-  font-size: 22px;
-}
-.el-menu-item.is-active i {
-  color: #355DFF;
 }
 .social-icons {
   width: 100%;
@@ -210,25 +210,25 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 9px 15px;
+  /deep/ .el-switch {
+    transform: scale(1.3, 1.3);
+  }
 }
-/deep/ {
-  .el-menu-item.is-active {
-    background: rgba(228, 228, 228, 0.1) !important;
-    border-radius: 8px;
+.collasped {
+  .sidebar__logo,
+  .sidebar__footer,
+  .social-icons {
+    display: none;
   }
-  .el-switch__core {
-    background-color: #23262F;
-    border: 1px solid #353945;
-    width: 54px !important;
-    height: 28px;
-    border-radius: 14px;
+  .sidebar__toggle {
+    transform: scale(-1, 1);
   }
-  .el-switch__core:after {
-    width: 26px;
-    height: 26px;
+  .sidebar__body {
+    padding-left: 0;
+    padding-right: 0;
   }
-  .el-switch.is-checked .el-switch__core::after {
-    margin-left: -26px;
+  /deep/ .el-menu-item.is-active {
+    border-radius: 0;
   }
 }
 </style>

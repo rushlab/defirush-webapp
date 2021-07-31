@@ -8,7 +8,7 @@
       <el-popover
         placement="bottom"
         width="240"
-        trigger="click"
+        trigger="hover"
       >
         <div class="gas-fees__inner">
           <div class="inner__title">Ethereum Gas Price Forecast</div>
