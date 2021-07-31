@@ -23,6 +23,7 @@
     "element-ui": "^2.4.11",
     "ethers": "^5.3.1",
     "express": "^4.16.4",
+    "leancloud-storage": "^4.11.1",
     "lodash": "^4.17.21",
     "morgan": "^1.10.0",
     "nuxt": "^2.0.0",
