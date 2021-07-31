@@ -142,7 +142,7 @@ export default {
       if (this.walletChainId == 1) {
         return 'Etherum Mainnet'
       } else {
-        'Unknown Network'
+        return 'Unknown Network'
       }
     },
     maskedWalletAddress() {

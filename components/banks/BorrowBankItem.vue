@@ -6,7 +6,8 @@
       v-loading="!!pending"
       element-loading-spinner="el-icon-loading"
       element-loading-background="transparent"
-      :show-header="false">
+      :show-header="false"
+      :border="true">
       <el-table-column label="Bank" width="180">
         <div slot-scope="scope" class="table-cell">
           <el-image class="exchange__icon" fit="contain" :src="scope.row.icon"></el-image>
@@ -182,6 +183,7 @@ export default {
 
 
 <style lang="scss" scoped>
+@import '@/assets/stylesheets/variables.scss';
 .bank-item {
   width: 100%;
   display: flex;
@@ -226,6 +228,9 @@ export default {
   .el-loading-spinner {
     margin-top: 0;
     transform: translateY(-50%);
+  }
+  .el-table td {
+    border-top: 1px solid $color-border;
   }
 }
 </style>

@@ -13,7 +13,7 @@
             <span class="text-warning">Not enough balance </span> <span>Max: {{ balanceDisplay }}</span>
           </template>
         </div>
-        <el-input v-model="amountDisplay" placeholder="Input token amount...">
+        <el-input v-model="amountDisplay" placeholder="Input token amount..." class="input-amount">
           <el-button class="select-token-btn" slot="prepend" @click="tokenSelectDialogVisible = !tokenSelectDialogVisible">
             <div class="select-token-btn__inner">
               <el-image v-if="underlyingToken" class="token-icon" :src="underlyingToken.logoURI"></el-image>
@@ -173,10 +173,6 @@ export default {
   .el-table__empty-block {
     display: none;
   }
-  .el-input-group__prepend {
-    background-color: #ffffff;
-  }
-
   .el-table th, .el-table tr {
     background-color: $color-bg-page;
   }
@@ -185,6 +181,9 @@ export default {
   }
   .el-table th.is-leaf, .el-table td {
     border-bottom-color: $color-border;
+  }
+  .el-table th {
+    border-top: 1px solid $color-border;
   }
 }
 .token-amount /deep/ .el-form-item__content {
@@ -209,12 +208,16 @@ export default {
 }
 .token-value-to-usd {
   bottom: 0;
+  margin-top: 8px;
 }
 .select-token-btn {
   width: 350px;
   background-color: transparent;
   text-align: left;
   position: relative;
+  line-height: 20px;
+  padding-top: 18px;
+  padding-bottom: 18px;
   &::after {
     content: "\e790";
     font-family: element-icons !important;
@@ -249,6 +252,29 @@ export default {
     cursor: pointer;
     text-decoration: underline;
     color: $color-text;
+  }
+}
+.last-updated-at {
+  color: $color-text;
+}
+.input-amount /deep/ {
+  .el-input-group__prepend {
+    background-color: #E6E8EC;
+    height: 56px !important;
+    color: $color-text;
+    font-size: 18px;
+    font-weight: 400;
+    border: none;
+  }
+
+  .el-input__inner {
+    height: 56px;
+    line-height: 56px;
+    background-color: #E6E8EC;
+    color: $color-text;
+    font-size: 18px;
+    font-weight: 400;
+    border: none;
   }
 }
 </style>
