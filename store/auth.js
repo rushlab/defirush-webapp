@@ -31,10 +31,7 @@ export const mutations = {
  */
 export const actions = {
   async login({ dispatch, commit }, { chainId, address, message, signature }) {
-    const content = JSON.stringify({
-      chainId, address, message, signature,
-      timestamp: (new Date()).valueOf()
-    })
+    const content = JSON.stringify({ chainId, address, message, signature })
     global.localStorage.setItem(AUTH_STORAGE_KEY, content)
     commit('setWallet', { walletChainId: chainId, walletAddress: address })
     commit('setSignerStatus', true)
@@ -47,8 +44,8 @@ export const actions = {
   async getLoginData({ dispatch, commit }) {
     const content = global.localStorage.getItem(AUTH_STORAGE_KEY)
     try {
-      const { chainId, address, message, signature, timestamp } = JSON.parse(content)
-      return { chainId, address, message, signature, timestamp }
+      const { chainId, address, message, signature } = JSON.parse(content)
+      return { chainId, address, message, signature }
     } catch(error) {}
   }
 }

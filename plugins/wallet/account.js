@@ -5,10 +5,14 @@ import { MessageBox } from 'element-ui'
 import { WalletApp } from './wallet-app'
 
 
-async function verifyLoginData({ chainId, address, message, signature, timestamp }) {
+async function verifyLoginData({ chainId, address, message, signature }) {
   // TODO 还需要验证一下 chainID 对不对
-  if ((new Date()).valueOf() - timestamp > 86400 * 7 * 1000) {
+  const [_tip, _address, _timestamp] = message.split('\n')
+  if ((new Date()).valueOf() - _timestamp > 86400 * 7 * 1000) {
     throw new Error('expired')
+  }
+  if (_address.toLowerCase() !== address.toLowerCase()) {
+    throw new Error('invalid address')
   }
   const signerAddress = await ethers.utils.verifyMessage(message, signature)
   if (signerAddress.toLowerCase() !== address.toLowerCase()) {

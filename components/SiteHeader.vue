@@ -105,7 +105,6 @@ export default {
   computed: {
     ...mapState('auth', ['walletChainId', 'walletAddress', 'isAuthenticated', 'isSignerAlive']),
     networkName() {
-      console.log(this.walletChainId)
       if (this.walletChainId == 1) {
         return 'Etherum Mainnet Network'
       } else {
@@ -153,7 +152,8 @@ export default {
     async verifyUserWallet() {
       const { signer, address } = this.connectDialog
       const tip = 'Please sign to let us verify that you are the owner of this address'
-      const message = `${tip}\n${address}`
+      const timestamp = (new Date()).valueOf()
+      const message = `${tip}\n${address}\n${timestamp}`
       let signature, signerAddress, chainId
       this.connectDialog.isVerifying = true
       try {
