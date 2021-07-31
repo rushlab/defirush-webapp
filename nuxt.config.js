@@ -37,7 +37,6 @@ module.exports = {
     '@/plugins/wallet/account.js',
     '@/plugins/wallet/transaction.js',
     '@/plugins/axios.js',
-    '@/plugins/filters.js',
   ],
   /*
    ** Nuxt.js dev-modules

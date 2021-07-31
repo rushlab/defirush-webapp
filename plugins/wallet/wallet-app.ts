@@ -3,7 +3,7 @@ import { ethers } from 'ethers'
 
 export class WalletApp implements WalletInterface {
   $store: any
-  $feedRegistry: any
+
   constructor(store: any) {
     this.$store = store
   }
@@ -66,28 +66,25 @@ export class WalletApp implements WalletInterface {
   }
 
   _getFeedRegistry() {
-    if (!this.$feedRegistry) {
-      const FeedRegistryAddress = '0xd441F0B98BcF34749391A3879A94caA95ffDB74D'
-      const provider = this.getProvider()
-      const feedRegistryInterfaceABI = [
-        "function latestRoundData(address asset, address denomination) view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound)"
-      ];
-      this.$feedRegistry = new ethers.Contract(FeedRegistryAddress, feedRegistryInterfaceABI, provider)
-    }
-    return this.$feedRegistry
-
+    const FeedRegistryAddress = '0xd441F0B98BcF34749391A3879A94caA95ffDB74D'
+    const provider = this.getProvider()
+    const feedRegistryInterfaceABI = [
+      'function latestRoundData(address asset, address denomination) view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound)'
+    ];
+    return new ethers.Contract(FeedRegistryAddress, feedRegistryInterfaceABI, provider)
   }
+
   /**
    *
    * @param asset underlyingToken address
    * @returns 当前assetToken 对 USD的价格
    */
   async getPriceUSD(asset: Address): Promise<AmountDisplay> {
-    const contact = this._getFeedRegistry()
+    const contract = this._getFeedRegistry()
     // const USD = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
     // const LINK = '0x514910771AF9Ca656af840dff83E8264EcF986CA';
     const USD = '0x0000000000000000000000000000000000000348';
-    const roundData = await contact.callStatic.latestRoundData(asset, USD)
+    const roundData = await contract.callStatic.latestRoundData(asset, USD)
     const [,price,,,] = roundData
     const priceUsdDisplay = ethers.utils.formatUnits(price, 8)
     return priceUsdDisplay

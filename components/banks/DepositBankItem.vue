@@ -10,31 +10,23 @@
       border>
       <el-table-column label="Bank" width="180">
         <div slot-scope="scope" class="table-cell">
-          <el-image class="exchange__icon" fit="contain" :src="scope.row.icon"></el-image>
+          <el-image class="exchange__icon" fit="contain" :src="scope.row.logo"></el-image>
           <span class="exchange__title">{{ scope.row.title }}</span>
         </div>
       </el-table-column>
       <el-table-column label="锁仓量">
-        <template slot-scope="scope">
-          <span>{{ totalDepositsInUSD || '-' }} USD</span>
-        </template>
+        <template slot-scope="scope">{{ totalDepositsInUSD }}</template>
       </el-table-column>
       <el-table-column label="APY">
-        <template slot-scope="scope">
-          <span>{{ depositAPY || '-' }} %</span>
-        </template>
+        <template slot-scope="scope">{{ depositAPYPercent }}</template>
       </el-table-column>
       <el-table-column label="已存款金额">
-        <template slot-scope="scope">
-          <span>{{ userDepositsInUSD || '-' }} USD</span>
-        </template>
+        <template slot-scope="scope">{{ userDepositsInUSD }}</template>
       </el-table-column>
       <el-table-column label="Gas Fee" width="180">
-        <template slot-scope="scope">
-          <span>-</span>
-        </template>
+        <template slot-scope="scope"></template>
       </el-table-column>
-      <el-table-column label="action" width="180">
+      <el-table-column label="Action" width="180">
         <template slot-scope="scope">
           <el-button type="primary" size="small" round @click="isVisible = true" :disabled="disabledDeposit">Deposit</el-button>
         </template>
@@ -54,6 +46,7 @@
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import { ethers } from 'ethers'
+import { formatCurrency } from '@/utils/formatter'
 import DepositDialog from '@/components/selects/DepositDialog'
 
 export default {
@@ -78,81 +71,64 @@ export default {
   data() {
     return {
       isVisible: false,
-      assetData: null,
       pending: false,
       disabled: false,
-      userDeposits: '0'
+      assetData: {},
+      accountAssetData: {},
     }
   },
   computed: {
     disabledDeposit() {
-      return _.isEmpty(this.bankData) || !this.bankApp || _.isEmpty(this.underlyingTokenData) || this.disabled
-    },
-    disabledWithdraw() {
-      return _.isEmpty(this.bankData) || !this.bankApp || _.isEmpty(this.underlyingTokenData)
+      return _.isEmpty(this.underlyingTokenData) || this.disabled
     },
     underlyingTokenAddress() {
       return _.get(this.underlyingTokenData, 'address')
     },
     totalDepositsInUSD() {
-      const { totalDeposits, priceUSD } = this.assetData || {}
-      if (!totalDeposits || !priceUSD) return '-'
-      return (+totalDeposits * +priceUSD).toString()
+      const { totalDeposits, priceUSD } = this.assetData
+      return formatCurrency((+totalDeposits || 0) * (+priceUSD || 0))
     },
-    depositAPY() {
-      return this.assetData ? ((+this.assetData.depositAPY || 0) * 100).toFixed(2) : '-'
+    depositAPYPercent() {
+      const { depositAPY } = this.assetData
+      return ((+depositAPY || 0) * 100).toFixed(2) + '%'
     },
     userDepositsInUSD() {
-      const { priceUSD } = this.assetData || {}
-      const userDeposits = +this.userDeposits || 0
-      if (!userDeposits || !priceUSD) return '-'
-      return (+userDeposits * +priceUSD).toString()
-    }
-  },
-  watch: {
-    underlyingTokenAddress: {
-      handler(newVal) {
-        if (!newVal) return;
-        this.getAllData()
-      },
-      immediate: true
+      const { priceUSD } = this.assetData
+      const { userDeposits } = this.accountAssetData
+      return formatCurrency((+userDeposits || 0) * (+priceUSD || 0))
     }
   },
   methods: {
-    getAllData() {
-      this.getAssetData()
-      this.getAccountAssetData()
+    async getAllData() {
+      this.pending = true
+      try {
+        await Promise.all([
+          this.getAssetData(),
+          this.getAccountAssetData()
+        ])
+      } catch(error) {}
+      this.pending = false
     },
     async getAssetData() {
       /**
        * trycatch 包一下，这样对于当前bankApp不支持的 underlyingAsset，可以直接将状态置为 disabled
        */
       try {
-        this.pending = true
         this.assetData = await this.bankApp.getAssetData(this.underlyingTokenAddress)
         this.disabled = false
       } catch (error) {
-        console.log('@GetAssetData error', error)
         this.disabled = true
       }
-      this.pending = false
     },
     async getAccountAssetData() {
       try {
-        const { userDeposits } = await this.bankApp.getAccountAssetData(this.underlyingTokenAddress)
-        this.userDeposits = userDeposits
-      } catch (error) {
-        console.log('@@@ getAccountAssetData error', error)
-        this.userDeposits = '0'
-      }
+        this.accountAssetData = await this.bankApp.getAccountAssetData(this.underlyingTokenAddress)
+      } catch (error) {}
     },
     onDepositSuccess(amountDisplay) {
       this.getAllData()
     },
-    estimateGas() {
-
-    },
-    handleWithdraw() {}
+    estimateGas() {},
   },
 }
 </script>

@@ -37,16 +37,23 @@
       </el-table>
       <el-table :data="[]" style="width: 100%" border>
         <el-table-column label="Bank" width="180"></el-table-column>
-        <el-table-column label="锁仓量"></el-table-column>
+        <el-table-column label="Total borrowed"></el-table-column>
         <el-table-column label="APY"></el-table-column>
-        <!-- <el-table-column label="已借款金额"></el-table-column> -->
-        <el-table-column label="可贷款金额"></el-table-column>
+        <!-- <el-table-column label="Borrowing"></el-table-column> -->
+        <el-table-column label="Available">
+          <template slot="header">
+            <span>Available</span>
+            <el-tooltip effect="dark" content="The amount you can borrow" placement="top">
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+          </template>
+        </el-table-column>
         <el-table-column label="Gas Fee" width="180"></el-table-column>
         <el-table-column label="Action" width="180"></el-table-column>
         <span slot="empty"></span>
       </el-table>
       <borrow-bank-item
-        v-for="bank in banksList" :key="bank.title"
+        v-for="bank in banksList" :key="`${bank.name}-${underlyingToken.address}`"
         :ref="bank.title"
         :underlying-token-data="underlyingToken"
         :bank-data="bank"
@@ -67,9 +74,7 @@ import dayjs from 'dayjs'
 import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
 import ChainSelect from '@/components/ChainSelect'
 import BorrowBankItem from '@/components/banks/BorrowBankItem'
-import { AaveApp } from '@/utils/banks/aave-app'
-import { CompoundApp } from '@/utils/banks/compound-app'
-import { CreamApp } from '@/utils/banks/cream-app'
+import { createBankApps } from '@/utils/banks/factory'
 
 export default {
   components: {
@@ -93,7 +98,6 @@ export default {
       amountDisplay: '0',
       balanceDisplay: '0',
       underlyingTokenPriceUSD: 0,
-      availableBorrowsDisplay: 0,
       lastUpdatedAt: dayjs(),
       currentTime: 0
     }
@@ -107,39 +111,11 @@ export default {
     }
   },
   mounted() {
-    this.banksList = [{
-      icon: 'https://aave.com/favicon64.png', title: 'Aave',
-      app: new AaveApp(this.$wallet)
-    }, {
-      icon: 'https://compound.finance/compound-components/assets/compound-mark.svg', title: 'Compound',
-      app: new CompoundApp(this.$wallet)
-    }, {
-      icon: 'https://app.cream.finance/static/media/cream.29138554.svg', title: 'Cream',
-      app: new CreamApp(this.$wallet)
-    }]
-    this.getAvailableBorrowsDisplay()
+    this.banksList = createBankApps(this.$wallet)
     this.getUnderlyingAssetPriceUSD()
     this.getBalanceDisplay()
   },
   methods: {
-    async getAvailableBorrowsDisplay() {
-      /**
-       * 遍历每一个bankApp.getAccountData, 然后把获取到的结果累加
-       * 就是当前账户可以借贷的总额度(USD)
-       */
-      let availableBorrowsDisplay = 0
-      const promiseList = _.map(this.banksList, bank => {
-        const bankApp = bank.app
-        return typeof bankApp.getAccountData  === 'undefined' ?
-               Promise.resolve({availableBorrowsUSD: 0}) :  // 如果没有返回一个包含 availableBorrowsUSD 为 0 的promise
-               bankApp.getAccountData()
-      })
-      const resList = await Promise.all(promiseList)
-      availableBorrowsDisplay = _.chain(resList)
-                                 .sumBy(res => +res.availableBorrowsUSD)
-                                 .value()
-      this.availableBorrowsDisplay = availableBorrowsDisplay || 0
-    },
     async getBalanceDisplay() {
       if (this.isETH) {
         this.balanceDisplay = await this.$wallet.getBalance()
@@ -152,7 +128,7 @@ export default {
       this.underlyingToken = token
       this.getUnderlyingAssetPriceUSD()
       this.getBalanceDisplay()
-      this.refreshTable()
+      this.banksList = createBankApps(this.$wallet)
     },
     updateLastUpdatedAt() {
       return this.lastUpdatedAt ? this.lastUpdatedAt.to(this.currentTime) : '-'

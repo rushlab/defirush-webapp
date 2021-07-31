@@ -10,34 +10,24 @@
       :border="true">
       <el-table-column label="Bank" width="180">
         <div slot-scope="scope" class="table-cell">
-          <el-image class="exchange__icon" fit="contain" :src="scope.row.icon"></el-image>
+          <el-image class="exchange__icon" fit="contain" :src="scope.row.logo"></el-image>
           <span class="exchange__title">{{ scope.row.title }}</span>
         </div>
       </el-table-column>
-      <el-table-column label="锁仓量">
-        <template slot-scope="scope">
-          <span>{{ totalBorrowsInUSD || '-' }} USD</span>
-        </template>
+      <el-table-column label="Total borrowed">
+        <template slot-scope="scope">{{ totalBorrowsInUSD }}</template>
       </el-table-column>
       <el-table-column label="APY">
-        <template slot-scope="scope">
-          <span>{{ borrowAPY || '-' }} %</span>
-        </template>
+        <template slot-scope="scope">{{ borrowAPYPercent }}</template>
       </el-table-column>
       <!-- <el-table-column label="已贷款金额">
-        <template slot-scope="scope">
-          <span>{{ userBorrowsInUSD || '-' }} USD</span>
-        </template>
+        <template slot-scope="scope">{{ userBorrowsInUSD }}</template>
       </el-table-column> -->
-      <el-table-column label="可贷款金额">
-        <template slot-scope="scope">
-          <span>{{ availableBorrowsDisplay || '-' }} USD</span>
-        </template>
+      <el-table-column label="Available">
+        <template slot-scope="scope">{{ availableBorrows }}</template>
       </el-table-column>
       <el-table-column label="Gas Fee" width="180">
-        <template slot-scope="scope">
-          <span>-</span>
-        </template>
+        <template slot-scope="scope"></template>
       </el-table-column>
       <el-table-column label="action" width="180">
         <template slot-scope="scope">
@@ -50,7 +40,6 @@
       :visible.sync="isVisible"
       :bankApp="bankApp"
       :underlying-token-data="underlyingTokenData"
-      :available-borrows-display="availableBorrowsDisplay"
       @success="onBorrowSuccess"/>
   </div>
 
@@ -60,6 +49,7 @@
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import { ethers } from 'ethers'
+import { formatCurrency } from '@/utils/formatter'
 import BorrowDialog from '@/components/selects/BorrowDialog'
 
 export default {
@@ -84,8 +74,9 @@ export default {
   data() {
     return {
       isVisible: false,
-      assetData: null,
-      accountData: null,
+      assetData: {},
+      accountData: {},
+      accountAssetData: {},
       userBorrows: 0,
       pending: false,
       disabled: false,
@@ -96,87 +87,67 @@ export default {
   },
   computed: {
     disabledBorrow() {
-      return _.isEmpty(this.bankData) || !this.bankApp || _.isEmpty(this.underlyingTokenData) || this.disabled
+      return _.isEmpty(this.underlyingTokenData) || this.disabled
     },
     underlyingTokenAddress() {
       return _.get(this.underlyingTokenData, 'address')
     },
-    availableBorrowsDisplay() {
-      const availableBorrowsUSD = _.get(this.accountData, 'availableBorrowsUSD', '0')
-      const priceUSD = _.get(this.assetData, 'priceUSD', '0')
-      return +priceUSD ? (+availableBorrowsUSD / +priceUSD).toString() : ''
+    availableBorrows() {
+      const { availableBorrowsUSD } = this.accountData
+      const { priceUSD } = this.assetData
+      return +(+priceUSD ? (+availableBorrowsUSD / +priceUSD).toFixed(6) : '0')
     },
     totalBorrowsInUSD() {
-      const { totalBorrows, priceUSD } = this.assetData || {}
-      if (!totalBorrows || !priceUSD) return '-'
-      return (+totalBorrows * +priceUSD).toString()
+      const { totalBorrows, priceUSD } = this.assetData
+      return formatCurrency((+totalBorrows || 0) * (+priceUSD || 0))
     },
-    borrowAPY() {
-      return this.assetData ? ((+this.assetData.borrowAPY || 0) * 100).toFixed(2) : '-'
+    borrowAPYPercent() {
+      const { borrowAPY } = this.assetData
+      return ((+borrowAPY || 0) * 100).toFixed(2) + '%'
     },
     userBorrowsInUSD() {
-      const { priceUSD  = '0' } = this.assetData || {}
-      const userBorrows = +this.userBorrows || 0
-      if (!userBorrows || !priceUSD) return '-'
-      return (+userBorrows * +priceUSD).toString()
-    }
-  },
-  watch: {
-    underlyingTokenAddress: {
-      handler(newVal) {
-        if (!newVal) {
-          this.resetData()
-          return
-        }
-        this.getAllData()
-      },
-      immediate: true
+      const { priceUSD } = this.assetData
+      const { userBorrows } = this.accountAssetData
+      return formatCurrency((+userDeposits || 0) * (+priceUSD || 0))
     }
   },
   methods: {
-    resetData() {
-      this.assetData = null
-      this.accountData = null
-      this.userBorrows = 0
+    async getAllData() {
+      this.pending = true
+      try {
+        await Promise.all([
+          this.getAssetData(),
+          this.getAccountData(),
+          // this.getAccountAssetData(),  // 显示可借贷额度的，不需要显示已借贷金额
+        ])
+      } catch(error) {}
       this.pending = false
-      this.disabled = false
-    },
-    getAllData() {
-      this.getAssetData()
-      this.getAccountData()
-      // this.getAccountAssetData()  // 显示可借贷额度的，不需要显示已借贷金额
     },
     async getAssetData() {
       /**
        * trycatch 包一下，这样对于当前bankApp不支持的 underlyingAsset，可以直接将状态置为 disabled
        */
       try {
-        this.pending = true
         this.assetData = await this.bankApp.getAssetData(this.underlyingTokenAddress)
         this.disabled = false
       } catch (error) {
-        console.log('@GetAssetData error', error)
         this.disabled = true
       }
-      this.pending = false
     },
     async getAccountAssetData() {
       try {
-        const { userBorrows } = await this.bankApp.getAccountAssetData(this.underlyingTokenAddress)
-        console.log('@@@@ userBorrows', userBorrows)
-        this.userBorrows = userBorrows
-      } catch (error) {
-        console.log('@@@ getAccountAssetData error', error)
-        this.userBorrows = '0'
-      }
+        this.accountAssetData = await this.bankApp.getAccountAssetData(this.underlyingTokenAddress)
+      } catch (error) {}
     },
     async getAccountData() {
-      const accountData = await this.bankApp.getAccountData()
-      this.accountData = accountData
+      try {
+        this.accountData = await this.bankApp.getAccountData()
+      } catch (error) {}
     },
     onBorrowSuccess() {
       this.getAllData()
     },
+    estimateGas() {},
   },
 }
 </script>

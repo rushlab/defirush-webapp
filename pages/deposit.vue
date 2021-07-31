@@ -36,15 +36,15 @@
       </el-table>
       <el-table :data="[]" style="width: 100%" border>
         <el-table-column label="Bank" width="180"></el-table-column>
-        <el-table-column label="锁仓量"></el-table-column>
+        <el-table-column label="TVL"></el-table-column>
         <el-table-column label="APY"></el-table-column>
-        <el-table-column label="已存款金额"></el-table-column>
+        <el-table-column label="Supplying"></el-table-column>
         <el-table-column label="Gas Fee" width="180"></el-table-column>
         <el-table-column label="Action" width="180"></el-table-column>
         <span slot="empty"></span>
       </el-table>
       <deposit-bank-item
-        v-for="bank in banksList" :key="bank.title"
+        v-for="bank in banksList" :key="`${bank.name}-${underlyingToken.address}`"
         :ref="bank.title"
         :underlying-token-data="underlyingToken"
         :bank-data="bank"
@@ -64,9 +64,7 @@ import dayjs from 'dayjs'
 import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
 import DepositBankItem from '@/components/banks/DepositBankItem'
 import ChainSelect from '@/components/ChainSelect'
-import { AaveApp } from '@/utils/banks/aave-app'
-import { CompoundApp } from '@/utils/banks/compound-app'
-import { CreamApp } from '@/utils/banks/cream-app'
+import { createBankApps } from '@/utils/banks/factory'
 
 export default {
   components: {
@@ -105,16 +103,7 @@ export default {
     }
   },
   mounted() {
-    this.banksList = [{
-      icon: 'https://aave.com/favicon64.png', title: 'Aave',
-      app: new AaveApp(this.$wallet)
-    }, {
-      icon: 'https://compound.finance/compound-components/assets/compound-mark.svg', title: 'Compound',
-      app: new CompoundApp(this.$wallet)
-    }, {
-      icon: 'https://app.cream.finance/static/media/cream.29138554.svg', title: 'Cream',
-      app: new CreamApp(this.$wallet)
-    }]
+    this.banksList = createBankApps(this.$wallet)
     this.getUnderlyingAssetPriceUSD()
     this.getBalanceDisplay()
   },
@@ -123,6 +112,8 @@ export default {
       this.underlyingToken = token
       this.getUnderlyingAssetPriceUSD()
       this.getBalanceDisplay()
+      // 换 token 以后需要重置 table
+      this.banksList = createBankApps(this.$wallet)
     },
     async getBalanceDisplay() {
       if (this.isETH) {

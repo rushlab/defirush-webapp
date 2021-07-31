@@ -2,6 +2,8 @@
   <div class="page">
     <el-card>
       <div>Telegram Key: {{ profile.telegramKey }}</div>
+      <div>Telegram chat id: {{ profile.telegramChatId }}</div>
+      <div>Telegram username: {{ profile.telegramUsername }}</div>
     </el-card>
   </div>
 </template>
