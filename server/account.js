@@ -1,16 +1,24 @@
 const express = require('express')
 const router = express.Router()
 
-router.get('/', (req, res, next) => {
-  res.json({
-    api: 'profile'
-  })
+const { authenticate } = require('./utils/auth')
+
+
+router.use('/', async (req, res, next) => {
+  try {
+    req.customer = await authenticate(req)
+  } catch(err) {
+    //
+  }
+  next()
 })
 
-// router.use('/', (req, res, next) => {
-//   authenticate(req).then((customer) => {
-//   }
-// }
+router.get('/profile', (req, res, next) => {
+  res.json({
+    api: 'profile',
+    customer: req.customer,
+  })
+})
 
 /*
  * 处理一下错误, 不继续传递给 index.js 里面的 /api/ 路由

@@ -13,9 +13,13 @@ export const state = () => ({
   walletAddress: '',
   isAuthenticated: false,
   isSignerAlive: false,
+  _apiToken: '',  // 只给 axios 用
 })
 
 export const mutations = {
+  _setApiToken(state, token) {
+    state._apiToken = token
+  },
   setWallet(state, { walletChainId, walletAddress }) {
     state.walletChainId = +walletChainId
     state.walletAddress = walletAddress
@@ -27,16 +31,19 @@ export const mutations = {
 }
 
 /**
- * 下面三个方法其实都不需要 async, 但以后可能需要, 因为需要向服务器验证, 先都加上 async
+ * 下面三个方法其实都不需要 async, 但以后可能需要, 因为需要向服务器验证,
+ * 所以先都用 actions 不用 mutations, 而 actions 一定要 async
  */
 export const actions = {
   async login({ dispatch, commit }, { chainId, address, message, signature }) {
     const content = JSON.stringify({ chainId, address, message, signature })
     global.localStorage.setItem(AUTH_STORAGE_KEY, content)
+    commit('_setApiToken', btoa(content))
     commit('setWallet', { walletChainId: chainId, walletAddress: address })
     commit('setSignerStatus', true)
   },
   async logout({ dispatch, commit }) {
+    commit('_setApiToken', '')
     commit('setWallet', { walletChainId: 1, walletAddress: '' })
     commit('setSignerStatus', false)
     global.localStorage.removeItem(AUTH_STORAGE_KEY)
@@ -45,6 +52,8 @@ export const actions = {
     const content = global.localStorage.getItem(AUTH_STORAGE_KEY)
     try {
       const { chainId, address, message, signature } = JSON.parse(content)
+      // 执行到这里 content 就没问题, 然后再 _setApiToken
+      commit('_setApiToken', btoa(content))
       return { chainId, address, message, signature }
     } catch(error) {}
   }

@@ -87,6 +87,7 @@ export default async ({ store }) => {
       store.commit('auth/setWallet', { walletChainId: chainId, walletAddress: address })
       store.commit('auth/setSignerStatus', connected)
     } catch(error) {
+      console.log(error)
       await store.dispatch('auth/logout')
     }
   }

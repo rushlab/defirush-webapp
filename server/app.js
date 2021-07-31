@@ -2,12 +2,12 @@ const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
-const logger = require('morgan')
+// const logger = require('morgan')
 
 const app = express()
 
 app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'])  // app.enable('trust proxy')
-app.use(logger('combined'))  // logger('dev')
+// app.use(logger('combined'))  // logger('dev')
 app.use('/.ping', function(req, res, next) {
   res.json({
     ip: req.ip,
@@ -28,8 +28,8 @@ app.use('/api', cookieParser())
 /**
  * API routes
  */
-const profileRoutes = require('./profile')
-app.use('/api/profile', profileRoutes)
+const accountRoutes = require('./account')
+app.use('/api/account', accountRoutes)
 
 
 /*

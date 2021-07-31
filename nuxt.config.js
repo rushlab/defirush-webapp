@@ -36,6 +36,7 @@ module.exports = {
     '@/plugins/nuxt-client-init.js',
     '@/plugins/wallet/account.js',
     '@/plugins/wallet/transaction.js',
+    '@/plugins/axios.js',
     '@/plugins/filters.js',
   ],
   /*
@@ -54,7 +55,9 @@ module.exports = {
   modules: [
     '@nuxtjs/axios',
   ],
-  axios: {},
+  axios: {
+    credentials: false  // cross-site Access-Control requests doesn't need to be made using credentials
+  },
   /*
    ** Build configuration
    */
