@@ -124,8 +124,7 @@ export default {
       }
     },
     async getUnderlyingAssetPriceUSD() {
-      // const [,,,,priceUSD] = await this.bankApp.getAssetData(asset)
-      // this.underlyingTokenPriceUSD = priceUSD
+      // TODO, 这里不要显示 price 了, $wallet 里面的方法也去掉, 直接在 dialog 里显示价格, 从 bankApp 里面取价格
       const underlyingAssetAddress = this.underlyingToken.address
       if (!underlyingAssetAddress) return
       const underlyingTokenPriceUSD = await this.$wallet.getPriceUSD(underlyingAssetAddress)

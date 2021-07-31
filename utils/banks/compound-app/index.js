@@ -205,7 +205,7 @@ class CompoundApp extends BankApp {
     // 这里最好检查 this.underlyingEnabled, 建议用户存款的同时也 enterMarket, 不然也没啥意义, 但先不这么做
     if (this._isCETH(cTokenAddr)) {
       const cToken = new ethers.Contract(cTokenAddr, ['function mint() payable'], this.$wallet.getSigner());
-      await cToken.mint({ value: amountMantissa }).then((tx) => tx.wait());
+      await cToken.mint({ value: amountMantissa }).then(this.$wallet.waitForTx);
     } else {
       // const allowanceMantissa = await this.underlyingAllowance(underlyingToken);
       const allowanceMantissa = await super._allowance(underlyingToken, cTokenAddr);
@@ -213,7 +213,7 @@ class CompoundApp extends BankApp {
         throw new Error('allowance of underlying token is not enough');
       }
       const cToken = new ethers.Contract(cTokenAddr, ['function mint(uint256)'], this.$wallet.getSigner());
-      await cToken.mint(amountMantissa).then((tx) => tx.wait());
+      await cToken.mint(amountMantissa).then(this.$wallet.waitForTx);
     }
   }
 
@@ -224,7 +224,7 @@ class CompoundApp extends BankApp {
     const cToken = new ethers.Contract(cTokenAddr, [
       'function borrow(uint borrowAmount) returns (uint)',
     ], this.$wallet.getSigner());
-    await cToken.borrow(amountMantissa).then((tx) => tx.wait());
+    await cToken.borrow(amountMantissa).then(this.$wallet.waitForTx);
   }
 
   async repay(underlyingToken, amountDisplay) {
@@ -235,12 +235,12 @@ class CompoundApp extends BankApp {
       const cToken = new ethers.Contract(cTokenAddr, [
         'function repayBorrow() payable',
       ], this.$wallet.getSigner());
-      await cToken.repayBorrow({ value: amountMantissa }).then((tx) => tx.wait());
+      await cToken.repayBorrow({ value: amountMantissa }).then(this.$wallet.waitForTx);
     } else {
       const cToken = new ethers.Contract(cTokenAddr, [
         'function repayBorrow(uint borrowAmount) returns (uint)',
       ], this.$wallet.getSigner());
-      await cToken.repayBorrow(amountMantissa).then((tx) => tx.wait());
+      await cToken.repayBorrow(amountMantissa).then(this.$wallet.waitForTx);
     }
   }
 
@@ -251,7 +251,7 @@ class CompoundApp extends BankApp {
       'function repayBorrow(uint borrowAmount) returns (uint)',
     ], this.$wallet.getSigner());
     const _max = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-    await cToken.repayBorrow(_max).then((tx) => tx.wait());
+    await cToken.repayBorrow(_max).then(this.$wallet.waitForTx);
   }
 
   async withdraw(underlyingToken, amountDisplay) {
@@ -261,7 +261,7 @@ class CompoundApp extends BankApp {
     const cToken = new ethers.Contract(cTokenAddr, [
       'function redeemUnderlying(uint redeemAmount) returns (uint)',
     ], this.$wallet.getSigner());
-    await cToken.redeemUnderlying(amountMantissa).then((tx) => tx.wait());
+    await cToken.redeemUnderlying(amountMantissa).then(this.$wallet.waitForTx);
   }
 
   async withdrawAll(underlyingToken) {
@@ -271,7 +271,7 @@ class CompoundApp extends BankApp {
       'function redeem(uint redeemTokens) returns (uint)',
     ], this.$wallet.getSigner());
     const balanceMantissa = await cToken.balanceOf(this.$wallet.getAddress());
-    await cToken.redeem(balanceMantissa).then((tx) => tx.wait());
+    await cToken.redeem(balanceMantissa).then(this.$wallet.waitForTx);
   }
 
 }

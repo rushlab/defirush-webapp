@@ -143,7 +143,7 @@ export default {
         const amount = ethers.utils.parseEther('1')  // 获取 1 个 Ether
         await contract.requestEther(amount, {
           gasPrice: 0,
-        }).then(this.$waitForTx)
+        }).then(this.$wallet.waitForTx)
         await this.getEtherBalance()
       } catch (error) {
         console.log(error)

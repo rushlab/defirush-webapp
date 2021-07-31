@@ -170,19 +170,18 @@ class AaveApp extends BankApp {
 
   async deposit(underlyingToken, amountDisplay) {
     const signer = this.$wallet.getSigner();
-    console.log('@@@ deposit.signer', signer)
     const onBehalfOf = this.$wallet.getAddress();
     if (this._isETH(underlyingToken)) {
       const amountMantissa = this._displayToMantissa(amountDisplay, 18);
       // depositETH(lendingPool, onBehalfOf, referralCode) payable
       const payload = [this.lendingPool.address, onBehalfOf, 0, { value: amountMantissa }];
-      await this.wETHGateway.connect(signer).depositETH(...payload).then((tx) => tx.wait());
+      await this.wETHGateway.connect(signer).depositETH(...payload).then(this.$wallet.waitForTx);
     } else {
       const decimals = await this._decimals(underlyingToken);
       const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
       // deposit(asset, amount, onBehalfOf, referralCode)
       const payload = [underlyingToken, amountMantissa, onBehalfOf, 0];
-      await this.lendingPool.connect(signer).deposit(...payload).then((tx) => tx.wait());
+      await this.lendingPool.connect(signer).deposit(...payload).then(this.$wallet.waitForTx);
     }
   }
 
@@ -199,13 +198,13 @@ class AaveApp extends BankApp {
       const amountMantissa = this._displayToMantissa(amountDisplay, 18);
       // borrowETH(lendingPool, amount, interestRateMode, referralCode)
       const payload = [this.lendingPool.address, amountMantissa, rateMode, 0];
-      await this.wETHGateway.connect(signer).borrowETH(...payload).then((tx) => tx.wait());
+      await this.wETHGateway.connect(signer).borrowETH(...payload).then(this.$wallet.waitForTx);
     } else {
       const decimals = await this._decimals(underlyingToken);
       const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
       // borrow(asset, amount, interestRateMode, referralCode, onBehalfOf)
       const payload = [underlyingToken, amountMantissa, rateMode, 0, onBehalfOf];
-      await this.lendingPool.connect(signer).borrow(...payload).then((tx) => tx.wait());
+      await this.lendingPool.connect(signer).borrow(...payload).then(this.$wallet.waitForTx);
     }
   }
 
@@ -217,13 +216,13 @@ class AaveApp extends BankApp {
       const amountMantissa = this._displayToMantissa(amountDisplay, 18);
       // repayETH(address lendingPool, uint256 amount, uint256 rateMode, address onBehalfOf)
       const payload = [this.lendingPool.address, amountMantissa, rateMode, onBehalfOf, { value: amountMantissa }];
-      await this.wETHGateway.connect(signer).repayETH(...payload).then((tx) => tx.wait());
+      await this.wETHGateway.connect(signer).repayETH(...payload).then(this.$wallet.waitForTx);
     } else {
       const decimals = await this._decimals(underlyingToken);
       const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
       // repay(address asset, uint256 amount, uint256 rateMode, address onBehalfOf)
       const payload = [underlyingToken, amountMantissa, rateMode, onBehalfOf];
-      await this.lendingPool.connect(signer).repay(...payload).then((tx) => tx.wait());
+      await this.lendingPool.connect(signer).repay(...payload).then(this.$wallet.waitForTx);
     }
   }
 
@@ -235,7 +234,7 @@ class AaveApp extends BankApp {
     const _max = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
     // repay(address asset, uint256 amount, uint256 rateMode, address onBehalfOf)
     const payload = [underlyingToken, _max, rateMode, onBehalfOf];
-    await this.lendingPool.connect(signer).repay(...payload).then((tx) => tx.wait());
+    await this.lendingPool.connect(signer).repay(...payload).then(this.$wallet.waitForTx);
   }
 
   async withdraw(underlyingToken, amountDisplay) {
@@ -250,13 +249,13 @@ class AaveApp extends BankApp {
       const amountMantissa = this._displayToMantissa(amountDisplay, 18);
       // withdrawETH(lendingPool, amount, to)
       const payload = [this.lendingPool.address, amountMantissa, to];
-      await this.wETHGateway.connect(signer).withdrawETH(...payload).then((tx) => tx.wait());
+      await this.wETHGateway.connect(signer).withdrawETH(...payload).then(this.$wallet.waitForTx);
     } else {
       const decimals = await this._decimals(underlyingToken);
       const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
       // withdraw(asset, amount, to)
       const payload = [underlyingToken, amountMantissa, to];
-      await this.lendingPool.connect(signer).withdraw(...payload).then((tx) => tx.wait());
+      await this.lendingPool.connect(signer).withdraw(...payload).then(this.$wallet.waitForTx);
     }
   }
 
@@ -267,7 +266,7 @@ class AaveApp extends BankApp {
     const _max = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
     // withdraw(asset, amount, to)
     const payload = [underlyingToken, _max, to];
-    await this.lendingPool.connect(signer).withdraw(...payload).then((tx) => tx.wait());
+    await this.lendingPool.connect(signer).withdraw(...payload).then(this.$wallet.waitForTx);
   }
 }
 

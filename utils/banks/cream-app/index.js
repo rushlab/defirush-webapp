@@ -217,7 +217,7 @@ class CreamApp extends BankApp {
     // 这里最好检查 this.underlyingEnabled, 建议用户存款的同时也 enterMarket, 不然也没啥意义, 但先不这么做
     if (this._isCrETH(crTokenAddr)) {
       const crToken = new ethers.Contract(crTokenAddr, ['function mint() payable'], this.$wallet.getSigner());
-      await crToken.mint({ value: amountMantissa }).then((tx) => tx.wait());
+      await crToken.mint({ value: amountMantissa }).then(this.$wallet.waitForTx);
     } else {
       // const allowanceDisplay = await this.underlyingAllowance(underlyingToken);
       const allowanceMantissa = await super._allowance(underlyingToken, crTokenAddr);
@@ -225,7 +225,7 @@ class CreamApp extends BankApp {
         throw new Error('allowance of underlying token is not enough');
       }
       const crToken = new ethers.Contract(crTokenAddr, ['function mint(uint256)'], this.$wallet.getSigner());
-      await crToken.mint(amountMantissa).then((tx) => tx.wait());
+      await crToken.mint(amountMantissa).then(this.$wallet.waitForTx);
     }
   }
 
@@ -236,7 +236,7 @@ class CreamApp extends BankApp {
     const crToken = new ethers.Contract(crTokenAddr, [
       'function borrow(uint borrowAmount) returns (uint)',
     ], this.$wallet.getSigner());
-    await crToken.borrow(amountMantissa).then((tx) => tx.wait());
+    await crToken.borrow(amountMantissa).then(this.$wallet.waitForTx);
   }
 
   async repay(underlyingToken, amountDisplay) {
@@ -247,12 +247,12 @@ class CreamApp extends BankApp {
       const crToken = new ethers.Contract(crTokenAddr, [
         'function repayBorrow() payable',
       ], this.$wallet.getSigner());
-      await crToken.repayBorrow({ value: amountMantissa }).then((tx) => tx.wait());
+      await crToken.repayBorrow({ value: amountMantissa }).then(this.$wallet.waitForTx);
     } else {
       const crToken = new ethers.Contract(crTokenAddr, [
         'function repayBorrow(uint borrowAmount) returns (uint)',
       ], this.$wallet.getSigner());
-      await crToken.repayBorrow(amountMantissa).then((tx) => tx.wait());
+      await crToken.repayBorrow(amountMantissa).then(this.$wallet.waitForTx);
     }
   }
 
@@ -263,7 +263,7 @@ class CreamApp extends BankApp {
       'function repayBorrow(uint borrowAmount) returns (uint)',
     ], this.$wallet.getSigner());
     const _max = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-    await crToken.repayBorrow(_max).then((tx) => tx.wait());
+    await crToken.repayBorrow(_max).then(this.$wallet.waitForTx);
   }
 
   async withdraw(underlyingToken, amountDisplay) {
@@ -273,7 +273,7 @@ class CreamApp extends BankApp {
     const crToken = new ethers.Contract(crTokenAddr, [
       'function redeemUnderlying(uint redeemAmount) returns (uint)',
     ], this.$wallet.getSigner());
-    await crToken.redeemUnderlying(amountMantissa).then((tx) => tx.wait());
+    await crToken.redeemUnderlying(amountMantissa).then(this.$wallet.waitForTx);
   }
 
   async withdrawAll(underlyingToken) {
@@ -283,7 +283,7 @@ class CreamApp extends BankApp {
       'function redeem(uint redeemTokens) returns (uint)',
     ], this.$wallet.getSigner());
     const balanceMantissa = await crToken.balanceOf(this.$wallet.getAddress());
-    await crToken.redeem(balanceMantissa).then((tx) => tx.wait());
+    await crToken.redeem(balanceMantissa).then(this.$wallet.waitForTx);
   }
 
 }
