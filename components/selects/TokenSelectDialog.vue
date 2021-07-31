@@ -1,7 +1,7 @@
 <!-- dialog 返回的是整个对象, select 组件返回 id -->
 <template>
-  <el-dialog class="dialog--tokens" title="Select Token"
-    width="600px" top="5vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
+  <el-dialog class="dialog--dark dialog--tokens" title="Select Token"
+    width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
     <div class="filters">
       <div class="filter-item">
@@ -12,7 +12,7 @@
           v-model="q"></el-input>
       </div>
     </div>
-    <el-table :data="listedTokens" v-loading="pending">
+    <!-- <el-table :data="listedTokens" v-loading="pending">
       <el-table-column width="60" class-name="col-image">
         <template slot-scope="{ row }">
           <el-image
@@ -29,8 +29,32 @@
             type="primary" size="mini" @click="handleSelectOne(row)">Select</el-button>
         </template>
       </el-table-column>
-    </el-table>
-    <div class="text-center hint" v-show="filteredResults.length > 10">Type in exact Symbol or Address to get more results...</div>
+    </el-table> -->
+    <div class="common-bases">
+      <div class="common-bases__title">Common bases</div>
+      <div class="common-bases__inner">
+        <div class="common-item" v-for="item in commonBases" :key="item.address" @click="handleSelectOne(item)">
+          <el-image
+            style="width: 18px; height: 18px; display: block;"
+            :src="item.logoURI" fit="contain"
+          ></el-image>
+          <div class="common-item__symbol">{{ item.symbol }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="token-list">
+      <div v-for="item in listedTokens" :key="item.address" class="token-item" @click="handleSelectOne(item)">
+        <el-image
+          style="width: 30px; height: 30px; display: block;"
+          :src="item.logoURI" fit="contain"
+        ></el-image>
+        <div class="token__caption">
+          <div class="token__title">{{ item.symbol }}</div>
+          <div class="token__name">{{ item.name }}</div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="text-center hint" v-show="filteredResults.length > 10">Type in exact Symbol or Address to get more results...</div> -->
   </el-dialog>
 </template>
 
@@ -57,6 +81,51 @@ export default {
     return {
       isVisible: this.visible,
       q: '', // token symbol or full address
+      commonBases: [
+        {
+        "symbol": "ETH",
+        "name": "Ethereum",
+        "decimals": 18,
+        "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "logoURI": "https://tokens.1inch.exchange/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.png"
+        },
+        {
+        "symbol": "DAI",
+        "name": "Dai Stablecoin",
+        "decimals": 18,
+        "address": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "logoURI": "https://tokens.1inch.exchange/0x6b175474e89094c44da98b954eedeac495271d0f.png"
+        },
+        {
+        "symbol": "UNI",
+        "name": "Uniswap",
+        "decimals": 18,
+        "address": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+        "logoURI": "https://tokens.1inch.exchange/0x1f9840a85d5af5bf1d1762f925bdaddc4201f984.png"
+        },
+        {
+        "symbol": "LINK",
+        "name": "Chain Link",
+        "address": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "decimals": 18,
+        "logoURI": "https://tokens.1inch.exchange/0x514910771af9ca656af840dff83e8264ecf986ca.png"
+        },
+        {
+        "symbol": "USDC",
+        "name": "USD Coin",
+        "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "decimals": 6,
+        "logoURI": "https://tokens.1inch.exchange/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png"
+        },
+        {
+        "symbol": "1INCH",
+        "name": "1INCH Token",
+        "decimals": 18,
+        "eip2612": true,
+        "address": "0x111111111117dc0aa78b770fa6a738034120c302",
+        "logoURI": "https://tokens.1inch.exchange/0x111111111117dc0aa78b770fa6a738034120c302.png"
+        }
+      ]
     }
   },
   computed: {
@@ -117,7 +186,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/stylesheets/variables.scss";
+@import "@/assets/stylesheets/components/dialog.scss";
 
 .filters {
   padding: 5px 0;
@@ -127,7 +196,7 @@ export default {
   // TODO 换成 element-ui 的变量
   border-bottom: 1px solid #f0f0f0;
   .filter-item {
-    margin: 5px 10px;
+    margin: 5px auto;
     width: 100%;
   }
 }
@@ -135,11 +204,89 @@ export default {
   color: $color-text-light;
   padding: 10px 0;
 }
-.dialog--tokens {
-  /deep/ .el-dialog__body {
-    padding-top: 0;
-    padding-bottom: 20px;
+/deep/ {
+  .el-input__inner {
+    height: 48px;
+    line-height: 48px;
+    color: $color-text;
+    background-color: $color-input-bg;
+    font-size: 16px;
+    color: $color-text;
+    &::placeholder {
+      color: $color-text-light;
+    }
   }
-  /deep/ .el-dialog {}
+}
+// .dialog--tokens {
+//   /deep/ .el-dialog__body {
+//     padding-top: 0;
+//     padding-bottom: 20px;
+//   }
+//   /deep/ .el-dialog {}
+// }
+.common-bases {
+  margin-top: 15px;
+}
+.common-bases__title {
+  font-size: 14px;
+  color: $color-text-light;
+  margin-bottom: 8px;
+}
+.common-bases__inner {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.common-item {
+  height: 36px;
+  background: transparent;
+  border: 1px solid #979AAA;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: 0 18px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  &:hover {
+    background-color: $color-input-bg;
+  }
+  .common-item__symbol {
+    margin-left: 12px;
+    font-size: 15px;
+    color: $color-text;
+  }
+}
+.token-list {
+  width: 100%;
+  max-height: 400px;
+  overflow: auto;
+  padding: 15px 0;
+  border-top: 1px solid $color-border;
+  margin-top: 20px;
+}
+.token-item {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  cursor: pointer;
+  padding: 15px 0;
+  &:hover {
+    opacity: 0.6;
+  }
+}
+.token__caption {
+  margin-left: 15px;
+}
+.token__title {
+  font-size: 20px;
+  color: $color-text;
+}
+.token__name {
+  font-size: 12px;
+  color: $color-text-light;
 }
 </style>
