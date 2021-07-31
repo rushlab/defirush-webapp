@@ -4,6 +4,38 @@
       <span>{{ networkName }}</span>
     </div>
     <div style="margin-left: auto;"></div>
+    <div class="gas-fees">
+      <el-popover
+        placement="bottom"
+        width="240"
+        trigger="click"
+      >
+        <div class="gas-fees__inner">
+          <div class="inner__title">Ethereum Gas Price Forecast</div>
+          <div class="inner__body">
+            <div class="item">
+              <span class="item__speed">Fase</span>
+              <span class="item__value">30</span>
+              <span class="item__duration">13 sec</span>
+            </div>
+            <div class="item">
+              <span class="item__speed">Fase</span>
+              <span class="item__value">30</span>
+              <span class="item__duration">13 sec</span>
+            </div>
+            <div class="item">
+              <span class="item__speed">Fase</span>
+              <span class="item__value">30</span>
+              <span class="item__duration">13 sec</span>
+            </div>
+          </div>
+        </div>
+        <div class="gas-fee-btn" slot="reference">
+          <div class="gas-fee-icon"></div>
+          <div class="gas-fee-value">13</div>
+        </div>
+      </el-popover>
+    </div>
     <template v-if="isAuthenticated">
       <div class="wallet-status">
         <el-dropdown>
@@ -13,7 +45,9 @@
           </div>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>
-              <el-button class="dropdown__btn" @click="copyWalletAddress" type="text">{{ maskedWalletAddress }} <i class="el-icon-copy-document"></i></el-button>
+              <el-button class="dropdown__btn" @click="copyWalletAddress" type="text">
+                {{ maskedWalletAddress }} <el-tooltip class="item" effect="dark" content="Click to copy" placement="top"><i class="el-icon-copy-document"></i></el-tooltip>
+              </el-button>
             </el-dropdown-item>
             <el-dropdown-item>
               <el-button class="dropdown__btn" @click="handleLogout" type="text">Logout</el-button>
@@ -244,6 +278,7 @@ export default {
   border-radius: 20px;
   color: $color-text;
   box-shadow: 0 0 1px 0 $color-border;
+  cursor: pointer;
   .icon-metamask {
     position: absolute;
     width: 24px;
@@ -341,6 +376,72 @@ export default {
 }
 .footer__btn[disabled] {
   opacity: 0.7;
+}
+
+.gas-fee-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #E6E8EC;
+  border-radius: 50%;
+  margin-right: 12px;
+  cursor: pointer;
+}
+.gas-fee-icon {
+  width: 11px;
+  height: 11px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-image: url('~/assets/icons/icon-gas.png');
+}
+.gas-fee-value {
+  color: $color-text;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.gas-fees__inner {
+  padding: 3px 13px;
+  text-align: center;
+  color: $color-text;
+}
+.inner__title {
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 28px;
+  margin-bottom: 15px;
+}
+.inner__body {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .item {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .item__speen {
+    font-size: 12px;
+    line-height: 14px;
+    margin-bottom: 4px;
+  }
+  .item__value {
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 20px;
+    margin-bottom: 4px;
+  }
+  .item__duration {
+    font-size: 10px;
+    line-height: 10px;
+    color: #777E91;
+  }
 }
 /deep/ {
   .el-dialog__body {
