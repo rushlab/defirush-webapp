@@ -8,7 +8,7 @@
         <i v-else class="el-icon-s-unfold"></i> -->
       </div>
     </div>
-    <div class="sidebar__body">
+    <div class="sidebar__body" :class="{'collasped': isCollasped}">
       <el-menu
         :router="true"
         :default-active="defaultActive"
@@ -142,6 +142,10 @@ export default {
   padding: 20px;
   position: relative;
   flex: 1;
+  &.collasped {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 .sidebar {
   border-right: none;

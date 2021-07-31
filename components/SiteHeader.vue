@@ -13,7 +13,12 @@
         <div class="gas-fees__inner">
           <div class="inner__title">Ethereum Gas Price Forecast</div>
           <div class="inner__body">
-            <div class="item">
+            <div class="item" v-for="(item, key) in gasPriceTable" :key="key">
+              <span class="item__speed">{{ key }}</span>
+              <span class="item__value">{{ item.price_gwei }}</span>
+              <span class="item__duration">{{ item.waiting_seconds }} sec</span>
+            </div>
+            <!-- <div class="item">
               <span class="item__speed">Fase</span>
               <span class="item__value">30</span>
               <span class="item__duration">13 sec</span>
@@ -22,12 +27,7 @@
               <span class="item__speed">Fase</span>
               <span class="item__value">30</span>
               <span class="item__duration">13 sec</span>
-            </div>
-            <div class="item">
-              <span class="item__speed">Fase</span>
-              <span class="item__value">30</span>
-              <span class="item__duration">13 sec</span>
-            </div>
+            </div> -->
           </div>
         </div>
         <div class="gas-fee-btn" slot="reference">
@@ -134,6 +134,11 @@ export default {
         isConnecting: false,
         isVerifying: false
       },
+      gasPriceTable: {
+        fase: {},
+        normal: {},
+        slow: {}
+      }
     }
   },
   computed: {
@@ -156,8 +161,27 @@ export default {
       return ''
     }
   },
+  mounted() {
+    this.getGasPrice()
+  },
   methods: {
     copyToClipboard,
+    async getGasPrice() {
+      try {
+        this.gasPricePending = true
+        const res = await this.$axios.get('/api/gas_price_table/')
+        const { fast, normal, slow } = res.data
+        this.gasPriceTable = {
+          fast: { ...fast, price_gwei: parseInt(fast.price_gwei) },
+          normal: { ...normal, price_gwei: parseInt(normal.price_gwei) },
+          slow: { ...slow, price_gwei: parseInt(slow.price_gwei) }
+        }
+      } catch (error) {
+
+      }
+      this.gasPricePending = false
+      // setTimeout(this.getGasPrice, 3000)
+    },
     async connectBrowserWallet() {
       if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
         this.connectDialog.isConnecting = true
