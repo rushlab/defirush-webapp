@@ -106,7 +106,7 @@ export default {
     ...mapState('auth', ['walletChainId', 'walletAddress', 'isAuthenticated', 'isSignerAlive']),
     networkName() {
       if (this.walletChainId == 1) {
-        return 'Etherum Mainnet Network'
+        return 'Etherum Mainnet'
       } else {
         'Unknown Network'
       }
@@ -114,7 +114,7 @@ export default {
     maskedWalletAddress() {
       const walletAddress = this.walletAddress || ''
       if (!walletAddress) return ''
-      return walletAddress.substring(0, 4) + '...' + walletAddress.substring(walletAddress.length - 4)
+      return walletAddress.substring(0, 6) + '...' + walletAddress.substring(walletAddress.length - 4)
     },
     dialogTitle() {
       if (!this.connectDialog.address) return 'Sellect a Wallet'

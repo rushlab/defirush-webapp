@@ -40,13 +40,31 @@
         </el-menu-item>
         <el-menu-item index="/swap">
           <i class="el-icon-set-up"></i>
-          <strong v-show="!isCollasped">Swap</strong>
+          <strong v-show="!isCollasped">Collateral Swap</strong>
+        </el-menu-item>
+
+        <el-menu-item index="/swap">
+          <i class="el-icon-set-up"></i>
+          <strong v-show="!isCollasped">Debt Swap</strong>
+        </el-menu-item>
+        <el-menu-item index="/swap">
+          <i class="el-icon-set-up"></i>
+          <strong v-show="!isCollasped">Refinance</strong>
+        </el-menu-item>
+        <el-menu-item index="/swap">
+          <i class="el-icon-set-up"></i>
+          <strong v-show="!isCollasped">Settings</strong>
         </el-menu-item>
       </el-menu>
 
       <div class="social-icons">
         <div class="social-icon"></div>
         <div class="social-icon"></div>
+      </div>
+    </div>
+    <div class="sidebar__footer">
+      <div class="simulation-togger">
+        <span>Simulation</span>  <el-switch v-model="isSimulation"></el-switch>
       </div>
     </div>
   </div>
@@ -63,6 +81,7 @@ export default {
   },
   data() {
     return {
+      isSimulation: false,
     }
   },
   computed: {
@@ -84,6 +103,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.sidebar-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
 .sidebar__header {
   width: 100%;
   position: relative;
@@ -113,6 +138,11 @@ export default {
   background-size: contain;
   background-image: url('~/assets/icons/icon-collaspe.png');
 }
+.sidebar__body {
+  padding: 20px;
+  position: relative;
+  flex: 1;
+}
 .sidebar {
   border-right: none;
 }
@@ -134,8 +164,8 @@ export default {
     content: "";
     position: absolute;
     top: 0;
-    left: 20px;
-    right: 20px;
+    left: 0px;
+    right: 0px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 }
@@ -156,6 +186,45 @@ export default {
   &:nth-child(2) { background-image: url('~/assets/icons/icon-twitter.png'); }
   & + & {
     margin-left: 40px;
+  }
+}
+.sidebar__footer {
+  height: 100px;
+  padding: 20px;
+  position: relative;
+}
+.simulation-togger {
+  position: absolute;
+  left: 20px;
+  bottom: 40px;
+  right: 20px;
+  height: 46px;
+  background: rgba(228, 228, 228, 0.1);
+  color: #808191;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 15px;
+}
+/deep/ {
+  .el-menu-item.is-active {
+    background: rgba(228, 228, 228, 0.1) !important;
+    border-radius: 8px;
+  }
+  .el-switch__core {
+    background-color: #23262F;
+    border: 1px solid #353945;
+    width: 54px !important;
+    height: 28px;
+    border-radius: 14px;
+  }
+  .el-switch__core:after {
+    width: 26px;
+    height: 26px;
+  }
+  .el-switch.is-checked .el-switch__core::after {
+    margin-left: -26px;
   }
 }
 </style>
