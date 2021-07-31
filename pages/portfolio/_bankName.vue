@@ -118,18 +118,18 @@
           </template>
         </el-table-column>
         <el-table-column label="CF">
-          <template slot-scope="{ row }">{{ formatPercentage(row.depositAPY) }}</template>
+          <template slot-scope="{ row }">-</template>
         </el-table-column>
-        <el-table-column label="APY">
+        <el-table-column label="APY" width="160">
           <div class="table-column-label" slot="header">
             <span>APY</span><!--
             --><el-tooltip effect="dark" content="Collateral factor" placement="top">
               <i class="el-icon-question"></i>
             </el-tooltip>
           </div>
-          <template slot-scope="{ row }">-</template>
+          <template slot-scope="{ row }">{{ formatPercentage(row.depositAPY) }}</template>
         </el-table-column>
-        <el-table-column label="Action">
+        <el-table-column label="Action" width="200" align="center">
           <template slot-scope="{ row }">
             <el-button type="success" size="mini" round @click="() => onWithdraw(row.info)">Withdraw</el-button>
           </template>
@@ -148,14 +148,15 @@
         </el-table-column>
         <el-table-column label="Borrowing">
           <template slot-scope="{ row }">
-            <div>{{ row.userBorrows }}</div>
+            <div>{{ row.userBorrows }} {{ row.info.symbol }}</div>
             <div>{{ formatCurrency((+row.userBorrows) * (+row.priceUSD)) }}</div>
           </template>
         </el-table-column>
-        <el-table-column label="APY">
+        <el-table-column></el-table-column>
+        <el-table-column label="APY" width="160">
           <template slot-scope="{ row }">{{ formatPercentage(row.borrowAPY) }}</template>
         </el-table-column>
-        <el-table-column label="Action">
+        <el-table-column label="Action" width="200" align="center">
           <template slot-scope="{ row }">
             <el-button type="primary" size="mini" round @click="() => onRepay(row.info)">Repay</el-button>
           </template>

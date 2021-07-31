@@ -98,6 +98,9 @@ export default {
       return formatCurrency((+userDeposits || 0) * (+priceUSD || 0))
     }
   },
+  mounted() {
+    this.getAllData()
+  },
   methods: {
     async getAllData() {
       this.pending = true

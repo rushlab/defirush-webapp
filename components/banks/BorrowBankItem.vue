@@ -82,9 +82,6 @@ export default {
       disabled: false,
     }
   },
-  mounted() {
-    this.getAllData()
-  },
   computed: {
     disabledBorrow() {
       return _.isEmpty(this.underlyingTokenData) || this.disabled
@@ -110,6 +107,9 @@ export default {
       const { userBorrows } = this.accountAssetData
       return formatCurrency((+userDeposits || 0) * (+priceUSD || 0))
     }
+  },
+  mounted() {
+    this.getAllData()
   },
   methods: {
     async getAllData() {
