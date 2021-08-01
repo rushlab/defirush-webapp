@@ -46,13 +46,13 @@
                 <el-col :span="12">
                   <div class="data-item">
                     <div class="data-item__label">Daily earning</div>
-                    <div class="data-item__value">{{ formatCurrency(21.56) }}</div>
+                    <div class="data-item__value">{{ formatCurrency(dailyEarnUSD) }}</div>
                   </div>
                 </el-col>
                 <el-col :span="12">
                   <div class="data-item">
                     <div class="data-item__label">APY</div>
-                    <div class="data-item__value">3.23%</div>
+                    <div class="data-item__value">{{ formatPercentage(bankDepositAPY) }}</div>
                   </div>
                 </el-col>
               </el-row>
@@ -236,6 +236,19 @@ export default {
     },
     isDanger() {
       return this.safetyPrecentage <= 80
+    },
+    totalEarnInYearUSD() {
+      const _totalEarnInYearUSD = _.sumBy(this.deposits, ({ userDeposits, priceUSD, depositAPY }) => {
+        return +userDeposits * +priceUSD * +depositAPY
+      })
+      return _totalEarnInYearUSD
+    },
+    bankDepositAPY() {
+      const { userDepositsUSD } = this.accountData
+      return +userDepositsUSD ? this.totalEarnInYearUSD / +userDepositsUSD : ''
+    },
+    dailyEarnUSD() {
+      return this.totalEarnInYearUSD / 365
     }
   },
   mounted() {
