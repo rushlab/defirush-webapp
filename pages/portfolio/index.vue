@@ -9,7 +9,7 @@ export default {
   //   return redirect(302, '/portfolio/aave')
   // },
   mounted() {
-    this.$router.replace('/portfolio/aave')
+    this.$router.replace('/portfolio/all')
   }
 }
 </script>

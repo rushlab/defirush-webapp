@@ -24,6 +24,7 @@ export default {
   data() {
     return {
       options: [
+        { title: "All", value: "all" },
         { title: "Aave", value: "aave" },
         { title: "Compound", value: "compound" },
         { title: "Cream", value: "cream" },
