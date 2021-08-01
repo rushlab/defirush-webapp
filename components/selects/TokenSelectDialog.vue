@@ -31,9 +31,13 @@
       </el-table-column>
     </el-table> -->
     <div class="common-bases">
-      <div class="common-bases__title">Common bases</div>
+      <div class="common-bases__title">Common tokens</div>
       <div class="common-bases__inner">
-        <div class="common-item" v-for="item in commonBases" :key="item.address" @click="handleSelectOne(item)">
+        <div
+          class="common-item"
+          v-for="item in commonTokens" :key="item.address"
+          @click="handleSelectOne(item)"
+        >
           <el-image
             style="width: 18px; height: 18px; display: block;"
             :src="item.logoURI" fit="contain"
@@ -81,51 +85,6 @@ export default {
     return {
       isVisible: this.visible,
       q: '', // token symbol or full address
-      commonBases: [
-        {
-        "symbol": "ETH",
-        "name": "Ethereum",
-        "decimals": 18,
-        "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-        "logoURI": "https://tokens.1inch.exchange/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.png"
-        },
-        {
-        "symbol": "DAI",
-        "name": "Dai Stablecoin",
-        "decimals": 18,
-        "address": "0x6b175474e89094c44da98b954eedeac495271d0f",
-        "logoURI": "https://tokens.1inch.exchange/0x6b175474e89094c44da98b954eedeac495271d0f.png"
-        },
-        {
-        "symbol": "UNI",
-        "name": "Uniswap",
-        "decimals": 18,
-        "address": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-        "logoURI": "https://tokens.1inch.exchange/0x1f9840a85d5af5bf1d1762f925bdaddc4201f984.png"
-        },
-        {
-        "symbol": "LINK",
-        "name": "Chain Link",
-        "address": "0x514910771af9ca656af840dff83e8264ecf986ca",
-        "decimals": 18,
-        "logoURI": "https://tokens.1inch.exchange/0x514910771af9ca656af840dff83e8264ecf986ca.png"
-        },
-        {
-        "symbol": "USDC",
-        "name": "USD Coin",
-        "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        "decimals": 6,
-        "logoURI": "https://tokens.1inch.exchange/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.png"
-        },
-        {
-        "symbol": "1INCH",
-        "name": "1INCH Token",
-        "decimals": 18,
-        "eip2612": true,
-        "address": "0x111111111117dc0aa78b770fa6a738034120c302",
-        "logoURI": "https://tokens.1inch.exchange/0x111111111117dc0aa78b770fa6a738034120c302.png"
-        }
-      ]
     }
   },
   computed: {
@@ -133,6 +92,9 @@ export default {
       tokenList: state => state.data,
       pending: state => state.pending,
     }),
+    commonTokens() {
+      return this.tokenList.slice(0, 5)
+    },
     filteredResults() {
       let res = []
       if (!this.q) {

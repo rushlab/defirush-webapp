@@ -291,7 +291,6 @@ export default {
       } catch(error) {
         console.log(asset, error)
       }
-      console.log(data)
       return data
     },
     async getAccountAssets() {
