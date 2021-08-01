@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 
-const { authenticate } = require('./utils/auth')
+const { authenticate } = require('../utils/auth')
 const error = (status, message) => {
   const error = new Error(message)
   error.status = status

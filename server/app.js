@@ -28,9 +28,9 @@ app.use('/api', cookieParser())
 /**
  * API routes
  */
-const clientRoutes = require('./client')
+const clientRoutes = require('./api/client')
 app.use('/api', clientRoutes)
-const accountRoutes = require('./account')
+const accountRoutes = require('./api/account')
 app.use('/api/account', accountRoutes)
 
 

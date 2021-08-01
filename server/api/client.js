@@ -2,8 +2,10 @@ const axios = require('axios')
 const express = require('express')
 const router = express.Router()
 
-const { getSecret } = require('./utils/index')
+const { getSecret } = require('../utils/index')
 const DEFI_PULSE_API_KEY = getSecret('DEFI_PULSE_API_KEY', '')
+
+// TODO 可以考虑用 https://www.gasnow.org/
 
 router.get('/gas_price_table', async (req, res, next) => {
   const { data } = await axios.get('https://data-api.defipulse.com/api/v1/egs/api/ethgasAPI.json', {
