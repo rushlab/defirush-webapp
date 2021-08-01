@@ -108,7 +108,7 @@ export default {
         res = _.filter(this.tokenList, { address: _q })
       } else {
         res = _.filter(this.tokenList, token => {
-          return _.startsWith(token.symbol, this.q.toUpperCase())
+          return token.symbol.toLowerCase().indexOf(this.q.toLowerCase()) >= 0
         })
       }
       return res
@@ -117,9 +117,7 @@ export default {
       return _.take(this.filteredResults, 10)
     }
   },
-  mounted() {
-
-  },
+  mounted() {},
   watch: {
     visible(newVal, oldValue) {
       this.isVisible = newVal
