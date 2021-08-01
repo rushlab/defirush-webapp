@@ -4,6 +4,10 @@
         "chainId": 1,
         "name": "Ethereum",
         "currencySymbol": "ETH",
+        "wrappedCurrency": {
+          "coingeckoId": "weth",
+          "symbol": "WETH"
+        },
         "rpcURL": "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
     },
     {
@@ -11,6 +15,10 @@
         "chainId": 56,
         "name": "Binance Smart Chain",
         "currencySymbol": "BNB",
+        "wrappedCurrency": {
+          "coingeckoId": "wbnb",
+          "symbol": "WBNB"
+        },
         "rpcURL": "https://bsc-dataseed.binance.org"
     },
     {
@@ -18,6 +26,10 @@
         "chainId": 137,
         "name": "Polygon POS",
         "currencySymbol": "MATIC",
+        "wrappedCurrency": {
+          "coingeckoId": "wmatic",
+          "symbol": "WMATIC"
+        },
         "rpcURL": "https://rpc-mainnet.maticvigil.com"
     },
     {
@@ -25,6 +37,10 @@
         "chainId": 128,
         "name": "Huobi ECO Chain Mainnet",
         "currencySymbol": "HT",
+        "wrappedCurrency": {
+          "coingeckoId": "wrapped-huobi-token",
+          "symbol": "WHT"
+        },
         "rpcURL": "https://http-mainnet-node.huobichain.com"
     }
 ]

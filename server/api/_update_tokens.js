@@ -51,14 +51,20 @@ async function fetchToken(token) {
 }
 
 async function listMarkets() {
-  const res = await CoinGeckoApi.get('/coins/markets', {
+  const res1 = await CoinGeckoApi.get('/coins/markets', {
     params: {
       'vs_currency': 'usd',
       'per_page': 250,
       'order': 'market_cap_rank',
     }
   })
-  const tokens = _.map(res.data, (item) => {
+  const res2 = await CoinGeckoApi.get('/coins/markets', {
+    params: {
+      'vs_currency': 'usd',
+      'ids': (_.map(CHAINS, (chain) => _.get(chain, 'wrappedCurrency.coingeckoId'))).join(',')
+    }
+  })
+  const tokens = _.map([...res1.data, ...res2.data], (item) => {
     const { id, symbol, name, image } = item
     return {
       coingeckoId: id,
