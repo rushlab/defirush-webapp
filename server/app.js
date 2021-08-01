@@ -30,6 +30,8 @@ app.use('/api', cookieParser())
  */
 const clientRoutes = require('./api/client')
 app.use('/api', clientRoutes)
+const tokensRoutes = require('./api/tokens')
+app.use('/api/tokens', tokensRoutes)
 const accountRoutes = require('./api/account')
 app.use('/api/account', accountRoutes)
 

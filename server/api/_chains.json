@@ -1,0 +1,30 @@
+[
+    {
+        "coingeckoId": "ethereum",
+        "chainId": 1,
+        "name": "Ethereum",
+        "currencySymbol": "ETH",
+        "rpcURL": "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
+    },
+    {
+        "coingeckoId": "binance-smart-chain",
+        "chainId": 56,
+        "name": "Binance Smart Chain",
+        "currencySymbol": "BNB",
+        "rpcURL": "https://bsc-dataseed.binance.org"
+    },
+    {
+        "coingeckoId": "polygon-pos",
+        "chainId": 137,
+        "name": "Polygon POS",
+        "currencySymbol": "MATIC",
+        "rpcURL": "https://rpc-mainnet.maticvigil.com"
+    },
+    {
+        "coingeckoId": "huobi-token",
+        "chainId": 128,
+        "name": "Huobi ECO Chain Mainnet",
+        "currencySymbol": "HT",
+        "rpcURL": "https://http-mainnet-node.huobichain.com"
+    }
+]
