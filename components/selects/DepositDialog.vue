@@ -168,8 +168,7 @@ export default {
     },
     onInputAmountDisplay(val) {
       const re = new RegExp(`(\\d+\\.\\d{${this.underlyingAssetDecimals}})(\\d+)`)
-      const amountDisplay = val.replace(re, '$1')
-      this.form.amountDisplay = amountDisplay
+      this.form.amountDisplay = val.replace(re, '$1')
       this._updatePrecentageFromAmount()
     },
     _updatePrecentageFromAmount() {
@@ -179,7 +178,9 @@ export default {
       this._updateAmountFromPrecentage()
     },
     _updateAmountFromPrecentage() {
-      this.form.amountDisplay = (+this.amountMaxDisplay) * +this.form.amountSlideValue / 100
+      const val = '' + ((+this.amountMaxDisplay) * +this.form.amountSlideValue / 100)
+      const re = new RegExp(`(\\d+\\.\\d{${this.underlyingAssetDecimals}})(\\d+)`)
+      this.form.amountDisplay = val.replace(re, '$1')
     },
     async handleApprove() {
       try {
