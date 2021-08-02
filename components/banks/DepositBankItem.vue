@@ -15,13 +15,19 @@
         </div>
       </el-table-column>
       <el-table-column label="锁仓量">
-        <template slot-scope="scope">{{ totalDepositsInUSD }}</template>
+        <template slot-scope="scope">
+          <div>{{ assetData.totalDeposits || '0' }} {{ underlyingTokenData.symbol }}</div>
+          <div class="asset-value-to-usd">{{totalDepositsInUSD}}</div>
+        </template>
       </el-table-column>
       <el-table-column label="APY">
         <template slot-scope="scope">{{ depositAPYPercent }}</template>
       </el-table-column>
       <el-table-column label="已存款金额">
-        <template slot-scope="scope">{{ userDepositsInUSD }}</template>
+        <template slot-scope="scope">
+          <div>{{ accountAssetData.userDeposits || '0' }} {{ underlyingTokenData.symbol }}</div>
+          <div class="asset-value-to-usd">{{ userDepositsInUSD }}</div>
+        </template>
       </el-table-column>
       <el-table-column label="Gas Fee" width="180">
         <template slot-scope="scope"></template>
@@ -144,6 +150,7 @@ export default {
   display: flex;
   justify-content: flex-start;
   align-items: stretch;
+  color: $color-text;
 }
 .item__column {
   display: flex;
@@ -179,13 +186,20 @@ export default {
   justify-content: flex-start;
   align-items: center;
 }
+.asset-value-to-usd {
+  color: $color-text-light;
+}
 /deep/ {
   .el-loading-spinner {
     margin-top: 0;
     transform: translateY(-50%);
   }
+  .el-table {
+    color: $color-text;
+  }
   .el-table td {
     border-top: 1px solid $color-border;
+    border-right: none;
   }
 }
 </style>

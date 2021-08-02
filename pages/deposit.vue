@@ -30,7 +30,7 @@
         <el-table-column>
           <div slot-scope="scope" class="table-refresh-head">
             <span>Data updated&nbsp;</span><span class="last-updated-at">{{ lastUpdatedAtDisplay }}</span><span>&nbsp;ago</span>
-            <div class="btn-text" @click="refreshTable">REFRESH</div>
+            <div class="btn-text btn--refresh" :class="{'is-refreshing': isRefreshing}" @click="refreshTable">REFRESH</div>
           </div>
         </el-table-column>
       </el-table>
@@ -89,6 +89,7 @@ export default {
       underlyingTokenPriceUSD: 0,
       lastUpdatedAt: dayjs(),
       currentTime: dayjs(),
+      isRefreshing: false,
     }
   },
   computed: {
@@ -232,6 +233,14 @@ export default {
 .bank-list {
   border: 1px solid $color-border;
 }
+@keyframes rotating {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 .table-refresh-head {
   display: flex;
   justify-content: flex-start;
@@ -242,6 +251,26 @@ export default {
     cursor: pointer;
     text-decoration: underline;
     color: $color-text;
+  }
+  .btn--refresh {
+    position: relative;
+    padding-right: 20px;
+  }
+  .btn--refresh::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    right: 0;
+    top: 50%;
+    margin-top: -8px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-image: url('~/assets/icons/icon-rotate.png');
+  }
+  .btn--refresh.is-refreshing::after {
+    animation: rotating infinite 1s ease-in-out;
   }
 }
 .last-updated-at {

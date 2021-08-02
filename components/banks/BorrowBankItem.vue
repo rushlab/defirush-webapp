@@ -15,7 +15,10 @@
         </div>
       </el-table-column>
       <el-table-column label="Total borrowed">
-        <template slot-scope="scope">{{ totalBorrowsInUSD }}</template>
+        <template slot-scope="scope">
+          <div>{{ assetData.totalBorrows || '0' }} {{ underlyingTokenData.symbol }}</div>
+          <div class="asset-value-to-usd">{{ totalBorrowsInUSD }}</div>
+        </template>
       </el-table-column>
       <el-table-column label="APY">
         <template slot-scope="scope">{{ borrowAPYPercent }}</template>
@@ -24,7 +27,10 @@
         <template slot-scope="scope">{{ userBorrowsInUSD }}</template>
       </el-table-column> -->
       <el-table-column label="Available">
-        <template slot-scope="scope">{{ availableBorrows }}</template>
+        <template slot-scope="scope">
+          <div>{{ availableBorrows || '0' }} {{ underlyingTokenData.symbol }}</div>
+          <div class="asset-value-to-usd">{{ formatCurrency(+availableBorrows * +assetData.priceUSD) }}</div>
+        </template>
       </el-table-column>
       <el-table-column label="Gas Fee" width="180">
         <template slot-scope="scope"></template>
@@ -112,6 +118,7 @@ export default {
     this.getAllData()
   },
   methods: {
+    formatCurrency,
     async getAllData() {
       this.pending = true
       try {
@@ -195,13 +202,20 @@ export default {
   justify-content: flex-start;
   align-items: center;
 }
+.asset-value-to-usd {
+  color: $color-text-light;
+}
 /deep/ {
   .el-loading-spinner {
     margin-top: 0;
     transform: translateY(-50%);
   }
+  .el-table {
+    color: $color-text;
+  }
   .el-table td {
     border-top: 1px solid $color-border;
+    border-right: none;
   }
 }
 </style>
