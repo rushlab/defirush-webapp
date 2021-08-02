@@ -337,6 +337,9 @@ export default {
   .el-table__body {
     color: $color-text;
   }
+  .el-table th>.cell {
+    padding-left: 20px;
+  }
   .el-table th, .el-table tr {
     background-color: $color-bg-page;
   }
@@ -355,6 +358,7 @@ export default {
   justify-content: flex-start;
   align-items: center;
   color: $color-text;
+  padding-left: 10px;
   img {
     width: 40px;
     display: block;

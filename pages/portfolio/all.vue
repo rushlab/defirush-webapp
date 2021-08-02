@@ -286,6 +286,7 @@ export default {
       const tableData = []
       _.forEach(this.banks, (bank) => {
         const bankPortfolio = this.bankPortfolioDict[bank.name]
+        if (!bankPortfolio) return
         const depositData = bankPortfolio.depositsDict[underlyingToken.address.toLowerCase()]
         if (depositData) {
           const { userDeposits, depositAPY, userDepositsUSD } = depositData
@@ -301,6 +302,7 @@ export default {
       const tableData = []
       _.forEach(this.banks, (bank) => {
         const bankPortfolio = this.bankPortfolioDict[bank.name]
+        if (!bankPortfolio) return
         const borrowData = bankPortfolio.borrowsDict[underlyingToken.address.toLowerCase()]
         if (borrowData) {
           const { userBorrows, borrowAPY, userBorrowsUSD } = borrowData
@@ -356,6 +358,9 @@ export default {
   .el-table__body {
     color: $color-text;
   }
+  .el-table th>.cell {
+    padding-left: 20px;
+  }
   .el-table th, .el-table tr {
     background-color: $color-bg-page;
   }
@@ -374,6 +379,7 @@ export default {
   justify-content: flex-start;
   align-items: center;
   color: $color-text;
+  padding-left: 10px;
   img {
     width: 40px;
     display: block;
