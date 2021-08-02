@@ -49,7 +49,7 @@
       <el-col :span="12">
         <el-card header="Collateral" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
           <h2 slot="header">Collateral</h2>
-          <el-table :data="deposits" border>
+          <el-table :data="deposits">
             <el-table-column label="Asset">
               <div slot-scope="{ row }" class="asset-info">
                 <img :src="row.info.logoURI">
@@ -71,7 +71,7 @@
       <el-col :span="12">
         <el-card header="Debts" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
           <h2 slot="header">Debts</h2>
-          <el-table :data="borrows" border>
+          <el-table :data="borrows">
             <el-table-column label="Asset">
               <div slot-scope="{ row }" class="asset-info">
                 <img :src="row.info.logoURI">
