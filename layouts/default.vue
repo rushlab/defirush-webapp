@@ -1,13 +1,13 @@
 <template>
-  <el-container>
-    <el-aside class="sidebar-wrapper" :width="!!isCollasped ? '64px' : '240px'">
+  <el-container class="app">
+    <el-aside class="app__aside" :width="!!isCollasped ? '64px' : '240px'">
       <sidebar :isCollasped.sync="isCollasped"/>
     </el-aside>
     <el-container style="height: 100vh; overflow: auto;">
-      <el-header class="side-header-wrapper">
+      <el-header class="app__header">
         <site-header />
       </el-header>
-      <el-main>
+      <el-main class="app__main">
         <nuxt />
       </el-main>
       <!-- <el-footer>Footer</el-footer> -->
@@ -32,13 +32,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.side-header-wrapper {
+.app__header {
   height: 75px !important;
   box-shadow: 0 1px 0 0px #E6E6E6;
   z-index: 1;
 }
-.sidebar-wrapper {
+.app__aside {
   box-shadow: 1px 0 0 0px #E6E6E6;
   background-color: #000000;
+}
+.app__main {
+  position: relative;
 }
 </style>

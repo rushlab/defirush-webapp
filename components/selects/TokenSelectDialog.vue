@@ -105,7 +105,7 @@ export default {
         if (!_.startsWith(_q, '0x')) {
           _q = '0x' + _q
         }
-        res = _.filter(this.tokenList, { address: _q })
+        res = _.filter(this.tokenList, (token) => token.address.toLowerCase() === _q.toLowerCase())
       } else {
         res = _.filter(this.tokenList, token => {
           return token.symbol.toLowerCase().indexOf(this.q.toLowerCase()) >= 0

@@ -38,15 +38,15 @@
           <i class="el-icon-wallet"></i>
           <strong slot="title">Borrow</strong>
         </el-menu-item>
-        <el-menu-item index="/swap">
+        <el-menu-item index="/collateral-swap">
           <i class="el-icon-set-up"></i>
           <strong slot="title">Collateral Swap</strong>
         </el-menu-item>
-        <el-menu-item index="/swap">
+        <el-menu-item index="/debt-swap">
           <i class="el-icon-set-up"></i>
           <strong slot="title">Debt Swap</strong>
         </el-menu-item>
-        <el-menu-item index="/swap">
+        <el-menu-item index="/refinance">
           <i class="el-icon-set-up"></i>
           <strong slot="title">Refinance</strong>
         </el-menu-item>
