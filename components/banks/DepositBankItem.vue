@@ -164,6 +164,7 @@ export default {
 .exchange__icon {
   width: 40px;
   height: 40px;
+  border-radius: 50%;
   margin-right: 10px;
 }
 .exchange__title {
@@ -193,6 +194,9 @@ export default {
   .el-loading-spinner {
     margin-top: 0;
     transform: translateY(-50%);
+  }
+  .el-loading-spinner i {
+    color: $color-text;
   }
   .el-table {
     color: $color-text;

@@ -142,7 +142,7 @@ export default {
   overflow: hidden;
 }
 .upper-part {
-  padding: 20px 30px 10px;
+  padding: 20px 30px 0px;
 }
 .filters {
   padding: 0;
@@ -168,6 +168,8 @@ export default {
     background-color: $color-input-bg;
     font-size: 16px;
     color: $color-text;
+    border: none;
+    border-radius: 0;
     &::placeholder {
       color: $color-text-light;
     }

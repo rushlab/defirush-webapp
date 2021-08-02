@@ -72,6 +72,10 @@
     font-size: 20px;
     color: $color-text;
     font-weight: 400;
+    &:hover {
+      color: inherit;
+      opacity: 0.8;
+    }
   }
   .el-form-item {
     margin-bottom: 10px;
@@ -109,6 +113,7 @@
       background-color: $color-input-bg;
       border: none;
       color: $color-text;
+      border-radius: 0;
     }
   }
   .el-slider__bar {

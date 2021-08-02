@@ -64,6 +64,9 @@ export default {
     background-color: $btn-dark-bg;
     color: $btn-dark-text;
   }
+  &:hover {
+    background-color: $color-input-bg;
+  }
 }
 </style>
 

@@ -81,7 +81,7 @@
 
     <el-card header="Deposits" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
       <h2 slot="header">Collateral</h2>
-      <el-table :data="depositsTableData">
+      <el-table :data="depositsTableData" v-loading="!!pending" element-loading-spinner="el-icon-loading" element-loading-background="transparent">
         <el-table-column label="Asset">
           <div slot-scope="{ row }" class="asset-info">
             <img :src="row.underlyingToken.logoURI">
@@ -123,7 +123,7 @@
     <div style="margin-top: 1em;"></div>
     <el-card header="Borrows" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
       <h2 slot="header">Borrows</h2>
-      <el-table :data="borrowsTableData">
+      <el-table :data="borrowsTableData" v-loading="!!pending" element-loading-spinner="el-icon-loading" element-loading-background="transparent">
         <el-table-column label="Asset">
           <div slot-scope="{ row }" class="asset-info">
             <img :src="row.underlyingToken.logoURI">
@@ -213,7 +213,8 @@ export default {
       repayDialog: {
         visible: false,
         underlyingToken: null,
-      }
+      },
+      pending: false
     }
   },
   computed: {
@@ -283,7 +284,9 @@ export default {
       return this.$store.getters['tokens/getToken'](asset)
     },
     async fetchData() {
+      this.pending = true
       this.bankPortfolio = await getBankPortfolio(this.bank)
+      this.pending = false
     },
     changeBankRoute(bankName) {
       this.$router.push(`/portfolio/${bankName}`)
@@ -352,6 +355,13 @@ export default {
   .el-progress-bar__outer {
     background-color: #DFE2E8;
   }
+  .el-loading-spinner {
+    margin-top: 0;
+    transform: translateY(-50%);
+  }
+  .el-loading-spinner i {
+    color: $color-text;
+  }
 }
 .asset-info {
   display: flex;
@@ -363,6 +373,7 @@ export default {
     width: 40px;
     display: block;
     margin-right: 10px;
+    border-radius: 50%;
   }
   .asset-name {
     font-size: 0.8em;

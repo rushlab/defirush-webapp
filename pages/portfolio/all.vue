@@ -49,7 +49,7 @@
       <el-col :span="12">
         <el-card header="Collateral" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
           <h2 slot="header">Collateral</h2>
-          <el-table :data="depositsTableData">
+          <el-table :data="depositsTableData" v-loading="!!pending" element-loading-spinner="el-icon-loading" element-loading-background="transparent">
             <el-table-column label="Asset">
               <div slot-scope="{ row }" class="asset-info">
                 <img :src="row.underlyingToken.logoURI">
@@ -98,7 +98,7 @@
       <el-col :span="12">
         <el-card header="Debts" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
           <h2 slot="header">Debts</h2>
-          <el-table :data="borrowsTableData">
+          <el-table :data="borrowsTableData" v-loading="!!pending" element-loading-spinner="el-icon-loading" element-loading-background="transparent">
             <el-table-column label="Asset">
               <div slot-scope="{ row }" class="asset-info">
                 <img :src="row.underlyingToken.logoURI">
@@ -169,6 +169,7 @@ export default {
       bankPortfolioDict: {
         // [bank]: { summary, deposits, borrows }
       },
+      pending: false
     }
   },
   computed: {
@@ -272,6 +273,7 @@ export default {
       return this.$store.getters['tokens/getToken'](asset)
     },
     async fetchData() {
+      this.pending = true
       const promises = _.map(this.banks, async (bank) => {
         const portfolio = await getBankPortfolio(bank)
         // 这样强制触发更新
@@ -281,6 +283,7 @@ export default {
         }
       })
       await Promise.all(promises)
+      this.pending = false
     },
     banksDepositsTableData(underlyingToken) {
       const tableData = []
@@ -373,6 +376,13 @@ export default {
   .el-progress-bar__outer {
     background-color: #DFE2E8;
   }
+  .el-loading-spinner {
+    margin-top: 0;
+    transform: translateY(-50%);
+  }
+  .el-loading-spinner i {
+    color: $color-text;
+  }
 }
 .asset-info {
   display: flex;
@@ -384,6 +394,7 @@ export default {
     width: 40px;
     display: block;
     margin-right: 10px;
+    border-radius: 50%;
   }
   .asset-name {
     font-size: 0.8em;

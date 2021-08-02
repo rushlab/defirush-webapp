@@ -67,5 +67,8 @@ export default {
   &.disabled {
     opacity: 0.5;
   }
+  &:hover {
+    background-color: $color-input-bg;
+  }
 }
 </style>
