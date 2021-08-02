@@ -1,42 +1,46 @@
 <!-- dialog 返回的是整个对象, select 组件返回 id -->
 <template>
   <el-dialog class="dialog--dark dialog--tokens" title="Select Token"
-    width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
+    width="500px" top="5vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
-    <div class="filters">
-      <div class="filter-item">
-        <el-input
-          placeholder="Search by Symbol or Address"
-          clearable
-          autofocus
-          v-model="q"></el-input>
-      </div>
-    </div>
-    <div class="common-bases">
-      <div class="common-bases__title">Common tokens</div>
-      <div class="common-bases__inner">
-        <div
-          class="common-item"
-          v-for="item in commonTokens" :key="item.address"
-          @click="handleSelectOne(item)"
-        >
-          <el-image
-            style="width: 18px; height: 18px; display: block;"
-            :src="item.logoURI" fit="contain"
-          ></el-image>
-          <div class="common-item__symbol">{{ item.symbol }}</div>
+    <div class="dialog__inner">
+      <div class="upper-part">
+        <div class="filters">
+          <div class="filter-item">
+            <el-input
+              placeholder="Search by Symbol or Address"
+              clearable
+              autofocus
+              v-model="q"></el-input>
+          </div>
+        </div>
+        <div class="common-bases">
+          <div class="common-bases__title">Common tokens</div>
+          <div class="common-bases__inner">
+            <div
+              class="common-item"
+              v-for="item in commonTokens" :key="item.address"
+              @click="handleSelectOne(item)"
+            >
+              <el-image
+                style="width: 18px; height: 18px; display: block;"
+                :src="item.logoURI" fit="contain"
+              ></el-image>
+              <div class="common-item__symbol">{{ item.symbol }}</div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="token-list">
-      <div v-for="item in listedTokens" :key="item.address" class="token-item" @click="handleSelectOne(item)">
-        <el-image
-          style="width: 30px; height: 30px; display: block;"
-          :src="item.logoURI" fit="contain"
-        ></el-image>
-        <div class="token__caption">
-          <div class="token__title">{{ item.symbol }}</div>
-          <div class="token__name">{{ item.name }}</div>
+      <div class="token-list">
+        <div v-for="item in listedTokens" :key="item.address" class="token-item" @click="handleSelectOne(item)">
+          <el-image
+            style="width: 30px; height: 30px; display: block;"
+            :src="item.logoURI" fit="contain"
+          ></el-image>
+          <div class="token__caption">
+            <div class="token__title">{{ item.symbol }}</div>
+            <div class="token__name">{{ item.name }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -130,15 +134,25 @@ export default {
 <style lang="scss" scoped>
 @import "@/assets/stylesheets/components/dialog.scss";
 
+.dialog__inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.upper-part {
+  padding: 20px 30px 10px;
+}
 .filters {
-  padding: 5px 0;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   // TODO 换成 element-ui 的变量
   border-bottom: 1px solid #f0f0f0;
   .filter-item {
-    margin: 5px auto;
+    margin: 0 auto;
     width: 100%;
   }
 }
@@ -159,13 +173,6 @@ export default {
     }
   }
 }
-// .dialog--tokens {
-//   /deep/ .el-dialog__body {
-//     padding-top: 0;
-//     padding-bottom: 20px;
-//   }
-//   /deep/ .el-dialog {}
-// }
 .common-bases {
   margin-top: 15px;
 }
@@ -189,25 +196,29 @@ export default {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  padding: 0 18px;
+  padding: 0 17px;
   margin-right: 10px;
   margin-bottom: 10px;
   &:hover {
     background-color: $color-input-bg;
   }
   .common-item__symbol {
-    margin-left: 12px;
+    margin-left: 10px;
     font-size: 15px;
     color: $color-text;
   }
 }
 .token-list {
   width: 100%;
-  max-height: 400px;
+  flex: 1;
   overflow: auto;
   padding: 15px 0;
   border-top: 1px solid $color-border;
-  margin-top: 20px;
+  margin-top: 10px;
+  overflow: auto;
+  // &::-webkit-scrollbar {
+  //   height: 30px;
+  // }
 }
 .token-item {
   width: 100%;
@@ -215,9 +226,9 @@ export default {
   justify-content: flex-start;
   align-items: center;
   cursor: pointer;
-  padding: 15px 0;
+  padding: 15px 30px;
   &:hover {
-    opacity: 0.6;
+    background-color: $color-input-bg;
   }
 }
 .token__caption {

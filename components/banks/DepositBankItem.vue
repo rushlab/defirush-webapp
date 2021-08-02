@@ -8,7 +8,7 @@
       element-loading-background="transparent"
       :show-header="false"
       border>
-      <el-table-column label="Bank" width="180">
+      <el-table-column label="Bank" width="200">
         <div slot-scope="scope" class="table-cell">
           <el-image class="exchange__icon" fit="contain" :src="scope.row.logo"></el-image>
           <span class="exchange__title">{{ scope.row.title }}</span>
@@ -29,10 +29,10 @@
           <div class="asset-value-to-usd">{{ userDepositsInUSD }}</div>
         </template>
       </el-table-column>
-      <el-table-column label="Gas Fee" width="180">
+      <el-table-column label="Gas Fee" width="120">
         <template slot-scope="scope"></template>
       </el-table-column>
-      <el-table-column label="Action" width="180">
+      <el-table-column label="Action" width="120">
         <template slot-scope="scope">
           <el-button type="primary" size="small" round @click="isVisible = true" :disabled="disabledDeposit">Deposit</el-button>
         </template>

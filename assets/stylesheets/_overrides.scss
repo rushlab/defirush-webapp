@@ -30,6 +30,12 @@
   opacity: 0.9;
 }
 
+.dialog--tokens {
+  .el-dialog__body {
+    padding: 0;
+    height: 550px;
+  }
+}
 .apy-popover {
   padding: 0;
   border-radius: 8px;

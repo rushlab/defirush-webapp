@@ -7,8 +7,8 @@
       element-loading-spinner="el-icon-loading"
       element-loading-background="transparent"
       :show-header="false"
-    >
-      <el-table-column label="Bank" width="180">
+      :border="true">
+      <el-table-column label="Bank" width="200">
         <div slot-scope="scope" class="table-cell">
           <el-image class="exchange__icon" fit="contain" :src="scope.row.logo"></el-image>
           <span class="exchange__title">{{ scope.row.title }}</span>
@@ -32,10 +32,10 @@
           <div class="asset-value-to-usd">{{ formatCurrency(+availableBorrows * +assetData.priceUSD) }}</div>
         </template>
       </el-table-column>
-      <el-table-column label="Gas Fee" width="180">
+      <el-table-column label="Gas Fee" width="120">
         <template slot-scope="scope"></template>
       </el-table-column>
-      <el-table-column label="action" width="180">
+      <el-table-column label="action" width="120">
         <template slot-scope="scope">
           <el-button type="success" size="small" round @click="isVisible = true" :disabled="disabledBorrow">Borrow</el-button>
         </template>

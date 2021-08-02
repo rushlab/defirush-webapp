@@ -35,12 +35,12 @@
         </el-table-column>
       </el-table>
       <el-table :data="[]">
-        <el-table-column label="Bank" width="180"></el-table-column>
+        <el-table-column label="Exchange" width="200"></el-table-column>
         <el-table-column label="TVL"></el-table-column>
         <el-table-column label="APY"></el-table-column>
         <el-table-column label="Supplying"></el-table-column>
-        <el-table-column label="Gas Fee" width="180"></el-table-column>
-        <el-table-column label="Action" width="180"></el-table-column>
+        <el-table-column label="Gas Fee" width="120"></el-table-column>
+        <el-table-column label="Action" width="120"></el-table-column>
         <span slot="empty"></span>
       </el-table>
       <deposit-bank-item
@@ -268,6 +268,9 @@ export default {
     background-position: center;
     background-size: cover;
     background-image: url('~/assets/icons/icon-rotate.png');
+  }
+  .btn--refresh:hover::after {
+    opacity: 0.8;
   }
   .btn--refresh.is-refreshing::after {
     animation: rotating infinite 1s ease-in-out;

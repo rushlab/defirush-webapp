@@ -1,6 +1,7 @@
 <template>
   <el-dialog class="dialog--repay" title="Repay"
     width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
+    :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
     <div class="dialog__inner" v-loading="isApproving || isRepaying" element-loading-background="rgba(0, 0, 0, 0)">
       <el-form :model="form">

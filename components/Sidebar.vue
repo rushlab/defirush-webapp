@@ -102,13 +102,19 @@ export default {
 
 <style lang="scss" scoped>
 .sidebar-wrapper {
-  height: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  padding: 40px 0 0;
+  overflow: auto;
   /deep/ {
     .el-menu {
       border-right: none;
+    }
+    .el-menu-item {
+      height: 46px;
+      line-height: 46px;
     }
     .el-menu-item.is-active {
       background: rgba(228, 228, 228, 0.1) !important;
@@ -126,12 +132,13 @@ export default {
   width: 100%;
   position: relative;
   color: #ffffff;
-  padding: 20px;
-  height: 104px;
+  padding: 0 25px;
+  height: 40px;
+  margin-bottom: 16px;
 }
 .sidebar__logo {
-  width: 133px;
-  height: 64px;
+  width: 105px;
+  height: 40px;
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -139,7 +146,7 @@ export default {
 }
 .sidebar__toggle {
   position: absolute;
-  top: 20px;
+  top: 8px;
   right: 20px;
   font-size: 18px;
   width: 24px;

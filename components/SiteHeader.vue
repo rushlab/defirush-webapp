@@ -8,7 +8,7 @@
       <el-popover
         placement="bottom"
         width="240"
-        trigger="click"
+        trigger="hover"
       >
         <div class="gas-fees__inner" :class="{'is-loading': !!gasPricePending}">
           <div class="inner__title">Ethereum Gas Price Forecast</div>
@@ -54,7 +54,7 @@
         type="primary" round
         class="btn--dark"
         @click="openConnectDialog"
-      >Connect wallet</el-button>
+      >Connect Wallet</el-button>
     </template>
     <!-- connect dialog -->
     <el-dialog
