@@ -108,7 +108,7 @@ export default {
       return (+this.amountDisplay * +this.underlyingTokenPriceUSD).toFixed(2)
     },
     lastUpdatedAtDisplay() {
-      return this.lastUpdatedAt ? this.lastUpdatedAt.to(this.currentTime) : '-'
+      return this.lastUpdatedAt ? this.lastUpdatedAt.from(this.currentTime) : '-'
     }
   },
   mounted() {
@@ -131,11 +131,7 @@ export default {
       this.getBalanceDisplay()
       this.banksList = createBankApps(this.$wallet)
     },
-    updateLastUpdatedAt() {
-      return this.lastUpdatedAt ? this.lastUpdatedAt.to(this.currentTime) : '-'
-    },
     async getUnderlyingAssetPriceUSD() {
-      // TODO, 这里不要显示 price 了, $wallet 里面的方法也去掉, 直接在 dialog 里显示价格, 从 bankApp 里面取价格
       const underlyingAssetAddress = this.underlyingToken.address
       if (!underlyingAssetAddress) {
         this.underlyingTokenPriceUSD = 0
