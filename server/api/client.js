@@ -47,9 +47,9 @@ const gasPriceTable = new (function() {
         action: 'gasoracle',
         apikey: ETHERSCAN_API_KEY,
       }
-    }).catch(() => ({'status': 0, 'message': 'gasoracle request error'}))
+    }).catch(() => ({'data': {'status': 0, 'message': 'request error'}}))
     if (+res.data.status !== 1) {
-      console.log(res.data.message)
+      console.log('error gasoracle', res.data.message)
       return
     }
     const result = res.data.result
@@ -66,9 +66,9 @@ const gasPriceTable = new (function() {
           gasprice: gasprice,
           apikey: ETHERSCAN_API_KEY,
         }
-      }).catch(() => ({'status': 0, 'message': 'gasestimate request error'}))
+      }).catch(() => ({'data': {'status': 0, 'message': 'request error'}}))
       if (+res.data.status !== 1) {
-        console.log(res.data.message)
+        console.log('error gasestimate', res.data.message)
         return
       }
       item['waiting_seconds'] = parseInt(res.data.result)

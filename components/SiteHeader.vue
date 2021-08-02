@@ -22,7 +22,7 @@
         </div>
         <div class="gas-fee-btn" slot="reference">
           <div class="gas-fee-icon"></div>
-          <div class="gas-fee-value">13</div>
+          <div class="gas-fee-value">{{ gasPriceTable.normal.price_gwei || '-' }}</div>
         </div>
         <div class="inner__loading">
           <i class="el-icon-loading"></i>
