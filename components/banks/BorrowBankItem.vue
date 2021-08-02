@@ -7,7 +7,7 @@
       element-loading-spinner="el-icon-loading"
       element-loading-background="transparent"
       :show-header="false"
-      :border="true">
+    >
       <el-table-column label="Bank" width="180">
         <div slot-scope="scope" class="table-cell">
           <el-image class="exchange__icon" fit="contain" :src="scope.row.logo"></el-image>

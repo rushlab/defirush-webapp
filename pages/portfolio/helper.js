@@ -49,10 +49,10 @@ export async function getBankPortfolio(bankItem) {
   const depositsDict = {}
   const borrowsDict = {}
   const promiseList1 = _.map(depositAssets, async (asset) => {
-    depositsDict[asset] = await _getAssetDepositsData(bankApp, asset)
+    depositsDict[asset.toLowerCase()] = await _getAssetDepositsData(bankApp, asset)
   })
   const promiseList2 = _.map(borrowAssets, async (asset) => {
-    borrowsDict[asset] = await _getAssetBorrowsData(bankApp, asset)
+    borrowsDict[asset.toLowerCase()] = await _getAssetBorrowsData(bankApp, asset)
   })
   await Promise.all([ ...promiseList1, ...promiseList2])
   return { summary, depositsDict, borrowsDict }
