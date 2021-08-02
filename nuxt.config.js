@@ -54,6 +54,8 @@ module.exports = {
     '@nuxtjs/axios',
   ],
   axios: {
+    // baseURL: '/', // use env API_URL to override
+    browserBaseURL: '/', // use env API_URL_BROWSER to override
     credentials: false  // cross-site Access-Control requests doesn't need to be made using credentials
   },
   /*
