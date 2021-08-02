@@ -8,9 +8,9 @@
       <el-popover
         placement="bottom"
         width="240"
-        trigger="hover"
+        trigger="click"
       >
-        <div class="gas-fees__inner">
+        <div class="gas-fees__inner" :class="{'is-loading': !!gasPricePending}">
           <div class="inner__title">Ethereum Gas Price Forecast</div>
           <div class="inner__body">
             <div class="item" v-for="(item, key) in gasPriceTable" :key="key">
@@ -18,21 +18,14 @@
               <span class="item__value">{{ item.price_gwei }}</span>
               <span class="item__duration">{{ item.waiting_seconds }} sec</span>
             </div>
-            <!-- <div class="item">
-              <span class="item__speed">Fase</span>
-              <span class="item__value">30</span>
-              <span class="item__duration">13 sec</span>
-            </div>
-            <div class="item">
-              <span class="item__speed">Fase</span>
-              <span class="item__value">30</span>
-              <span class="item__duration">13 sec</span>
-            </div> -->
           </div>
         </div>
         <div class="gas-fee-btn" slot="reference">
           <div class="gas-fee-icon"></div>
           <div class="gas-fee-value">13</div>
+        </div>
+        <div class="inner__loading">
+          <i class="el-icon-loading"></i>
         </div>
       </el-popover>
     </div>
@@ -116,6 +109,7 @@
 <script>
 import _ from 'lodash'
 import { ethers } from 'ethers'
+import dayjs from 'dayjs'
 import { mapState, mapGetters } from 'vuex'
 import MetamaskLogo from '@/components/MetamaskLogo'
 import { copyToClipboard } from '@/utils/copy'
@@ -139,7 +133,9 @@ export default {
         fase: {},
         normal: {},
         slow: {}
-      }
+      },
+      currentTime: 0,
+      gasPricePending: false
     }
   },
   computed: {
@@ -166,13 +162,23 @@ export default {
     }
   },
   mounted() {
-    this.getGasPrice()
+    this.getGasPrice(true)
+  },
+  watch: {
+    currentTime: {
+      handler() {
+        setTimeout(() => {
+          this.getGasPrice()
+        }, 15000)
+      },
+      immediate: true
+    }
   },
   methods: {
     copyToClipboard,
-    async getGasPrice() {
+    async getGasPrice(isInit = false) {
+      this.gasPricePending = true
       try {
-        this.gasPricePending = true
         const res = await this.$axios.get('/api/gas_price_table/')
         const { fast, normal, slow } = res.data
         this.gasPriceTable = {
@@ -180,11 +186,9 @@ export default {
           normal: { ...normal, price_gwei: parseInt(normal.price_gwei) },
           slow: { ...slow, price_gwei: parseInt(slow.price_gwei) }
         }
-      } catch (error) {
-
-      }
+        if (!isInit) this.currentTime = dayjs()
+      } catch (error) {}
       this.gasPricePending = false
-      // setTimeout(this.getGasPrice, 3000)
     },
     async connectBrowserWallet() {
       if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
@@ -437,6 +441,25 @@ export default {
   padding: 3px 13px;
   text-align: center;
   color: $color-text;
+  position: relative;
+}
+.inner__loading {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.05);
+  z-index: -10;
+  opacity: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $color-text;
+}
+.gas-fees__inner.is-loading .inner__loading {
+  z-index: 1;
+  opacity: 1;
 }
 .inner__title {
   font-weight: normal;
