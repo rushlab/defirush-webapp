@@ -108,7 +108,7 @@ export default {
       return (+this.amountDisplay * +this.underlyingTokenPriceUSD).toFixed(2)
     },
     lastUpdatedAtDisplay() {
-      return this.lastUpdatedAt ? this.lastUpdatedAt.from(this.currentTime) : '-'
+      return this.lastUpdatedAt ? this.lastUpdatedAt.from(this.currentTime, true) : '-'
     }
   },
   mounted() {

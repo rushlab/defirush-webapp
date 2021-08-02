@@ -60,12 +60,12 @@ export default {
   margin-right: 15px;
   cursor: pointer;
   transition: all .25s ease-in-out;
+  &:hover {
+    background-color: $color-input-bg;
+  }
   &.active {
     background-color: $btn-dark-bg;
     color: $btn-dark-text;
-  }
-  &:hover {
-    background-color: $color-input-bg;
   }
 }
 </style>

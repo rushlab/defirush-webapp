@@ -100,7 +100,7 @@ export default {
       return _.get(this.underlyingToken, 'address', '').toLowerCase() === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase()
     },
     lastUpdatedAtDisplay() {
-      return this.lastUpdatedAt ? this.lastUpdatedAt.from(this.currentTime) : '-'
+      return this.lastUpdatedAt ? this.lastUpdatedAt.from(this.currentTime, true) : '-'
     }
   },
   mounted() {
