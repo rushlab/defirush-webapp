@@ -97,7 +97,6 @@
           <!-- 没有验证过，点击进行验证 -->
           <div class="input-hint">Please sign to let us verify that you are the owner of this address</div>
           <div class="dialog-verify__address">{{ connectDialog.address }}</div>
-
         </template>
       </div>
       <div
@@ -106,7 +105,7 @@
         <button
           class="footer__btn"
           :disabled="connectDialog.isVerifying"
-          @click="verifyUserWallet">{{ connectDialog.isVerifying ? 'Verifying' : 'Verify' }}</button>
+          @click="verifyUserWallet">{{ verifyBtnText }}</button>
       </div>
     </el-dialog>
   </div>
@@ -132,7 +131,7 @@ export default {
         signer: null,
         verified: false,
         isConnecting: false,
-        isVerifying: false
+        isVerifying: false,
       },
       gasPriceTable: {
         fase: {},
@@ -159,6 +158,9 @@ export default {
       if (!this.connectDialog.address) return 'Sellect a Wallet'
       if (this.connectDialog.address && !this.connectDialog.verified) return 'Verify'
       return ''
+    },
+    verifyBtnText() {
+      return this.connectDialog.isVerifying ? 'Verifying' : 'Verify'
     }
   },
   mounted() {
@@ -250,6 +252,8 @@ export default {
         address: '',
         signer: null,
         verified: false,
+        isConnecting: false,
+        isVerifying: false
       }
     },
     async handleLogout() {
