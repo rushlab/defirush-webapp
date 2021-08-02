@@ -52,18 +52,43 @@
           <el-table :data="deposits">
             <el-table-column label="Asset">
               <div slot-scope="{ row }" class="asset-info">
-                <img :src="row.info.logoURI">
-                <div><div>{{ row.info.symbol }}</div><div class="asset-name">{{ row.info.name }}</div></div>
+                <img :src="tokensInfo[row.asset].logoURI">
+                <div><div>{{ tokensInfo[row.asset].symbol }}</div><div class="asset-name">{{ tokensInfo[row.asset].name }}</div></div>
               </div>
             </el-table-column>
             <el-table-column label="Supplying">
               <template slot-scope="{ row }">
-                <div>{{ row.userDeposits }} {{ row.info.symbol }}</div>
+                <div>{{ row.userDeposits }} {{ tokensInfo[row.asset].symbol }}</div>
                 <div class="asset-value-to-usd">{{ formatCurrency(row.userDepositsUSD) }}</div>
               </template>
             </el-table-column>
             <el-table-column label="APY">
-              <template slot-scope="{ row }">{{ formatPercentage(row.depositAPY) }}</template>
+              <template slot-scope="{ row }">
+                <div class="col-apy">
+                  <span>{{ formatPercentage(row.depositAPY) }}</span>
+                  <el-popover
+                    popper-class="apy-popover"
+                    placement="left"
+                    width="320"
+                    class="apy-popover"
+                    trigger="click">
+                    <el-table :data="row.depositAPYList" :border="false">
+                      <el-table-column width="200" property="" label="Bank">
+                        <template slot-scope="{ row }">
+                          <el-image :src="row.bank.logo" style="width: 28px; height: 28px; display: inline-block;vertical-align: middle;"></el-image>
+                          <span style="display: inline-block;line-height: 28px;vertical-align: middle;">{{ row.bank.title }}</span>
+                        </template>
+                      </el-table-column>
+                      <el-table-column width="120" property="apy" label="APY">
+                        <template slot-scope="{ row }">
+                          <span>{{ formatPercentage(row.depositAPY) }}</span>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                    <i slot="reference" class="el-icon-view"></i>
+                  </el-popover>
+                </div>
+              </template>
             </el-table-column>
           </el-table>
         </el-card>
@@ -74,18 +99,42 @@
           <el-table :data="borrows">
             <el-table-column label="Asset">
               <div slot-scope="{ row }" class="asset-info">
-                <img :src="row.info.logoURI">
-                <div><div>{{ row.info.symbol }}</div><div class="asset-name">{{ row.info.name }}</div></div>
+                <img :src="tokensInfo[row.asset].logoURI">
+                <div><div>{{ tokensInfo[row.asset].symbol }}</div><div class="asset-name">{{ tokensInfo[row.asset].name }}</div></div>
               </div>
             </el-table-column>
             <el-table-column label="Borrowing">
               <template slot-scope="{ row }">
-                <div>{{ row.userBorrows }} {{ row.info.symbol }}</div>
+                <div>{{ row.userBorrows }} {{ tokensInfo[row.asset].symbol }}</div>
                 <div class="asset-value-to-usd">{{ formatCurrency(row.userBorrowsUSD) }}</div>
               </template>
             </el-table-column>
             <el-table-column label="APY">
-              <template slot-scope="{ row }">{{ formatPercentage(row.borrowAPY) }}</template>
+              <template slot-scope="{ row }">
+                <div class="col-apy">
+                  <span>{{ formatPercentage(row.borrowAPY) }}</span>
+                  <el-popover
+                    popper-class="apy-popover"
+                    placement="left"
+                    width="320"
+                    trigger="click">
+                    <el-table :data="row.borrowAPYList" :border="false">
+                      <el-table-column width="200" property="" label="Bank">
+                        <template slot-scope="{ row }">
+                          <el-image :src="row.bank.logo" style="width: 28px; height: 28px; display: inline-block;vertical-align: middle;"></el-image>
+                          <span style="display: inline-block;line-height: 28px;vertical-align: middle;">{{ row.bank.title }}</span>
+                        </template>
+                      </el-table-column>
+                      <el-table-column width="120" property="apy" label="APY">
+                        <template slot-scope="{ row }">
+                          <span>{{ formatPercentage(row.borrowAPY) }}</span>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                    <i slot="reference" class="el-icon-view"></i>
+                  </el-popover>
+                </div>
+              </template>
             </el-table-column>
           </el-table>
         </el-card>
@@ -107,6 +156,8 @@ import RepayDialog from '@/components/selects/RepayDialog'
 import { formatCurrency } from '@/utils/formatter'
 import { createBankApp } from '@/utils/banks/factory'
 
+import { getAccountDataOfBank } from './helper'
+
 export default {
   asyncData({ store, params }) {
     return {
@@ -126,25 +177,23 @@ export default {
         userBorrowsUSD: '0.00',
         availableBorrowsUSD: '0.00',
       },
-      depositsMap: {
-        // [assetAddress]: {
-        //   info,
-        //   data: []
-        // }
-      },  // 存放
-      borrowsMap: {}
+      bankDataList: [],
+      tokensInfo: {},
+      deposits: [],
+      borrows: [],
     }
   },
   computed: {
     totalEarnInYearUSD() {
       let _totalEarnInYearUSD = 0
-      _.forEach(this.depositsMap, ({ data }, address) => {
-        const res = _.sumBy(data, ({depositAPY, priceUSD, userDeposits}) => {
-          return +userDeposits * +priceUSD * +depositAPY
+      _.forEach(this.bankDataList, ({ depositsData, borrowsData }) => {
+        _.forEach(depositsData, ({ userEarnUSDInYear }) => {
+          _totalEarnInYearUSD += +userEarnUSDInYear
         })
-        _totalEarnInYearUSD += res
+        // _.forEach(borrowsData, ({ userEarnUSDInYear }) => {
+        //   _totalEarnInYearUSD -= +userEarnUSDInYear
+        // })
       })
-
       return _totalEarnInYearUSD
     },
     userDepositAPY() {
@@ -154,149 +203,75 @@ export default {
     dailyEarnUSD() {
       return this.totalEarnInYearUSD / 365
     },
-    deposits() {
-      const results = []
-      _.forEach(this.depositsMap, ({ info, data = [] }) => {
-        let _userDeposits = 0,
-            _userDepositsUSD = 0,
-            _totalEarnInYearUSD = 0
-        _.forEach(data, ({ depositAPY = '0', priceUSD = '0', userDeposits = '0' }) => {
-          _userDeposits += +userDeposits
-          _userDepositsUSD += +userDeposits * +priceUSD
-          _totalEarnInYearUSD += (+userDeposits * +priceUSD * depositAPY)
-        })
-        results.push({
-          info,
-          userDeposits: _userDeposits.toString(),
-          userDepositsUSD: _userDepositsUSD.toString(),
-          depositAPY: _userDepositsUSD > 0 ? (_totalEarnInYearUSD / _userDepositsUSD).toString() : '0',
-        })
-      })
-      return results
-    },
-    borrows() {
-      const results = []
-      _.forEach(this.borrowsMap, ({ info, data = [] }) => {
-        let _userBorrows = 0,
-            _userBorrowsUSD = 0,
-            _totalEarnInYearUSD = 0
-        _.forEach(data, ({ borrowAPY = '0', priceUSD = '0', userBorrows = '0' }) => {
-          _userBorrows += +userBorrows
-          _userBorrowsUSD += +userBorrows * +priceUSD
-          _totalEarnInYearUSD += (+userBorrows * +priceUSD * borrowAPY)
-        })
-        results.push({
-          info,
-          userBorrows: _userBorrows.toString(),
-          userBorrowsUSD: _userBorrowsUSD.toString(),
-          borrowAPY: _userBorrowsUSD > 0 ? (_totalEarnInYearUSD / _userBorrowsUSD).toString() : '0',
-        })
-      })
-      return results
-    }
   },
   mounted() {
-    this.banksList = [{
-      icon: 'https://aave.com/favicon64.png', title: 'Aave',
-      app: new AaveApp(this.$wallet)
-    }, {
-      icon: 'https://compound.finance/compound-components/assets/compound-mark.svg', title: 'Compound',
-      app: new CompoundApp(this.$wallet)
-    }, {
-      icon: 'https://app.cream.finance/static/media/cream.29138554.svg', title: 'Cream',
-      app: new CreamApp(this.$wallet)
-    }]
-    this.getAccountDataFromBanks()
+    this.banksList = _.map(['aave', 'compound', 'cream'], (bankName) => createBankApp(bankName, this.$wallet))
+    this.getBanksData()
   },
   methods: {
     formatCurrency,
-    getAccountDataFromBanks() {
-      const promiseList = this.banksList.map(({app}) => {
-        return app.getAccountData()
+    getAccountDataOfBank,
+    async getBanksData() {
+      const promiseList = _.map(this.banksList, (bank) => {
+        return this.getAccountDataOfBank(bank)
       })
-      return Promise.all(promiseList).then(resList => {
-        let _userDepositsUSD = 0
-        let _userBorrowsUSD = 0
-        let _availableBorrowsUSD = 0
-        _.forEach(resList, ({ userDepositsUSD, userBorrowsUSD, availableBorrowsUSD }) => {
-          _userDepositsUSD += +userDepositsUSD
-          _userBorrowsUSD += +userBorrowsUSD
-          _availableBorrowsUSD += +availableBorrowsUSD
-        })
-        this.accountData = {
-          userDepositsUSD: _userDepositsUSD.toString(),
-          userBorrowsUSD: _userBorrowsUSD.toString(),
-          availableBorrowsUSD: _availableBorrowsUSD.toString(),
-        }
-        this.getAccountAssetsFromBanks()
-      })
+      this.bankDataList = await Promise.all(promiseList)
+      this.updateBankData()
     },
-    async _getCollateralFromOneBank(bankApp) {
-      const { deposits, borrows } = await bankApp.getAccountAssets()   // 1. 获取单个银行的资产列表；
-      const depositsPromiseList = _.map(deposits, (asset) => {
-        const info = this.$store.getters['tokens/getToken'](asset)
-        if (!this.depositsMap.hasOwnProperty(asset)) {
-          this.depositsMap = {
-            ...this.depositsMap,
-            [asset]: { info, data: [] }
+    updateBankData() {
+      let deposits = []
+      let borrows = []
+      _.forEach(this.bankDataList, ({ bank, depositsData, borrowsData }) => {
+        _.forEach(depositsData, ({ asset, userDeposits = '0.00', depositAPY = '0', priceUSD = '0.00', userDepositsUSD = '0.00', userEarnUSDInYear = '0.00' }) => {
+          // 遍历资产列表，获取资产信息
+          if (!this.tokensInfo.hasOwnProperty(asset)) {
+            this.tokensInfo[asset] = this.$store.getters['tokens/getToken'](asset) || {}
           }
-        }
-        return Promise.all([
-          bankApp.getAssetData(asset),                        // 2. 遍历存款列表，获取每个资产的 depositAPY 和 priceUSD
-          bankApp.getAccountAssetData(asset)                  // 3. getAccountAssetData() 获取 用户的存款数量 userDeposits
-        ]).then(resList => {
-          const [ { depositAPY, borrowAPY, priceUSD }, { userDeposits, userBorrows } ] = resList
-          const _depositsObj = { ...this.depositsMap[asset] }
-          _depositsObj.data.push({
-            depositAPY,
-            priceUSD,
-            userDeposits
-          })
-          this.depositsMap = {
-            ...this.depositsMap,
-            [asset]: _depositsObj
+          // 更新资产数据
+          let currentAsset = _.find(deposits, { asset })
+          if (currentAsset) {
+            currentAsset.userDeposits = (+currentAsset.userDeposits + +userDeposits).toString()
+            currentAsset.userDepositsUSD = (+currentAsset.userDepositsUSD + +userDepositsUSD).toString()
+            currentAsset.depositAPYList.push({ bank, depositAPY })
+            currentAsset.userEarnUSDInYear = (+currentAsset.userEarnUSDInYear + +userEarnUSDInYear).toString()
+            currentAsset.depositAPY = +currentAsset.userDepositsUSD > 0 ? (+currentAsset.userEarnUSDInYear / +currentAsset.userDepositsUSD).toString() : '0'
+          } else {
+            deposits.push({
+              asset,
+              userDeposits,
+              userDepositsUSD,
+              userEarnUSDInYear,
+              depositAPY, // 当前 APY，用于加权平均
+              depositAPYList: [{ bank, depositAPY }],
+            })
+          }
+        })
+        _.forEach(borrowsData, ({ asset, userBorrows = '0.00', borrowAPY = '0', priceUSD = '0.00', userBorrowsUSD = '0.00', userEarnUSDInYear = '0.00' }) => {
+          if (!this.tokensInfo.hasOwnProperty(asset)) {
+            this.tokensInfo[asset] = this.$store.getters['tokens/getToken'](asset) || {}
+          }
+          // 更新资产数据
+          let currentAsset = _.find(borrows, { asset })
+          if (currentAsset) {
+            currentAsset.userBorrows = (+currentAsset.userBorrows + +userBorrows).toString()
+            currentAsset.userBorrowsUSD = (+currentAsset.userBorrowsUSD + +userBorrowsUSD).toString()
+            currentAsset.borrowAPYList.push({ bank, borrowAPY })
+            currentAsset.userEarnUSDInYear = (+currentAsset.userEarnUSDInYear + +userEarnUSDInYear).toString()
+            currentAsset.borrowAPY = +currentAsset.userBorrowsUSD > 0 ? (+currentAsset.userEarnUSDInYear / +currentAsset.userBorrowsUSD).toString() : '0'
+          } else {
+            borrows.push({
+              asset,
+              userBorrows,
+              userBorrowsUSD,
+              userEarnUSDInYear,
+              borrowAPY,
+              borrowAPYList: [{ bank, borrowAPY }]
+            })
           }
         })
       })
-      const borrowsPromiseList = _.map(borrows, (asset) => {
-        const info = this.$store.getters['tokens/getToken'](asset)
-        if (!this.borrowsMap.hasOwnProperty(asset)) {
-          this.borrowsMap = {
-            ...this.borrowsMap,
-            [asset]: { info, data: [] }
-          }
-        }
-        return Promise.all([
-          bankApp.getAssetData(asset),                        // 2. 遍历存款列表，获取每个资产的 depositAPY 和 priceUSD
-          bankApp.getAccountAssetData(asset)                  // 3. getAccountAssetData() 获取 用户的存款数量 userDeposits
-        ]).then(resList => {
-          const [ { depositAPY, borrowAPY, priceUSD }, { userDeposits, userBorrows } ] = resList
-          const _borrowsObj = { ...this.borrowsMap[asset] }
-          _borrowsObj.data.push({
-            borrowAPY,
-            priceUSD,
-            userBorrows
-          })
-          this.borrowsMap = {
-            ...this.borrowsMap,
-            [asset]: _borrowsObj
-          }
-        })
-      })
-      return [
-        ...depositsPromiseList,
-        ...borrowsPromiseList
-      ]
-    },
-    async getAccountAssetsFromBanks() {
-      const promiseList = []
-      _.forEach(this.banksList, ({app}) => {
-        promiseList.push(this._getCollateralFromOneBank(app))
-      })
-      await Promise.all(promiseList)
-      // this.depositsMap = {
-      //   ...this.depositsMap
-      // }
+      this.deposits = deposits
+      this.borrows = borrows
     },
     formatPercentage(val) {
       return (+val * 100).toFixed(2) + '%'

@@ -26,3 +26,29 @@
 .v-modal {
   opacity: 0.9;
 }
+
+.apy-popover {
+  padding: 0;
+  border-radius: 8px;
+  border: none;
+  .el-table {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .el-table__header,
+  .el-table th {
+    background-color: #f9f9f9;
+  }
+  .el-table__header,
+  .el-table__body {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  .el-table__header {
+    font-size: 14px;
+    color: #000000;
+  }
+  .el-table td, .el-table th.is-leaf {
+    border: none;
+  }
+}
