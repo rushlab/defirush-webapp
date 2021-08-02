@@ -165,7 +165,7 @@ export default {
   data() {
     return {
       bankName: 'all',
-      bankApps: [],
+      banks: [],
       bankPortfolioDict: {
         // [bank]: { summary, deposits, borrows }
       },
@@ -260,7 +260,7 @@ export default {
     },
   },
   mounted() {
-    this.bankApps = createBankApps(this.$wallet)
+    this.banks = createBankApps(this.$wallet)
     this.fetchData()
   },
   methods: {
@@ -272,25 +272,25 @@ export default {
       return this.$store.getters['tokens/getToken'](asset)
     },
     async fetchData() {
-      const promises = _.map(this.bankApps, async (bankApp) => {
-        const portfolio = await getBankPortfolio(bankApp)
+      const promises = _.map(this.banks, async (bank) => {
+        const portfolio = await getBankPortfolio(bank)
         // 这样强制触发更新
         this.bankPortfolioDict = {
           ...this.bankPortfolioDict,
-          [bankApp.name]: portfolio,
+          [bank.name]: portfolio,
         }
       })
       await Promise.all(promises)
     },
     banksDepositsTableData(underlyingToken) {
       const tableData = []
-      _.forEach(this.bankApps, (bankApp) => {
-        const bankPortfolio = this.bankPortfolioDict[bankApp.name]
+      _.forEach(this.banks, (bank) => {
+        const bankPortfolio = this.bankPortfolioDict[bank.name]
         const depositData = bankPortfolio.depositsDict[underlyingToken.address.toLowerCase()]
         if (depositData) {
           const { userDeposits, depositAPY, userDepositsUSD } = depositData
           tableData.push({
-            bank: { logo: bankApp.logo, title: bankApp.title },
+            bank: { logo: bank.logo, title: bank.title },
             userDeposits, depositAPY, userDepositsUSD,
           })
         }
@@ -299,13 +299,13 @@ export default {
     },
     banksBorrowsTableData(underlyingToken) {
       const tableData = []
-      _.forEach(this.bankApps, (bankApp) => {
-        const bankPortfolio = this.bankPortfolioDict[bankApp.name]
+      _.forEach(this.banks, (bank) => {
+        const bankPortfolio = this.bankPortfolioDict[bank.name]
         const borrowData = bankPortfolio.borrowsDict[underlyingToken.address.toLowerCase()]
         if (borrowData) {
           const { userBorrows, borrowAPY, userBorrowsUSD } = borrowData
           tableData.push({
-            bank: { logo: bankApp.logo, title: bankApp.title },
+            bank: { logo: bank.logo, title: bank.title },
             userBorrows, borrowAPY, userBorrowsUSD,
           })
         }

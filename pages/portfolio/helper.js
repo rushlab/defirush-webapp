@@ -36,8 +36,8 @@ async function _getAssetBorrowsData(bankApp, asset) {
   }
 }
 
-export async function getBankPortfolio(bankItem) {
-  const { app: bankApp, title, logo } = bankItem
+export async function getBankPortfolio(bank) {
+  const { app: bankApp, title, logo } = bank
   const [
     { deposits: depositAssets, borrows: borrowAssets },
     { userDepositsUSD, userBorrowsUSD, availableBorrowsUSD }

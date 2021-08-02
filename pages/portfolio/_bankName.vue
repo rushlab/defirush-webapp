@@ -154,17 +154,17 @@
       </el-table>
     </el-card>
     <withdraw-dialog
-      v-if="bankApp && withdrawDialog.visible"
+      v-if="bank && withdrawDialog.visible"
       :visible.sync="withdrawDialog.visible"
-      :bank-app="bankApp"
+      :bank-app="bank.app"
       :underlying-token-data="withdrawDialog.underlyingToken"
-    />
+    ></withdraw-dialog>
     <repay-dialog
-      v-if="bankApp && repayDialog.visible"
+      v-if="bank && repayDialog.visible"
       :visible.sync="repayDialog.visible"
-      :bank-app="bankApp"
+      :bank-app="bank"
       :underlying-token-data="repayDialog.underlyingToken"
-    />
+    ></repay-dialog>
   </div>
 </template>
 
@@ -193,10 +193,10 @@ export default {
   },
   data() {
     const bankName = this.$route.params.bankName
-    const bankApp = createBankApp(bankName, this.$wallet)
+    const bank = createBankApp(bankName, this.$wallet)
     return {
       bankName,
-      bankApp,
+      bank,
       bankPortfolio: {
         summary: {},
         depositsDict: {},  // { [asset]: assetData }
@@ -283,7 +283,7 @@ export default {
       return this.$store.getters['tokens/getToken'](asset)
     },
     async fetchData() {
-      this.bankPortfolio = await getBankPortfolio(this.bankApp)
+      this.bankPortfolio = await getBankPortfolio(this.bank)
     },
     changeBankRoute(bankName) {
       this.$router.push(`/portfolio/${bankName}`)
