@@ -34,8 +34,20 @@
       </div>
     </div>
     <div slot="footer" class="dialog-footer">
-      <button class="footer__btn" v-if="needApprove" type="warning" @click="handleApprove">Approve</button>
-      <button class="footer__btn" v-else type="primary" @click="handleWithdraw" :loading="isWithdrawing">{{ isWithdrawing ? 'Withdrawing' : 'Withdraw' }}</button>
+      <el-button
+        v-if="needApprove"
+        type="primary"
+        class="footer__btn"
+        :loading="isApproving"
+        :disabled="isApproving"
+        @click="handleApprove">Approve</el-button>
+      <el-button
+        v-else
+        type="primary"
+        class="footer__btn"
+        :loading="isWithdrawing"
+        :disabled="isWithdrawing"
+        @click="handleWithdraw">Withdraw</el-button>
     </div>
   </el-dialog>
 </template>
@@ -193,7 +205,7 @@ export default {
       try {
         this.isWithdrawing = true
         await this.bankApp.withdraw(this.underlyingTokenData.address, this.form.amountDisplay)
-        this.$message({type: 'success', message: 'Success!'})
+        this.$message({type: 'success', message: 'Withdraw succeed!'})
         this.handleWithdrawSuccess()
       } catch (error) {
         console.log('handleWithdraw error: ', error)
@@ -211,5 +223,5 @@ export default {
 
 
 <style lang="scss" scoped>
-@import "./-Dialog.scss";
+@import '~/assets/stylesheets/components/dialog.scss';
 </style>

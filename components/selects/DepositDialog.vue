@@ -33,8 +33,24 @@
       </div>
     </div>
     <div slot="footer" class="dialog-footer">
-      <button class="footer__btn" v-if="needApprove" type="warning" @click="handleApprove">Approve</button>
-      <button class="footer__btn" v-else type="primary" @click="handleDeposit" :loading="isDepositing">{{ isDepositing ? 'Depositing' : 'Deposit' }}</button>
+      <el-button
+        v-if="!underlyingEnabled"
+        class="footer__btn" type="primary"
+        :loading="isEnabling"
+        :disabled="isEnabling"
+        @click="enableUnderlying">Enable Underlying</el-button>
+      <el-button
+        v-else-if="needApprove"
+        class="footer__btn" type="primary"
+        :loading="isApproving"
+        :disabled="isApproving"
+        @click="handleApprove">Approve</el-button>
+      <el-button
+        v-else
+        class="footer__btn" type="primary"
+        :loading="isDepositing"
+        :disabled="isDepositing"
+        @click="handleDeposit" >{{ isDepositing ? 'Depositing' : 'Deposit' }}</el-button>
     </div>
   </el-dialog>
 </template>
@@ -73,7 +89,6 @@ export default {
     }
     return {
       isVisible: this.visible,
-      isApproving: false,
       marks: {
         0: '0%',
         25: '25%',
@@ -95,6 +110,9 @@ export default {
       accountAssetData: {},
       allowanceDisplay: '0.00',
       balanceDisplay: '0.00',
+      underlyingEnabled: false,
+      isEnabling: false,
+      isApproving: false,
       isDepositing: false
     }
   },
@@ -127,6 +145,7 @@ export default {
   },
   mounted() {
     this.getAccountAndAssetData()
+    this.checkUnderlyingEnabled()
     this.updateAllowanceDisplay()
     this.getBalanceDisplay()
   },
@@ -148,6 +167,20 @@ export default {
       this.accountData = accountData
       this.assetData = assetData
       this.accountAssetData = accountAssetData
+    },
+    async checkUnderlyingEnabled() {
+      this.underlyingEnabled = await this.bankApp.underlyingEnabled(this.underlyingTokenData.address)
+    },
+    async enableUnderlying() {
+      try {
+        this.isEnabling = true
+        await this.bankApp.enableUnderlying(this.underlyingTokenData.address)
+        this.checkUnderlyingEnabled()
+      } catch (error) {
+        console.log(error)
+        this.$message.error(JSON.stringify(error))
+      }
+      this.isEnabling = false
     },
     async updateAllowanceDisplay() {
       if (this.isETH) return
@@ -197,7 +230,7 @@ export default {
       try {
         this.isDepositing = true
         await this.bankApp.deposit(this.underlyingTokenData.address, this.form.amountDisplay)
-        this.$message({type: 'success', message: '存款成功!'})
+        this.$message({type: 'success', message: 'Deposit action succeed!'})
         this.handleDepositSuccess()
       } catch (error) {
         console.log('handleDeposit error: ', error)
@@ -215,5 +248,6 @@ export default {
 
 
 <style lang="scss" scoped>
-@import "./-Dialog.scss";
+// @import "./-Dialog.scss";
+@import '~/assets/stylesheets/components/dialog.scss';
 </style>

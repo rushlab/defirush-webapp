@@ -102,10 +102,12 @@
       <div
         v-if="connectDialog.address && !connectDialog.verified"
         slot="footer" class="dialog-footer">
-        <button
+        <el-button
+          type="primary"
           class="footer__btn"
           :disabled="connectDialog.isVerifying"
-          @click="verifyUserWallet">{{ verifyBtnText }}</button>
+          :loading="connectDialog.isVerifying"
+          @click="verifyUserWallet">Verify</el-button>
       </div>
     </el-dialog>
   </div>
@@ -345,6 +347,7 @@ export default {
   padding-top: 9px;
   padding-bottom: 9px;
   background-color: $color-text;
+  border: 0;
   color: #ffffff;
   &:hover,
   &:active {
@@ -402,9 +405,7 @@ export default {
   font-size: 16px;
   padding: 25px 35px;
 }
-.footer__btn[disabled] {
-  opacity: 0.7;
-}
+
 
 .gas-fee-btn {
   width: 40px;

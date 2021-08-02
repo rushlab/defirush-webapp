@@ -12,24 +12,6 @@
           v-model="q"></el-input>
       </div>
     </div>
-    <!-- <el-table :data="listedTokens" v-loading="pending">
-      <el-table-column width="60" class-name="col-image">
-        <template slot-scope="{ row }">
-          <el-image
-            style="width: 40px; height: 40px; display: block;"
-            :src="row.logoURI" fit="contain"
-          ></el-image>
-        </template>
-      </el-table-column>
-      <el-table-column prop="symbol" label="Symbol" width="120" align="center"></el-table-column>
-      <el-table-column prop="name" label="Name"></el-table-column>
-      <el-table-column prop="actions" label="Actions" width="100">
-        <template slot-scope="{ row }">
-          <el-button
-            type="primary" size="mini" @click="handleSelectOne(row)">Select</el-button>
-        </template>
-      </el-table-column>
-    </el-table> -->
     <div class="common-bases">
       <div class="common-bases__title">Common tokens</div>
       <div class="common-bases__inner">

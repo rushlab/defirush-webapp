@@ -33,8 +33,20 @@
       </div>
     </div>
     <div slot="footer" class="dialog-footer">
-      <button class="footer__btn" v-if="needApprove" type="warning" @click="handleApprove">Approve</button>
-      <button class="footer__btn" v-else type="primary" @click="handleRepay" :loading="isRepaying">{{ isRepaying ? 'Repaying' : 'Repay' }}</button>
+      <el-button
+        v-if="needApprove"
+        type="primary"
+        class="footer__btn"
+        :loading="isApproving"
+        :disabled="isApproving"
+        @click="handleApprove">Approve</el-button>
+      <el-button
+        v-else
+        type="primary"
+        class="footer__btn"
+        :loading="isRepaying"
+        :disabled="isRepaying"
+        @click="handleRepay">Repay</el-button>
     </div>
   </el-dialog>
 </template>
@@ -205,7 +217,7 @@ export default {
       try {
         this.isRepaying = true
         await this.bankApp.repay(this.underlyingTokenData.address, this.form.amountDisplay)
-        this.$message({type: 'success', message: '存款成功!'})
+        this.$message({type: 'success', message: 'Repay succeed!'})
         this.handleRepaySuccess()
       } catch (error) {
         console.log('handleRepay error: ', error)
@@ -223,5 +235,5 @@ export default {
 
 
 <style lang="scss" scoped>
-@import "./-Dialog.scss";
+@import '~/assets/stylesheets/components/dialog.scss';
 </style>

@@ -22,6 +22,9 @@
   .el-dialog__footer {
     padding: 0;
   }
+  .el-loading-spinner .path {
+    stroke: $color-text;
+  }
 }
 .v-modal {
   opacity: 0.9;

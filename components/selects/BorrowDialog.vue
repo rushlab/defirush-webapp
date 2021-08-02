@@ -42,8 +42,20 @@
       </div>
     </div>
     <div slot="footer" class="dialog-footer">
-      <button class="footer__btn" v-if="needApprove" @click="handleApprove">Approve</button>
-      <button class="footer__btn" v-else @click="handleBorrow" :loading="isBorrowing">{{ isBorrowing   ? 'Borrowing' : 'Borrow' }}</button>
+      <el-button
+        v-if="needApprove"
+        type="primary"
+        class="footer__btn"
+        :loading="isApproving"
+        :disabled="isApproving"
+        @click="handleApprove">Approve</el-button>
+      <el-button
+        v-else
+        type="primary"
+        class="footer__btn"
+        :loading="isBorrowing"
+        :disabled="isBorrowing"
+        @click="handleBorrow">Borrow</el-button>
     </div>
   </el-dialog>
 </template>
@@ -219,7 +231,7 @@ export default {
       try {
         this.isBorrowing   = true
         await this.bankApp.borrow(this.underlyingTokenData.address, this.form.amountDisplay)
-        this.$message({type: 'success', message: '借款成功!'})
+        this.$message({type: 'success', message: 'Borrow Succeed!'})
         this.handleBorrowSuccess()
       } catch (error) {
         console.log('handleBorrow error: ', error)
@@ -237,7 +249,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import "./-Dialog.scss";
+@import '~/assets/stylesheets/components/dialog.scss';
 .collateral-info {
   display: flex;
   justify-content: flex-start;
