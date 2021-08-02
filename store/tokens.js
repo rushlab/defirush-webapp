@@ -5,9 +5,9 @@ export const state = () => {
   return {
     pending: false,
     data: [],
-    // [ { symbol, name, address, decimals, logoURI }, ... ]
+    // [ { id, symbol, name, address, decimals, logoURI }, ... ]
     _tokens: {},
-    // { [symbol]: { symbol, name, address, decimals, logoURI }, ... }
+    // { [address]: { id, symbol, name, address, decimals, logoURI }, ... }
   }
 }
 

@@ -7,7 +7,7 @@
       <el-form-item class="token-amount">
         <div class="token-balance-display">
           <template v-if="balanceDisplay > 0">
-            <span>Max:{{ balanceDisplay }}</span>
+            <span>Max: {{ balanceDisplay }}</span>
           </template>
           <template v-else>
             <span class="text-warning">Not enough balance </span> <span>Max: {{ balanceDisplay }}</span>
@@ -105,7 +105,7 @@ export default {
   },
   computed: {
     amountToUSD() {
-      return (+this.amountDisplay * +this.underlyingTokenPriceUSD).toFixed(6)
+      return (+this.amountDisplay * +this.underlyingTokenPriceUSD).toFixed(2)
     },
     lastUpdatedAtDisplay() {
       return this.lastUpdatedAt ? this.lastUpdatedAt.to(this.currentTime) : '-'
