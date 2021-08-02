@@ -8,29 +8,6 @@
       </el-form>
     </div>
 
-    <!-- <div class="bank-data">
-      <el-row :gutter="20">
-        <el-col :span="8">
-          <div class="bank-data-card">
-            <div class="card__title">Available Credit</div>
-            <div class="card__value">{{ formatCurrency(+accountData.userBorrowsUSD + +accountData.availableBorrowsUSD) }}</div>
-          </div>
-        </el-col>
-        <el-col :span="8">
-          <div class="bank-data-card">
-            <div class="card__title">Total Debt</div>
-            <div class="card__value">{{ formatCurrency(accountData.userBorrowsUSD) }}</div>
-          </div>
-        </el-col>
-        <el-col :span="8">
-          <div class="bank-data-card">
-            <div class="card__title">Credit Limit</div>
-            <div class="card__value">{{ formatCurrency(accountData.availableBorrowsUSD) }}</div>
-          </div>
-        </el-col>
-      </el-row>
-    </div> -->
-
     <div class="bank-data-card">
       <el-row :gutter="20">
         <el-col :span="12">
@@ -38,7 +15,7 @@
             <div class="card__row">
               <div class="data-item">
                 <div class="data-item__label">Value locked in bank</div>
-                <div class="data-item__value text-larger">{{ formatCurrency(+accountData.userBorrowsUSD + +accountData.availableBorrowsUSD) }}</div>
+                <div class="data-item__value text-larger">{{ formatCurrency(userDepositsUSD) }}</div>
               </div>
             </div>
             <div class="card__row">
@@ -46,13 +23,13 @@
                 <el-col :span="12">
                   <div class="data-item">
                     <div class="data-item__label">Daily earning</div>
-                    <div class="data-item__value">{{ formatCurrency(dailyEarnUSD) }}</div>
+                    <div class="data-item__value">{{ formatCurrency(averageDailyEarnUSD) }}</div>
                   </div>
                 </el-col>
                 <el-col :span="12">
                   <div class="data-item">
                     <div class="data-item__label">APY</div>
-                    <div class="data-item__value">{{ formatPercentage(bankDepositAPY) }}</div>
+                    <div class="data-item__value">{{ formatPercentage(averageDepositAPY) }}</div>
                   </div>
                 </el-col>
               </el-row>
@@ -65,14 +42,14 @@
               <el-row :gutter="20">
                 <el-col :span="12">
                   <div class="data-item">
-                    <div class="data-item__label">Total credit</div>
-                    <div class="data-item__value">{{ formatCurrency(totalCredit) }}</div>
+                    <div class="data-item__label">Borrow limit</div>
+                    <div class="data-item__value">{{ formatCurrency(userBorrowLimitUSD) }}</div>
                   </div>
                 </el-col>
                 <el-col :span="12">
                   <div class="data-item">
                     <div class="data-item__label">Total borrows</div>
-                    <div class="data-item__value">{{ formatCurrency(+accountData.userBorrowsUSD) }}</div>
+                    <div class="data-item__value">{{ formatCurrency(userBorrowsUSD) }}</div>
                   </div>
                 </el-col>
               </el-row>
@@ -80,7 +57,7 @@
             <div class="card__row">
               <div class="data-item">
                 <div class="data-item__label">
-                  <span>Utilization</span> <span class="utilization-tag" :class="{'is-danger': isDanger}">{{ isDanger ? 'Safe' : 'Danger' }}: {{ safetyPrecentage }}%</span>
+                  <span>Utilization</span> <span class="utilization-tag" :class="{'is-danger': isDanger}">{{ isDanger ? 'Safe' : 'Danger' }}: {{ formatPercentage(utilization) }}</span>
                 </div>
                 <div class="data-item__value">
                   <div class="utilization-progress-bar">
@@ -88,8 +65,8 @@
                       :stroke-width="16"
                       stroke-linecap="square"
                       :show-text="false"
-                      :percentage="safetyPrecentage"
-                      :color="customColors"></el-progress>
+                      :percentage="utilization * 100"
+                      :color="progressCustomColors"></el-progress>
                   </div>
                   <div class="utilization-hint">The ratio of your debt to your credit limit. If it hits 100%, your loan will be liquidated.</div>
                 </div>
@@ -101,20 +78,24 @@
     </div>
 
     <div style="margin-top: 1em;"></div>
+
     <el-card header="Deposits" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
       <h2 slot="header">Collateral</h2>
-      <el-table :data="deposits">
+      <el-table :data="depositsTableData">
         <el-table-column label="Asset">
           <div slot-scope="{ row }" class="asset-info">
-            <img :src="row.info.logoURI">
+            <img :src="row.underlyingToken.logoURI">
             <!-- <div class="asset-icon" :style="{backgroundImage: `url(${row.info.logoURI})`}"></div> -->
-            <div><div>{{ row.info.symbol }}</div><div class="asset-name">{{ row.info.name }}</div></div>
+            <div>
+              <div>{{ row.underlyingToken.symbol }}</div>
+              <div class="asset-name">{{ row.underlyingToken.name }}</div>
+            </div>
           </div>
         </el-table-column>
         <el-table-column label="Supplying">
           <template slot-scope="{ row }">
-            <div>{{ row.userDeposits }} {{ row.info.symbol }}</div>
-            <div class="asset-value-to-usd">{{ formatCurrency((+row.userDeposits) * (+row.priceUSD)) }}</div>
+            <div>{{ row.userDeposits }} {{ row.underlyingToken.symbol }}</div>
+            <div class="asset-value-to-usd">{{ formatCurrency(row.userDepositsUSD) }}</div>
           </template>
         </el-table-column>
         <el-table-column label="CF">
@@ -131,7 +112,10 @@
         </el-table-column>
         <el-table-column label="Action" width="200" align="center">
           <template slot-scope="{ row }">
-            <el-button type="success" size="mini" round @click="() => onWithdraw(row.info)">Withdraw</el-button>
+            <el-button
+              type="success" size="mini" round
+              @click="() => onWithdraw(row.underlyingToken)"
+            >Withdraw</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -139,17 +123,20 @@
     <div style="margin-top: 1em;"></div>
     <el-card header="Borrows" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
       <h2 slot="header">Borrows</h2>
-      <el-table :data="borrows">
+      <el-table :data="borrowsTableData">
         <el-table-column label="Asset">
           <div slot-scope="{ row }" class="asset-info">
-            <img :src="row.info.logoURI">
-            <div><div>{{ row.info.symbol }}</div><div class="asset-name">{{ row.info.name }}</div></div>
+            <img :src="row.underlyingToken.logoURI">
+            <div>
+              <div>{{ row.underlyingToken.symbol }}</div>
+              <div class="asset-name">{{ row.underlyingToken.name }}</div>
+            </div>
           </div>
         </el-table-column>
         <el-table-column label="Borrowing">
           <template slot-scope="{ row }">
-            <div>{{ row.userBorrows }} {{ row.info.symbol }}</div>
-            <div>{{ formatCurrency((+row.userBorrows) * (+row.priceUSD)) }}</div>
+            <div>{{ row.userBorrows }} {{ row.underlyingToken.symbol }}</div>
+            <div>{{ formatCurrency(row.userBorrowsUSD) }}</div>
           </template>
         </el-table-column>
         <el-table-column></el-table-column>
@@ -158,22 +145,25 @@
         </el-table-column>
         <el-table-column label="Action" width="200" align="center">
           <template slot-scope="{ row }">
-            <el-button type="primary" size="mini" round @click="() => onRepay(row.info)">Repay</el-button>
+            <el-button
+              type="primary" size="mini" round
+              @click="() => onRepay(row.underlyingToken)"
+            >Repay</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
     <withdraw-dialog
-      v-if="bankApp && withdrawDialogVisible"
-      :visible.sync="withdrawDialogVisible"
+      v-if="bankApp && withdrawDialog.visible"
+      :visible.sync="withdrawDialog.visible"
       :bank-app="bankApp"
-      :underlying-token-data="withdrawAssetTokenData"
+      :underlying-token-data="withdrawDialog.underlyingToken"
     />
     <repay-dialog
-      v-if="bankApp && repayDialogVisible"
-      :visible.sync="repayDialogVisible"
+      v-if="bankApp && repayDialog.visible"
+      :visible.sync="repayDialog.visible"
       :bank-app="bankApp"
-      :underlying-token-data="repayAssetTokenData"
+      :underlying-token-data="repayDialog.underlyingToken"
     />
   </div>
 </template>
@@ -188,138 +178,127 @@ import RepayDialog from '@/components/selects/RepayDialog'
 import { formatCurrency } from '@/utils/formatter'
 import { createBankApp } from '@/utils/banks/factory'
 
+import { getBankPortfolio } from './helper'
+
 export default {
-  asyncData({ store, params }) {
-    return {
-      bankName: params.bankName,
-    }
-  },
+  // asyncData({ store, params }) {
+  //   return {
+  //     bankName: params.bankName,
+  //   }
+  // },
   components: {
     BankSelect,
     WithdrawDialog,
-    RepayDialog
+    RepayDialog,
   },
   data() {
     const bankName = this.$route.params.bankName
-    const { app, title, logo } = createBankApp(bankName, this.$wallet)
+    const bankApp = createBankApp(bankName, this.$wallet)
     return {
-      currentChain: "Ethereum",
       bankName,
-      bankApp: app,
-      bankTitle: title,
-      bankLogo: logo,
-      accountData: {
-        userDepositsUSD: '0.00',
-        userBorrowsUSD: '0.00',
-        availableBorrowsUSD: '0.00',
+      bankApp,
+      bankPortfolio: {
+        summary: {},
+        depositsDict: {},  // { [asset]: assetData }
+        borrowsDict: {},  // { [asset]: assetData }
       },
-      deposits: [],
-      borrows: [],
-      customColors: [
+      progressCustomColors: [
         {color: '#0cb444', percentage: 80},
         {color: '#e74c3c', percentage: 100},
       ],
-      withdrawDialogVisible: false,
-      withdrawAssetTokenData: null,
-      repayDialogVisible: false,
-      repayAssetTokenData: null,
+      withdrawDialog: {
+        visible: false,
+        underlyingToken: null,
+      },
+      repayDialog: {
+        visible: false,
+        underlyingToken: null,
+      }
     }
   },
   computed: {
-    totalCredit() {
-      const { userBorrowsUSD, availableBorrowsUSD } = this.accountData
-      return +userBorrowsUSD + +availableBorrowsUSD
+    userDepositsUSD() {
+      const { userDepositsUSD } = this.bankPortfolio.summary
+      return +userDepositsUSD
     },
-    safetyPrecentage() {
-      const { userBorrowsUSD } = this.accountData
-      return this.totalCredit > 0 ? +((+userBorrowsUSD * 100 / this.totalCredit).toFixed(2)) : 0
+    userBorrowLimitUSD() {
+      const { userBorrowsUSD, availableBorrowsUSD } = this.bankPortfolio.summary
+      return (+userBorrowsUSD) + (+availableBorrowsUSD)
+    },
+    userBorrowsUSD() {
+      const { userBorrowsUSD } = this.bankPortfolio.summary
+      return +userBorrowsUSD
+    },
+    utilization() {
+      const userBorrowLimitUSD = this.userBorrowLimitUSD
+      const userBorrowsUSD = this.userBorrowsUSD
+      return userBorrowLimitUSD > 0 ? (userBorrowsUSD / userBorrowLimitUSD) : 0
     },
     isDanger() {
-      return this.safetyPrecentage <= 80
+      return this.utilization <= 0.8
     },
-    totalEarnInYearUSD() {
-      const _totalEarnInYearUSD = _.sumBy(this.deposits, ({ userDeposits, priceUSD, depositAPY }) => {
-        return +userDeposits * +priceUSD * +depositAPY
+    totalAnnualYieldUSD() {
+      const depositsData = _.values(this.bankPortfolio.depositsDict)
+      const depositEarn = _.sumBy(depositsData, ({ userDepositsUSD, depositAPY }) => {
+        return +userDepositsUSD * (+depositAPY)
       })
-      return _totalEarnInYearUSD
+      return depositEarn
     },
-    bankDepositAPY() {
-      const { userDepositsUSD } = this.accountData
-      return +userDepositsUSD ? this.totalEarnInYearUSD / +userDepositsUSD : ''
+    averageDepositAPY() {
+      const userDepositsUSD = this.userDepositsUSD
+      const totalAnnualYieldUSD = this.totalAnnualYieldUSD
+      return userDepositsUSD > 0 ? totalAnnualYieldUSD / userDepositsUSD : 0
     },
-    dailyEarnUSD() {
-      return this.totalEarnInYearUSD / 365
-    }
+    averageDailyEarnUSD() {
+      return this.totalAnnualYieldUSD / 365
+    },
+    depositsTableData() {
+      const tableData = []
+      _.forEach(this.bankPortfolio.depositsDict, (depositData, assetAddress) => {
+        const { userDeposits, depositAPY, userDepositsUSD } = depositData
+        const underlyingToken = this.getToken(assetAddress)
+        tableData.push({ userDeposits, depositAPY, userDepositsUSD, underlyingToken })
+      })
+      return tableData
+    },
+    borrowsTableData() {
+      const tableData = []
+      _.forEach(this.bankPortfolio.borrowsDict, (borrowData, assetAddress) => {
+        const { userBorrows, borrowAPY, userBorrowsUSD } = borrowData
+        const underlyingToken = this.getToken(assetAddress)
+        tableData.push({ userBorrows, borrowAPY, userBorrowsUSD, underlyingToken })
+      })
+      return tableData
+    },
   },
   mounted() {
-    this.getAccountData()
-    this.getAccountAssets()
+    this.fetchData()
   },
   methods: {
     formatCurrency,
-    getAccountData() {
-      return this.bankApp.getAccountData().then(({
-        userDepositsUSD, userBorrowsUSD, availableBorrowsUSD
-      }) => {
-        this.accountData.userDepositsUSD = userDepositsUSD
-        this.accountData.userBorrowsUSD = userBorrowsUSD
-        this.accountData.availableBorrowsUSD = availableBorrowsUSD
-      }).catch((error) => {
-        console.log(error)
-      })
-    },
-    async getAccountAssetData(asset) {
-      const data = {
-        info: this.$store.getters['tokens/getToken'](asset) || {},
-        userDeposits: '0.00', userBorrows: '0.00',
-        totalDeposits: '0.00', totalBorrows: '0.00',
-        depositAPY: '0.00', borrowAPY: '0.00', priceUSD: '0.00'
-      }
-      try {
-        const {
-          userDeposits, userBorrows
-        } = await this.bankApp.getAccountAssetData(asset)
-        const {
-          totalDeposits, totalBorrows,
-          depositAPY, borrowAPY, priceUSD
-        } = await this.bankApp.getAssetData(asset)
-        Object.assign(data, {
-          userDeposits, userBorrows,
-          totalDeposits, totalBorrows,
-          depositAPY, borrowAPY, priceUSD
-        })
-      } catch(error) {
-        console.log(asset, error)
-      }
-      return data
-    },
-    async getAccountAssets() {
-      try {
-        const { deposits, borrows } = await this.bankApp.getAccountAssets()
-        const _promises1 = _.map(deposits, (asset) => this.getAccountAssetData(asset))
-        const _promises2 = _.map(borrows, (asset) => this.getAccountAssetData(asset))
-        this.deposits = await Promise.all(_promises1)
-        this.borrows = await Promise.all(_promises2)
-      } catch(error) {
-        console.log(error)
-      }
-    },
     formatPercentage(val) {
       return (+val * 100).toFixed(2) + '%'
     },
-    handleRefresh() {
-      this.getAccountData()
+    getToken(asset) {
+      return this.$store.getters['tokens/getToken'](asset)
+    },
+    async fetchData() {
+      this.bankPortfolio = await getBankPortfolio(this.bankApp)
     },
     changeBankRoute(bankName) {
       this.$router.push(`/portfolio/${bankName}`)
     },
-    onWithdraw(tokenData) {
-      this.withdrawAssetTokenData = {...tokenData}
-      this.withdrawDialogVisible = true
+    onWithdraw(underlyingToken) {
+      this.withdrawDialog = {
+        underlyingToken: { ...underlyingToken },
+        visible: true,
+      }
     },
     onRepay(tokenData) {
-      this.repayAssetTokenData = {...tokenData}
-      this.repayDialogVisible = true
+      this.repayDialog = {
+        underlyingToken: { ...tokenData },
+        visible: true,
+      }
     }
   }
 }
