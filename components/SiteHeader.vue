@@ -21,7 +21,9 @@
           </div>
         </div>
         <div class="gas-fee-btn" slot="reference">
-          <div class="gas-fee-icon"></div>
+          <div class="gas-fee-icon">
+            <i class="rush-icon-gas"></i>
+          </div>
           <div class="gas-fee-value">{{ gasPriceTable.normal.price_gwei || '-' }}</div>
         </div>
         <div class="inner__loading">
@@ -80,7 +82,7 @@
               class="wallet-btn"
               :disabled="connectDialog.isConnecting"
               @click="connectBrowserWallet">
-              <metamask-logo class="wallet-icon" /> <span>WalletConnect</span>
+              <img class="wallet-icon--img" src="~/assets/icons/wallet-connect.png" alt=""> <span>WalletConnect</span>
             </button>
           </div>
           <a href="javascript(0);" class="help-hint">What is a wallet?</a>
@@ -389,6 +391,10 @@ export default {
     width: 36px;
     margin-right: 15px;
   }
+  .wallet-icon--img {
+    width: 36px;
+    margin-right: 15px;
+  }
   > span {
     font-size: 18px;
     font-weight: 400;
@@ -422,19 +428,28 @@ export default {
   border-radius: 50%;
   margin-right: 12px;
   cursor: pointer;
+  color: $color-text;
+  // transition: all .25s ease-in-out;
 }
 .gas-fee-icon {
-  width: 11px;
-  height: 11px;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  background-image: url('~/assets/icons/icon-gas.png');
+  // width: 11px;
+  // height: 11px;
+  // background-repeat: no-repeat;
+  // background-position: center;
+  // background-size: contain;
+  // background-image: url('~/assets/icons/icon-gas.png');
+  font-size: 11px;
 }
 .gas-fee-value {
-  color: $color-text;
   font-size: 11px;
   line-height: 1;
+}
+.gas-fee-btn:hover {
+  background-color: $color-text;
+  .gas-fee-icon,
+  .gas-fee-value {
+    color: #ffffff;
+  }
 }
 
 .gas-fees__inner {

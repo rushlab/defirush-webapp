@@ -25,7 +25,8 @@ module.exports = {
    ** Global CSS
    */
   css: [
-    'element-ui/lib/theme-chalk/index.css',
+    // 'element-ui/lib/theme-chalk/index.css',
+    '~assets/stylesheets/element-ui/index.scss',
     '~/assets/stylesheets/main.scss'
   ],
   /*

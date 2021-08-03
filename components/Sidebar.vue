@@ -19,45 +19,45 @@
         :collapse-transition="false"
       >
         <el-menu-item index="/">
-          <i class="el-icon-menu"></i>
+          <i class="rush-icon-home"></i>
           <strong slot="title">Home</strong>
         </el-menu-item>
-        <!-- <el-submenu index="/portfolio">
-          <template slot="title">Portfolio</template>
-          <el-menu-item index="/portfolio/aave">Aave</el-menu-item>
-        </el-submenu> -->
         <el-menu-item index="/portfolio">
-          <i class="el-icon-data-analysis"></i>
+          <i class="rush-icon-portfolio"></i>
           <strong slot="title">Portfolio</strong>
         </el-menu-item>
         <el-menu-item index="/deposit">
-          <i class="el-icon-money"></i>
+          <i class="rush-icon-deposit"></i>
           <strong slot="title">Deposit</strong>
         </el-menu-item>
         <el-menu-item index="/borrow">
-          <i class="el-icon-wallet"></i>
+          <i class="rush-icon-borrow"></i>
           <strong slot="title">Borrow</strong>
         </el-menu-item>
         <el-menu-item index="/collateral-swap">
-          <i class="el-icon-set-up"></i>
+          <i class="rush-icon-collateral-swap"></i>
           <strong slot="title">Collateral Swap</strong>
         </el-menu-item>
         <el-menu-item index="/debt-swap">
-          <i class="el-icon-set-up"></i>
+          <i class="rush-icon-debt-swap"></i>
           <strong slot="title">Debt Swap</strong>
         </el-menu-item>
         <el-menu-item index="/refinance">
-          <i class="el-icon-set-up"></i>
+          <i class="rush-icon-refinance"></i>
           <strong slot="title">Refinance</strong>
         </el-menu-item>
         <el-menu-item index="/settings">
-          <i class="el-icon-set-up"></i>
+          <i class="rush-icon-settings"></i>
           <strong slot="title">Settings</strong>
         </el-menu-item>
       </el-menu>
       <div class="social-icons">
-        <div class="social-icon"></div>
-        <div class="social-icon"></div>
+        <div class="social-icon">
+          <i class="rush-icon-telegram"></i>
+        </div>
+        <div class="social-icon">
+          <i class="rush-icon-twitter"></i>
+        </div>
       </div>
     </div>
     <div class="sidebar__footer">
@@ -101,6 +101,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/assets/stylesheets/variables.scss";
+
 .sidebar-wrapper {
   height: 100vh;
   display: flex;
@@ -122,6 +124,9 @@ export default {
     }
     .el-menu-item i {
       font-size: 22px;
+    }
+    i + strong {
+      margin-left: 12px;
     }
     .el-menu-item.is-active i {
       color: #355DFF;
@@ -165,8 +170,8 @@ export default {
 }
 .social-icons {
   width: 100%;
-  margin-top: 40px;
-  padding: 40px 20px 20px;
+  margin-top: 30px;
+  padding: 30px 20px 20px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -186,15 +191,15 @@ export default {
   height: 40px;
   text-align: center;
   line-height: 40px;
-  // border: 1px solid;
-  // border-radius: 50%;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 40px;
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  &:nth-child(1) { background-image: url('~/assets/icons/icon-telegram.png'); }
-  &:nth-child(2) { background-image: url('~/assets/icons/icon-twitter.png'); }
+  transition: color .2s ease-in-out;
+  &:hover {
+    color: #ffffff;
+  }
   & + & {
     margin-left: 40px;
   }
@@ -219,6 +224,12 @@ export default {
   padding: 9px 15px;
   /deep/ .el-switch {
     transform: scale(1.3, 1.3);
+  }
+  /deep/ {
+    .el-switch.is-checked .el-switch__core {
+      background-color: $color-primary;
+      border-color: $color-primary;
+    }
   }
 }
 .collasped {
