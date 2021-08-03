@@ -68,6 +68,7 @@
   padding-bottom: 7px;
 }
 
+// Notification styles
 .el-notification {
   box-shadow: 0px 9px 30px 8px rgba(119, 126, 144, 0.05);
   border-radius: 4px;
@@ -86,4 +87,20 @@
     color: $color-text;
     text-decoration: underline;
   }
+}
+
+// Message styles
+.el-message {
+  padding: 25px 20px;
+  background: #EEF0F4 !important;
+  box-shadow: 0px 9px 30px 8px rgba(119, 126, 144, 0.05);
+  border-radius: 8px;
+  border: none;
+}
+.el-message__icon {
+  // font-size: 22px;
+}
+.el-message__content {
+  color: $color-text !important;
+  font-weight: normal;
 }

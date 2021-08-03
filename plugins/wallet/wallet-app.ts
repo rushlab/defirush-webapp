@@ -61,7 +61,7 @@ export class WalletApp implements WalletInterface {
     const hash = tx.hash
     const notify: any = {
       dangerouslyUseHTMLString: true,
-      message: `<a href="https://etherscan.io/tx/${hash}" target="_blank">${hash.substr(0, 20)}...</a>`,
+      message: `<p>The Transaction has been confirmed.</p><a href="https://etherscan.io/tx/${hash}" target="_blank">${hash.substr(0, 20)}...</a>`,
       position: 'bottom-right',
       showClose: true,
       duration: 0,
