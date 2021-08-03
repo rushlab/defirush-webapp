@@ -51,6 +51,8 @@ export default {
 .btn-item {
   font-size: 14px;
   height: 32px;
+  min-width: 60px;
+  text-align: center;
   line-height: 20px;
   padding: 6px 20px;
   text-align: center;
