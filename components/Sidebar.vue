@@ -34,7 +34,7 @@
           <i class="rush-icon-borrow"></i>
           <strong slot="title">Borrow</strong>
         </el-menu-item>
-        <el-menu-item index="/collateral-swap">
+        <!-- <el-menu-item index="/collateral-swap">
           <i class="rush-icon-collateral-swap"></i>
           <strong slot="title">Collateral Swap</strong>
         </el-menu-item>
@@ -45,7 +45,7 @@
         <el-menu-item index="/refinance">
           <i class="rush-icon-refinance"></i>
           <strong slot="title">Refinance</strong>
-        </el-menu-item>
+        </el-menu-item> -->
         <el-menu-item index="/settings">
           <i class="rush-icon-settings"></i>
           <strong slot="title">Settings</strong>
