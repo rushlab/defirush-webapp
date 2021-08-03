@@ -419,8 +419,11 @@ export default {
   line-height: 16px;
   height: 30px;
   padding: 7px 10px;
-  background-color: rgb(12, 180, 68);
+  background-color: $color-success;
   border-radius: 4px;
+  &.is-danger {
+    background-color: $color-warning;
+  }
 }
 .utilization-progress-bar {
   position: relative;
@@ -431,7 +434,7 @@ export default {
     top: 0;
     line-height: 16px;
     font-size: 12px;
-    color: #777E91;
+    color: #ffffff;
     border-left: 1px solid;
     padding-left: 5px;
   }
