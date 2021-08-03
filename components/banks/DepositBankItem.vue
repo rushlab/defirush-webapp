@@ -9,7 +9,7 @@
       :show-header="false"
       border>
       <el-table-column label="Bank" width="200">
-        <div slot-scope="scope" class="table-cell">
+        <div slot-scope="scope" class="table-cell" style="padding-left: 10px;">
           <el-image class="exchange__icon" fit="contain" :src="scope.row.logo"></el-image>
           <span class="exchange__title">{{ scope.row.title }}</span>
         </div>

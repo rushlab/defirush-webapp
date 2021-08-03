@@ -151,7 +151,7 @@ export default {
 }
 .sidebar__toggle {
   position: absolute;
-  top: 8px;
+  top: 4px;
   right: 20px;
   font-size: 18px;
   width: 24px;

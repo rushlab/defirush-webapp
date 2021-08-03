@@ -67,3 +67,23 @@
   padding-top: 7px;
   padding-bottom: 7px;
 }
+
+.el-notification {
+  box-shadow: 0px 9px 30px 8px rgba(119, 126, 144, 0.05);
+  border-radius: 4px;
+  padding: 25px 20px;
+}
+.el-notification__title {
+  font-size: 18px;
+  font-weight: normal;
+  color: #000;
+}
+.el-notification__content {
+  color: #353945;
+  font-size: 14px;
+  line-height: 20px;
+  a {
+    color: $color-text;
+    text-decoration: underline;
+  }
+}

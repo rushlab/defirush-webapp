@@ -194,6 +194,12 @@ export default {
   .el-table th {
     border-top: 1px solid $color-border;
   }
+  .el-table th:first-child {
+    padding-left: 10px;
+  }
+  .el-icon-question:hover {
+    color: $color-text;
+  }
 }
 .token-amount /deep/ .el-form-item__content {
   position: relative;
@@ -261,6 +267,7 @@ export default {
   justify-content: flex-start;
   align-items: center;
   color: $color-text-light;
+  padding-left: 10px;
   .btn-text {
     margin-left: 10px;
     cursor: pointer;

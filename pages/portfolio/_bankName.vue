@@ -362,6 +362,9 @@ export default {
   .el-loading-spinner i {
     color: $color-text;
   }
+  .el-icon-question:hover {
+    color: $color-text;
+  }
 }
 .asset-info {
   display: flex;
