@@ -88,11 +88,12 @@ export default {
       banksList: [],
       tokenSelectDialogVisible: false,
       underlyingToken: {
-        "symbol": "ETH",
-        "name": "Ethereum",
-        "decimals": 18,
-        "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-        "logoURI": "https://tokens.1inch.exchange/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.png"
+        "id": "dai",
+        "symbol": "DAI",
+        "name": "Dai",
+        "logoURI": "https://assets.coingecko.com/coins/images/9956/large/dai-multi-collateral-mcd.png?1574218774",
+        "address": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "decimals": 18
       },
       accountData: null,
       amountDisplay: '0',
