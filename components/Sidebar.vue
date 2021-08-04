@@ -113,11 +113,7 @@ export default {
       }
     },
     isSimulationMode() {
-      if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
-        return +global.ethereum.chainId === 71337
-      } else {
-        return false
-      }
+      return this.walletChainId === 71337
     }
   },
   methods: {

@@ -71,8 +71,15 @@ function listenToMetaMask(store) {
     }
   }
   if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
-    global.ethereum.on('chainChanged', handler)
+    // global.ethereum.on('chainChanged', handler)
     global.ethereum.on('accountsChanged', handler)
+    global.ethereum.on('chainChanged', () => {
+      store.commit('auth/setWallet', {
+        walletChainId: +global.ethereum.chainId,
+        walletAddress: store.state.auth.walletAddress
+      })
+      handler()
+    })
   }
 }
 

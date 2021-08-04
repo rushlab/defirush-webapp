@@ -11,7 +11,7 @@ const AUTH_STORAGE_KEY = 'web3-wallet-auth'
 export const state = () => {
   let walletChainId = 1
   if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
-    walletChainId = +global.ethereum.chainId
+    walletChainId = +global.ethereum.chainId || 1
   }
   return {
     walletChainId,
