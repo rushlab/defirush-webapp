@@ -312,15 +312,15 @@ export default {
 .bank-data-card {
   padding: 20px;
   height: 240px;
-  background-color: $color-bg-page;
-  box-shadow: 0 0 0 1px $color-border;
+  background-color: $--background-color-base;
+  box-shadow: 0 0 0 1px $--border-color-base;
 }
 .card__title {
   font-size: 16px;
   font-weight: 400;
   line-height: 1;
   margin-bottom: 18px;
-  color: $color-text-light;
+  color: $--color-text-regular;
 }
 .card__value {
   font-size: 28px;
@@ -330,27 +330,28 @@ export default {
 }
 /deep/ {
   .el-card {
-    background-color: $color-bg-page;
-    box-shadow: 0 0 0 1px $color-border;
+    background-color: $--background-color-base;
+    box-shadow: 0 0 0 1px $--border-color-base;
     border-radius: 0;
+    border: none;
   }
   .el-table__empty-block {
     display: none;
   }
   .el-table__body {
-    color: $color-text;
+    color: $--color-text-primary;
   }
-  .el-table th>.cell {
+  .el-table th:first-child > .cell {
     padding-left: 20px;
   }
   .el-table th, .el-table tr {
-    background-color: $color-bg-page;
+    background-color: $--background-color-base;
   }
   .el-table--border th, .el-table--border td {
-    // border-right-color: $color-border;
+    // border-right-color: $--border-color-base;
   }
   .el-table th.is-leaf, .el-table td {
-    border-bottom-color: $color-border;
+    border-bottom-color: $--border-color-base;
   }
   .el-progress-bar__outer {
     background-color: #DFE2E8;
@@ -360,17 +361,17 @@ export default {
     transform: translateY(-50%);
   }
   .el-loading-spinner i {
-    color: $color-text;
+    color: $--color-text-primary;
   }
   .el-icon-question:hover {
-    color: $color-text;
+    color: $--color-text-primary;
   }
 }
 .asset-info {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  color: $color-text;
+  color: $--color-text-primary;
   padding-left: 10px;
   img {
     width: 40px;
@@ -381,12 +382,12 @@ export default {
   .asset-name {
     font-size: 0.8em;
     // opacity: 0.75;
-    color: $color-text-light;
+    color: $--color-text-regular;
     line-height: 1;
   }
 }
 .asset-value-to-usd {
-  color: $color-text-light;
+  color: $--color-text-regular;
 }
 .card__row + .card__row {
   margin-top: 15px;
@@ -419,10 +420,10 @@ export default {
   line-height: 16px;
   height: 30px;
   padding: 7px 10px;
-  background-color: $color-success;
+  background-color: $--color-success;
   border-radius: 4px;
   &.is-danger {
-    background-color: $color-warning;
+    background-color: $--color-warning;
   }
 }
 .utilization-progress-bar {
@@ -441,7 +442,7 @@ export default {
 }
 .utilization-hint {
   font-size: 14px;
-  color: $color-text-light;
+  color: $--color-text-regular;
   margin-top: 10px;
 }
 .asset-icon {

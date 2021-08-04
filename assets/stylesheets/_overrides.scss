@@ -1,11 +1,16 @@
+// table styles
+.el-table th > .cell {
+  font-weight: 400 !important;
+}
+
 .dialog--deposit,
 .dialog--borrow,
 .dialog--withdraw,
 .dialog--repay,
 .dialog--dark {
   .el-dialog {
-    background-color: $color-dialog-bg;
-    border: 1px solid $color-dialog-border;
+    background-color: $--background-color-base;
+    border: 1px solid $--border-color-base;
     border-radius: 8px;
     overflow: hidden;
   }
@@ -14,7 +19,7 @@
   }
   .el-dialog__header {
     padding: 15px 30px;
-    border-bottom: 1px solid $color-border;
+    border-bottom: 1px solid $--border-color-base;
   }
   .el-dialog__body {
     padding: 20px 30px 40px;
@@ -23,7 +28,7 @@
     padding: 0;
   }
   .el-loading-spinner .path {
-    stroke: $color-text;
+    stroke: $--color-text-primary;
   }
 }
 .v-modal {
@@ -55,7 +60,7 @@
   }
   .el-table__header {
     font-size: 14px;
-    color: #000000;
+    color: $--color-text-primary;
   }
   .el-table td, .el-table th.is-leaf {
     border: none;
@@ -70,21 +75,21 @@
 
 // Notification styles
 .el-notification {
-  box-shadow: 0px 9px 30px 8px rgba(119, 126, 144, 0.05);
+  box-shadow: 0px 9px 30px 8px $color-box-shadow;
   border-radius: 4px;
   padding: 25px 20px;
 }
 .el-notification__title {
   font-size: 18px;
   font-weight: normal;
-  color: #000;
+  color: $--color-text-primary;
 }
 .el-notification__content {
-  color: #353945;
+  color: $--color-text-secondary;
   font-size: 14px;
   line-height: 20px;
   a {
-    color: $color-text;
+    color: $--color-text-primary;
     text-decoration: underline;
   }
 }
@@ -92,8 +97,8 @@
 // Message styles
 .el-message {
   padding: 25px 20px;
-  background: #EEF0F4 !important;
-  box-shadow: 0px 9px 30px 8px rgba(119, 126, 144, 0.05);
+  background: $--background-color-base !important;
+  box-shadow: 0px 9px 30px 8px $color-box-shadow;
   border-radius: 8px;
   border: none;
 }
@@ -101,7 +106,7 @@
   // font-size: 22px;
 }
 .el-message__content {
-  color: $color-text !important;
+  color: $--color-text-primary !important;
   font-weight: normal;
 }
 

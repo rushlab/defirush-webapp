@@ -264,9 +264,9 @@ export default {
   }
 }
 .collateral-label {
-  color: $color-text-light;
+  color: $--color-text-regular;
 }
 .collateral-value {
-  color: $color-text;
+  color: $--color-text-primary;
 }
 </style>

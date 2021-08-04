@@ -157,21 +157,21 @@ export default {
   }
 }
 .hint {
-  color: $color-text-light;
+  color: $--color-text-regular;
   padding: 10px 0;
 }
 /deep/ {
   .el-input__inner {
     height: 48px;
     line-height: 48px;
-    color: $color-text;
+    color: $--color-text-primary;
     background-color: $color-input-bg;
     font-size: 16px;
-    color: $color-text;
+    color: $--color-text-primary;
     border: none;
     border-radius: 0;
     &::placeholder {
-      color: $color-text-light;
+      color: $--color-text-regular;
     }
   }
 }
@@ -180,7 +180,7 @@ export default {
 }
 .common-bases__title {
   font-size: 14px;
-  color: $color-text-light;
+  color: $--color-text-regular;
   margin-bottom: 8px;
 }
 .common-bases__inner {
@@ -207,7 +207,7 @@ export default {
   .common-item__symbol {
     margin-left: 10px;
     font-size: 15px;
-    color: $color-text;
+    color: $--color-text-primary;
   }
 }
 .token-list {
@@ -215,7 +215,7 @@ export default {
   flex: 1;
   overflow: auto;
   padding: 15px 0;
-  border-top: 1px solid $color-border;
+  border-top: 1px solid $--border-color-base;
   margin-top: 10px;
   overflow: auto;
   // &::-webkit-scrollbar {
@@ -238,10 +238,10 @@ export default {
 }
 .token__title {
   font-size: 20px;
-  color: $color-text;
+  color: $--color-text-primary;
 }
 .token__name {
   font-size: 12px;
-  color: $color-text-light;
+  color: $--color-text-regular;
 }
 </style>

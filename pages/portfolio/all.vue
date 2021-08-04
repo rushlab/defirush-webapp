@@ -329,8 +329,8 @@ export default {
 .bank-data-card {
   padding: 20px;
   height: 200px;
-  background-color: $color-bg-page;
-  box-shadow: 0 0 0 1px $color-border;
+  background-color: $--background-color-base;
+  box-shadow: 0 0 0 1px $--border-color-base;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -341,7 +341,7 @@ export default {
   font-weight: 400;
   line-height: 1;
   margin-bottom: 18px;
-  color: $color-text-light;
+  color: $--color-text-regular;
 }
 .card__value {
   font-size: 28px;
@@ -351,27 +351,27 @@ export default {
 }
 /deep/ {
   .el-card {
-    background-color: $color-bg-page;
-    box-shadow: 0 0 0 1px $color-border;
+    background-color: $--background-color-base;
+    box-shadow: 0 0 0 1px $--border-color-base;
     border-radius: 0;
   }
   .el-table__empty-block {
     display: none;
   }
   .el-table__body {
-    color: $color-text;
+    color: $--color-text-primary;
   }
-  .el-table th>.cell {
+  .el-table th:first-child > .cell {
     padding-left: 20px;
   }
   .el-table th, .el-table tr {
-    background-color: $color-bg-page;
+    background-color: $--background-color-base;
   }
   .el-table--border th, .el-table--border td {
-    // border-right-color: $color-border;
+    // border-right-color: $--border-color-base;
   }
   .el-table th.is-leaf, .el-table td {
-    border-bottom-color: $color-border;
+    border-bottom-color: $--border-color-base;
   }
   .el-progress-bar__outer {
     background-color: #DFE2E8;
@@ -381,14 +381,14 @@ export default {
     transform: translateY(-50%);
   }
   .el-loading-spinner i {
-    color: $color-text;
+    color: $--color-text-primary;
   }
 }
 .asset-info {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  color: $color-text;
+  color: $--color-text-primary;
   padding-left: 10px;
   img {
     width: 40px;
@@ -399,12 +399,12 @@ export default {
   .asset-name {
     font-size: 0.8em;
     // opacity: 0.75;
-    color: $color-text-light;
+    color: $--color-text-regular;
     line-height: 1;
   }
 }
 .asset-value-to-usd {
-  color: $color-text-light;
+  color: $--color-text-regular;
 }
 .card__row {
   width: 100%;
@@ -434,7 +434,7 @@ export default {
 .table-card {
   padding: 20px;
   width: 100%;
-  background-color: $color-bg-page;
-  box-shadow: 0 0 0 1px $color-border;
+  background-color: $--background-color-base;
+  box-shadow: 0 0 0 1px $--border-color-base;
 }
 </style>

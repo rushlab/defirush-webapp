@@ -204,7 +204,7 @@ export default {
   align-items: center;
 }
 .asset-value-to-usd {
-  color: $color-text-light;
+  color: $--color-text-regular;
 }
 /deep/ {
   .el-loading-spinner {
@@ -212,14 +212,16 @@ export default {
     transform: translateY(-50%);
   }
   .el-loading-spinner i {
-    color: $color-text;
+    color: $--color-text-primary;
   }
   .el-table {
-    color: $color-text;
+    color: $--color-text-primary;
   }
   .el-table td {
-    border-top: 1px solid $color-border;
     border-right: none;
+  }
+  .el-table--group, .el-table--border {
+    border: none;
   }
 }
 </style>

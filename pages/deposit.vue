@@ -165,16 +165,7 @@ export default {
     display: none;
   }
   .el-table th, .el-table tr {
-    background-color: $color-bg-page;
-  }
-  .el-table--border th, .el-table--border td {
-    // border-right-color: $color-border;
-  }
-  .el-table th.is-leaf, .el-table td {
-    border-bottom-color: $color-border;
-  }
-  .el-table th {
-    border-top: 1px solid $color-border;
+    background-color: $--background-color-base;
   }
   .el-table th:first-child {
     padding-left: 10px;
@@ -192,13 +183,13 @@ export default {
   height: 16px;
   z-index: 1;
   line-height: 1;
-  color: $color-text-light;
+  color: $--color-text-regular;
 }
 .token-balance-display {
   top: 0;
 }
 .text-warning {
-  color: $color-warning;
+  color: $--color-warning;
 }
 .token-value-to-usd {
   bottom: 0;
@@ -226,7 +217,7 @@ export default {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  color: $color-text;
+  color: $--color-text-primary;
 }
 .token-icon {
   width: 20px;
@@ -234,7 +225,8 @@ export default {
   margin-right: 10px;
 }
 .bank-list {
-  border: 1px solid $color-border;
+  border: 1px solid $--border-color-base;
+  border-bottom-width: 0;
 }
 @keyframes rotating {
   0% {
@@ -248,13 +240,13 @@ export default {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  color: $color-text-light;
+  color: $--color-text-regular;
   padding-left: 10px;
   .btn-text {
     margin-left: 10px;
     cursor: pointer;
     text-decoration: underline;
-    color: $color-text;
+    color: $--color-text-primary;
   }
   .btn--refresh {
     position: relative;
@@ -281,13 +273,13 @@ export default {
   }
 }
 .last-updated-at {
-  color: $color-text;
+  color: $--color-text-primary;
 }
 .input-amount /deep/ {
   .el-input-group__prepend {
     background-color: #E6E8EC;
     height: 56px !important;
-    color: $color-text;
+    color: $--color-text-primary;
     font-size: 18px;
     font-weight: 400;
     border: none;
@@ -297,7 +289,7 @@ export default {
     height: 56px;
     line-height: 56px;
     background-color: #E6E8EC;
-    color: $color-text;
+    color: $--color-text-primary;
     font-size: 18px;
     font-weight: 400;
     border: none;

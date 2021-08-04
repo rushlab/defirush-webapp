@@ -48,7 +48,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: 2px solid $color-text;
+  border: 2px solid $--color-text-primary;
   border-top-color: transparent;
   transform-origin: center center;
   animation: rotateLoading infinite 2s ease;

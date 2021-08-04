@@ -227,8 +227,8 @@ export default {
   }
   /deep/ {
     .el-switch.is-checked .el-switch__core {
-      background-color: $color-primary;
-      border-color: $color-primary;
+      background-color: $--color-primary;
+      border-color: $--color-primary;
     }
   }
 }

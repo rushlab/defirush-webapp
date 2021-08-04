@@ -1,23 +1,8 @@
 @import "element-ui/vars";  // element ui 的变量也可以直接在项目利用
 
-$color-primary: #033FFF !default;
-$color-warning: #e74c3c !default;
-$color-success: #3ACB6E !default;
-
-// text colors
-$color-text: #000000 !default;
-$color-text-light: #777E90 !default;
-$color-text-lighter: #858E99 !default;
-
-// bg colors
-$color-bg-page: #EEF0F4 !default;
-$color-bg-input: #E6E8EC !default;
-$color-bg-header: $color-bg-page;
-
 $btn-dark-bg: #000000 !default;
 $btn-dark-text: #ffffff !default;
 
-$color-border: #979AAA !default;
-$color-dialog-bg: #EEF0F4 !default;
-$color-dialog-border: #979AAA !default;
 $color-input-bg: #E6E8EC !default;
+
+$color-box-shadow: rgba(119, 126, 144, 0.05) !default;

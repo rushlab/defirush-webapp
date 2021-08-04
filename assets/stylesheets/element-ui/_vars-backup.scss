@@ -1,0 +1,17 @@
+/* 改变主题色变量 */
+// $--color-primary: #23b8ff;
+// $--button-font-weight: normal;
+
+$--color-primary: #033FFF;
+$--color-warning: #e74c3c;
+$--color-white: #FFFFFF;
+$--color-success: #3ACB6E;
+$--border-color-base: #979AAA;
+$--color-text-primary: #000000;
+$--color-text-regular: #000000;
+$--color-text-secondary: #858E99;
+$--color-text-placeholder: #777E90;
+$--border-color-light: #C5C5C5;
+$--background-color-base: #EEF0F4;
+
+@import "~element-ui/packages/theme-chalk/src/common/var";

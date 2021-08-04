@@ -282,7 +282,7 @@ export default {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  background-color: $color-bg-header;
+  background-color: $--background-color-base;
   z-index: 100;
 }
 .network-status {
@@ -290,7 +290,7 @@ export default {
   padding-left: 20px;
   font-size: 16px;
   line-height: 1;
-  color: $color-text-light;
+  color: $--color-text-regular;
   &::before {
     content: "";
     position: absolute;
@@ -300,10 +300,10 @@ export default {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background-color: $color-warning;
+    background-color: $--color-warning;
   }
   &.signer-alive::before {
-    background-color: $color-success;
+    background-color: $--color-success;
   }
 }
 .wallet-address-btn {
@@ -312,8 +312,8 @@ export default {
   line-height: 22px;
   padding: 9px 20px 9px 40px;
   border-radius: 20px;
-  color: $color-text;
-  box-shadow: 0 0 1px 0 $color-border;
+  color: $--color-text-primary;
+  box-shadow: 0 0 1px 0 $--border-color-base;
   cursor: pointer;
   .icon-metamask {
     position: absolute;
@@ -325,7 +325,7 @@ export default {
   }
 }
 .dropdown__btn {
-  color: $color-text;
+  color: $--color-text-primary;
 }
 .wallet-address {
   //
@@ -352,7 +352,7 @@ export default {
   line-height: 22px;
   padding-top: 9px;
   padding-bottom: 9px;
-  background-color: $color-text;
+  background-color: $--color-text-primary;
   border: 0;
   color: #ffffff;
   &:hover,
@@ -410,7 +410,7 @@ export default {
 .dialog-verify__address {
   margin-top: 50px;
   margin-bottom: 20px;
-  color: $color-text;
+  color: $--color-text-primary;
   background-color: #E6E8EC;
   font-size: 16px;
   padding: 25px 35px;
@@ -428,7 +428,7 @@ export default {
   border-radius: 50%;
   margin-right: 12px;
   cursor: pointer;
-  color: $color-text;
+  color: $--color-text-primary;
   // transition: all .25s ease-in-out;
 }
 .gas-fee-icon {
@@ -445,7 +445,7 @@ export default {
   line-height: 1;
 }
 .gas-fee-btn:hover {
-  background-color: $color-text;
+  background-color: $--color-text-primary;
   .gas-fee-icon,
   .gas-fee-value {
     color: #ffffff;
@@ -455,7 +455,7 @@ export default {
 .gas-fees__inner {
   padding: 3px 13px;
   text-align: center;
-  color: $color-text;
+  color: $--color-text-primary;
   position: relative;
 }
 .inner__loading {
@@ -470,7 +470,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: $color-text;
+  color: $--color-text-primary;
 }
 .gas-fees__inner.is-loading .inner__loading {
   z-index: 1;

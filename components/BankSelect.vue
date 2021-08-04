@@ -57,7 +57,7 @@ export default {
   padding: 6px 12px;
   text-align: center;
   background-color: transparent;
-  color: $color-text;
+  color: $--color-text-primary;
   border-radius: 16px;
   margin-right: 15px;
   cursor: pointer;
