@@ -3,7 +3,7 @@
     width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
-    <div class="dialog__inner" v-loading="isApproving || isBorrowing" element-loading-background="rgba(0, 0, 0, 0)">
+    <div class="dialog__inner" v-loading="pending || isApproving || isBorrowing" element-loading-background="rgba(0, 0, 0, 0)">
       <el-form :model="form">
         <el-form-item>
           <div class="collateral-info">
@@ -48,14 +48,14 @@
         type="primary"
         class="footer__btn"
         :loading="isApproving"
-        :disabled="isApproving"
+        :disabled="pending || isApproving"
         @click="handleApprove">Approve</el-button>
       <el-button
         v-else
         type="primary"
         class="footer__btn"
         :loading="isBorrowing"
-        :disabled="isBorrowing"
+        :disabled="pending || isBorrowing"
         @click="handleBorrow">Borrow</el-button>
     </div>
   </el-dialog>
@@ -119,6 +119,7 @@ export default {
       userBorrowsDisplay: 0,
       priceUSD: 0,
       allowanceMantissa: ethers.constants.Zero,
+      pending: false,
       isBorrowing: false
     }
   },
@@ -168,8 +169,7 @@ export default {
     },
   },
   mounted() {
-    this.getAccountAndAssetData()
-    this.updateAllowanceMantissa()
+    this.getDialogData()
   },
   methods: {
     formatCurrency,
@@ -179,6 +179,18 @@ export default {
     async onDialogOpen() {
       this.$emit('open')
       this.$emit('update:visible', true)
+    },
+    async getDialogData() {
+      try {
+        this.pending = true
+        await Promise.all([
+          this.getAccountAndAssetData(),
+          this.updateAllowanceMantissa()
+        ])
+      } catch (error) {
+        this.$message.error(JSON.stringify(error))
+      }
+      this.pending = false
     },
     async getAccountAndAssetData() {
       const underlyingToken = this.underlyingTokenData.address

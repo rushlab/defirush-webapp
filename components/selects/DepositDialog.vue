@@ -3,7 +3,7 @@
     width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
-    <div class="dialog__inner" v-loading="isApproving || isDepositing" element-loading-background="rgba(0, 0, 0, 0)">
+    <div class="dialog__inner" v-loading="pending || isApproving || isDepositing" element-loading-background="rgba(0, 0, 0, 0)">
       <el-form :model="form">
         <el-form-item>
           <div class="input-hint">How much collateral do you want to deposit?</div>
@@ -38,19 +38,19 @@
         v-if="!underlyingEnabled"
         class="footer__btn" type="primary"
         :loading="isEnabling"
-        :disabled="isEnabling"
+        :disabled="pending || isEnabling"
         @click="enableUnderlying">Enable Underlying</el-button>
       <el-button
         v-else-if="needApprove"
         class="footer__btn" type="primary"
         :loading="isApproving"
-        :disabled="isApproving"
+        :disabled="pending || isApproving"
         @click="handleApprove">Approve</el-button>
       <el-button
         v-else
         class="footer__btn" type="primary"
         :loading="isDepositing"
-        :disabled="isDepositing"
+        :disabled="pending || isDepositing"
         @click="handleDeposit" >Deposit</el-button>
     </div>
   </el-dialog>
@@ -112,6 +112,7 @@ export default {
       allowanceDisplay: '0.00',
       balanceDisplay: '0.00',
       underlyingEnabled: false,
+      pending: false,
       isEnabling: false,
       isApproving: false,
       isDepositing: false
@@ -145,16 +146,27 @@ export default {
     },
   },
   mounted() {
-    this.getAccountAndAssetData()
-    this.checkUnderlyingEnabled()
-    this.updateAllowanceDisplay()
-    this.getBalanceDisplay()
+    this.getDialogData()
   },
   methods: {
     formatCurrency,
     async onDialogOpen() {
       this.$emit('open')
       this.$emit('update:visible', true)
+    },
+    async getDialogData() {
+      try {
+        this.pending = true
+        await Promise.all([
+          this.getAccountAndAssetData(),
+          this.checkUnderlyingEnabled(),
+          this.updateAllowanceDisplay(),
+          this.getBalanceDisplay(),
+        ])
+      } catch (error) {
+        this.$message.error(JSON.stringify(error))
+      }
+      this.pending = false
     },
     async getAccountAndAssetData() {
       const underlyingToken = this.underlyingTokenData.address

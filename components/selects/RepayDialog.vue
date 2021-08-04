@@ -3,7 +3,7 @@
     width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
-    <div class="dialog__inner" v-loading="isApproving || isRepaying" element-loading-background="rgba(0, 0, 0, 0)">
+    <div class="dialog__inner" v-loading="pending || isApproving || isRepaying" element-loading-background="rgba(0, 0, 0, 0)">
       <el-form :model="form">
         <el-form-item>
           <div class="input-hint">How much collateral do you want to repay?</div>
@@ -39,14 +39,14 @@
         type="primary"
         class="footer__btn"
         :loading="isApproving"
-        :disabled="isApproving"
+        :disabled="pending || isApproving"
         @click="handleApprove">Approve</el-button>
       <el-button
         v-else
         type="primary"
         class="footer__btn"
         :loading="isRepaying"
-        :disabled="isRepaying"
+        :disabled="pending || isRepaying"
         @click="handleRepay">Repay</el-button>
     </div>
   </el-dialog>
@@ -108,6 +108,7 @@ export default {
       accountAssetData: {},
       allowanceDisplay: '0.00',
       balanceDisplay: '0.00',
+      pending: false,
       isRepaying: false
     }
   },
@@ -141,22 +142,27 @@ export default {
     visible(newVal, oldValue) {
       this.isVisible = newVal
     },
-    // 'form.amountSlideValue': {
-    //   handler(newVal) {
-    //     this.form.amountDisplay = (+this.balanceDisplay) * newVal / 100
-    //   }
-    // }
   },
   mounted() {
-    this.getAccountAndAssetData()
-    this.updateAllowanceDisplay()
-    // this.getBalanceDisplay()
+    this.getDialogData()
   },
   methods: {
     formatCurrency,
     async onDialogOpen() {
       this.$emit('open')
       this.$emit('update:visible', true)
+    },
+    async getDialogData() {
+      try {
+        this.pending = true
+        await Promise.all([
+          this.getAccountAndAssetData(),
+          this.updateAllowanceDisplay()
+        ])
+      } catch (error) {
+        this.$message.error(JSON.stringify(error))
+      }
+      this.pending = false
     },
     async getAccountAndAssetData() {
       const underlyingToken = this.underlyingTokenData.address
