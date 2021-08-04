@@ -62,13 +62,31 @@
     </div>
     <div class="sidebar__footer">
       <div class="simulation-togger">
-        <span>Simulation</span>  <el-switch v-model="isSimulation"></el-switch>
+        <span>Simulation</span>  <el-switch :value="isSimulationMode" @change="toggleSimulationMode"></el-switch>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { ethers } from "ethers"
+import { mapState } from 'vuex'
+
+const int2hex = (num) => ('0x' + num.toString(16))
+
+const chainId = 71337
+const simulationChainId = int2hex(chainId)
+const simulationNetWorkParams = {
+  chainId: simulationChainId,
+  chainName: 'hardhat-dev.defirush.io',
+  nativeCurrency: {
+    name: 'Ethereum',
+    symbol: 'ETH',
+    decimals: 18
+  },
+  rpcUrls: ['https://hardhat-dev.defirush.io']
+}
+
 export default {
   name: "Sidebar",
   props: {
@@ -80,9 +98,12 @@ export default {
   data() {
     return {
       isSimulation: false,
+      simulationChainId,
+      simulationNetWorkParams,
     }
   },
   computed: {
+    ...mapState('auth', ['walletChainId']),
     defaultActive() {
       const fullPath = this.$route.fullPath
       if (/\/portfolio\/\w+/.test(fullPath)) {
@@ -90,11 +111,61 @@ export default {
       } else {
         return fullPath
       }
+    },
+    isSimulationMode() {
+      if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
+        return +global.ethereum.chainId === 71337
+      } else {
+        return false
+      }
     }
   },
   methods: {
     toggleCollasped() {
       this.$emit('update:isCollasped', !this.isCollasped)
+    },
+    toggleSimulationMode(val) {
+      if (val) {
+        // 切换到模拟网络
+        this.checkSimulationNetwork()
+      } else {
+        this.execSwitchChainId(int2hex(1))
+      }
+    },
+    async checkSimulationNetwork() {
+      try {
+        console.log('@@@ checkSimulationNetwork', this.simulationChainId)
+        await this.execSwitchChainId(this.simulationChainId)
+      } catch (error) {
+        console.log('@@@ checkSimulationNetwork', error)
+        if (error.code === 4902) {
+          this.$confirm('An ethereum hain will be add to metamask?', 'Notice', {
+            confirmButtonText: 'Continue',
+            cancelButtonText: 'Cancel',
+            type: 'warning'
+          }).then(() => {
+            this.addSimulationNetwork()
+          }).catch(() => {
+          })
+        }
+      }
+    },
+    async addSimulationNetwork() {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [this.simulationNetWorkParams],
+        })
+        await this.execSwitchChainId(this.simulationChainId)
+      } catch (error) {
+        this.$message.error('Failed to wallet_addEthereumChain', JSON.stringify(error))
+      }
+    },
+    async execSwitchChainId(chainId) {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId }],
+      })
     }
   },
 }

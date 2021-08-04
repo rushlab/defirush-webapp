@@ -8,13 +8,19 @@ const AUTH_STORAGE_KEY = 'web3-wallet-auth'
  * isAuthenticated: 用户钱包地址已验证, 可以向 web 服务器请求个人信息, 现在这个值完全对应于有没有 walletAddress
  * isSignerAlive: 浏览器钱包可用, 可以发送交易, 并且和 walletAddress 对应
  */
-export const state = () => ({
-  walletChainId: 1,
-  walletAddress: '',
-  isAuthenticated: false,
-  isSignerAlive: false,
-  _apiToken: '',  // 只给 axios 用
-})
+export const state = () => {
+  let walletChainId = 1
+  if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
+    walletChainId = +global.ethereum.chainId
+  }
+  return {
+    walletChainId,
+    walletAddress: '',
+    isAuthenticated: false,
+    isSignerAlive: false,
+    _apiToken: '',  // 只给 axios 用
+  }
+}
 
 export const mutations = {
   _setApiToken(state, token) {
