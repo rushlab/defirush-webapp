@@ -158,12 +158,14 @@
       :visible.sync="withdrawDialog.visible"
       :bank-app="bank.app"
       :underlying-token-data="withdrawDialog.underlyingToken"
+      @success="fetchData"
     ></withdraw-dialog>
     <repay-dialog
       v-if="bank && repayDialog.visible"
       :visible.sync="repayDialog.visible"
-      :bank-app="bank"
+      :bank-app="bank.app"
       :underlying-token-data="repayDialog.underlyingToken"
+      @success="fetchData"
     ></repay-dialog>
   </div>
 </template>
