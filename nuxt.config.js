@@ -20,8 +20,13 @@ module.exports = {
   /*
    ** Customize the progress-bar color
    */
-  // loading: { color: '#fff' },
-  loading: '~/components/GlobalLoading.vue',
+  loading: { color: '#fff' },
+  // loading: '~/components/GlobalLoading.vue',
+  loadingIndicator: {
+    name: 'circle',
+    color: '#000000',
+    background: 'white'
+  },
   /*
    ** Global CSS
    */

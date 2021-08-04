@@ -104,3 +104,30 @@
   color: $color-text !important;
   font-weight: normal;
 }
+
+// dropdown menu
+.el-dropdown-menu__item:not(.is-disabled):hover,
+.el-dropdown-menu__item:focus {
+  background-color: $color-input-bg;
+}
+
+.el-popover {
+  .el-table__body {
+    // padding-left: 0;
+    // padding-right: 0;
+  }
+  .el-table__header,
+  .el-table__body,
+  .el-table__footer {
+    table-layout: initial;
+  }
+  .el-table__body {
+    // padding: 0;
+  }
+  .el-table--enable-row-hover .el-table__body tr:hover > td {
+    // background-color: transparent;
+  }
+  .el-table tr:hover {
+    background-color: $color-input-bg;
+  }
+}

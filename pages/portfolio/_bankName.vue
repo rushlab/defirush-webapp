@@ -57,7 +57,7 @@
             <div class="card__row">
               <div class="data-item">
                 <div class="data-item__label">
-                  <span>Utilization</span> <span class="utilization-tag" :class="{'is-danger': isDanger}">{{ isDanger ? 'Safe' : 'Danger' }}: {{ formatPercentage(utilization) }}</span>
+                  <span>Utilization</span> <span class="utilization-tag" :class="{'is-danger': isDanger}">{{ isDanger ? 'Danger' : 'Safe' }}: {{ formatPercentage(utilization) }}</span>
                 </div>
                 <div class="data-item__value">
                   <div class="utilization-progress-bar">
@@ -236,7 +236,7 @@ export default {
       return userBorrowLimitUSD > 0 ? (userBorrowsUSD / userBorrowLimitUSD) : 0
     },
     isDanger() {
-      return this.utilization <= 0.8
+      return this.utilization > 0.8
     },
     totalAnnualYieldUSD() {
       const depositsData = _.values(this.bankPortfolio.depositsDict)

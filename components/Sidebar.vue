@@ -210,9 +210,9 @@ export default {
   position: relative;
 }
 .simulation-togger {
-  position: absolute;
-  left: 20px;
-  bottom: 40px;
+  // position: absolute;
+  // left: 20px;
+  // bottom: 40px;
   right: 20px;
   height: 46px;
   background: rgba(228, 228, 228, 0.1);
