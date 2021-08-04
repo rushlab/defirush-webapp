@@ -7,10 +7,10 @@
       <el-form :model="form">
         <el-form-item>
           <div class="collateral-info">
-            <span class="collateral-label">Current Debt:&nbsp;</span><span class="collateral-value">{{ formatCurrency(currentDebtUSD) }}</span>
+            <span class="collateral-label">Current Debt:&nbsp;</span><span class="collateral-value">{{ formatCurrency(accountData.userBorrowsUSD) }}</span>
           </div>
           <div class="collateral-info">
-            <span class="collateral-label">Current Collateral Ratio:&nbsp;</span><span class="collateral-value">{{ collateralRatio }}</span>
+            <span class="collateral-label">Borrow Rate:&nbsp;</span><span class="collateral-value">{{ formatPercentage(assetData.borrowAPY) }}</span>
           </div>
 
           <div class="input-hint">How much collateral do you want to borrow?</div>
@@ -21,8 +21,8 @@
             :disabled="!+amountMaxDisplay || !underlyingAssetDecimals">
             <div slot="append">{{ underlyingAssetSymbol }}</div>
           </el-input>
-          <!-- <div class="balance-hint">Available: <strong class="balance__value">{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div> -->
-          <div class="balance-hint">Borrow Rate: <strong class="balance__value">{{ formatPercentage(assetData.borrowAPY) }}</strong></div>
+          <div class="balance-hint">Available to borrow: <strong class="balance__value">{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div>
+          <!-- <div class="balance-hint">available to borrow: <strong class="balance__value">{{ amountMaxDisplay }}</strong></div> -->
         </el-form-item>
         <el-form-item>
           <el-slider
@@ -146,6 +146,11 @@ export default {
     },
     currentDebtUSD() {
       return _.get(this.accountData, 'userBorrowsUSD', 0)
+    },
+    borrowRate() {
+      const { userBorrowsUSD = 0, availableBorrowsUSD = 0 } = this.accountData
+      const creditUSD = +userBorrowsUSD + +availableBorrowsUSD
+      return creditUSD > 0 ? (+userBorrowsUSD / creditUSD).toString() : '0.00'
     },
     collateralRatio() {
       const { userBorrowsUSD = 0, userDepositsUSD = 0} = this.accountData
