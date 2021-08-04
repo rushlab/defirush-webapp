@@ -1,6 +1,7 @@
 import { AaveApp } from './aave-app'
 import { CompoundApp } from './compound-app'
 import { CreamApp } from './cream-app'
+import { ForTubeApp } from './fortube-app'
 
 
 const bankConfigs: any = {
@@ -18,6 +19,11 @@ const bankConfigs: any = {
     logo: 'https://app.cream.finance/static/media/cream.29138554.svg',
     title: 'Cream',
     BankAppClass: CreamApp
+  },
+  'fortube': {
+    logo: 'https://for.tube/static/img/FOR.1faf664f.png',
+    title: 'ForTube',
+    BankAppClass: ForTubeApp
   },
 }
 

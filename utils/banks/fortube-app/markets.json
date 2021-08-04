@@ -1,0 +1,206 @@
+[
+  {
+    "symbol": "fETH",
+    "address": "0x5993233d88b4424d9c12e468a39736d5948c2835",
+    "underlyingAddress": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    "underlyingSymbol": "ETH"
+  },
+  {
+    "symbol": "fHBTC",
+    "address": "0x3ce92b88deaec1037335e614eb6409c95edcac76",
+    "underlyingAddress": "0x0316EB71485b0Ab14103307bf65a021042c6d380",
+    "underlyingSymbol": "HBTC"
+  },
+  {
+    "symbol": "fWBTC",
+    "address": "0x93b9b852fcd2f964faa7e50ec1374e016260718c",
+    "underlyingAddress": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+    "underlyingSymbol": "WBTC"
+  },
+  {
+    "symbol": "fUSDT",
+    "address": "0x51da0a7340874674c488b67200d007e422667650",
+    "underlyingAddress": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "underlyingSymbol": "USDT"
+  },
+  {
+    "symbol": "fUSDC",
+    "address": "0xfdd543ed2701deb2a172df4876e60918e28ba217",
+    "underlyingAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "underlyingSymbol": "USDC"
+  },
+  {
+    "symbol": "fBUSD",
+    "address": "0x556be90ea81e8abceec2737cf6ae0a6cfee58b40",
+    "underlyingAddress": "0x4fabb145d64652a948d72533023f6e7a623c7c53",
+    "underlyingSymbol": "BUSD"
+  },
+  {
+    "symbol": "fHUSD",
+    "address": "0x52d61a0aa88170b6ebdea25be1561e5665e6481b",
+    "underlyingAddress": "0xdf574c24545e5ffecb9a659c229253d4111d87e1",
+    "underlyingSymbol": "HUSD"
+  },
+  {
+    "symbol": "fDAI",
+    "address": "0xff5cda31926ca2ed79533d6b95fc6adbde0f1015",
+    "underlyingAddress": "0x6b175474e89094c44da98b954eedeac495271d0f",
+    "underlyingSymbol": "DAI"
+  },
+  {
+    "symbol": "fFOR",
+    "address": "0x84ff569ee2e8b9a2c22e79af431fd248fb41d87b",
+    "underlyingAddress": "0x1FCdcE58959f536621d76f5b7FfB955baa5A672F",
+    "underlyingSymbol": "FOR"
+  },
+  {
+    "symbol": "fBNB",
+    "address": "0x92563b3b8c92b22e37ac956a2b19c40988d25933",
+    "underlyingAddress": "0xB8c77482e45F1F44dE1745F52C74426C631bDD52",
+    "underlyingSymbol": "BNB"
+  },
+  {
+    "symbol": "fHT",
+    "address": "0x39527b067b04d43c627fb741848ef2c3f8ead3fe",
+    "underlyingAddress": "0x6f259637dcD74C767781E37Bc6133cd6A68aa161",
+    "underlyingSymbol": "HT"
+  },
+  {
+    "symbol": "fOKB",
+    "address": "0x4316aaa55ab3bd3a7ee3fbc83580521801210225",
+    "underlyingAddress": "0x75231F58b43240C9718Dd58B4967c5114342a86c",
+    "underlyingSymbol": "OKB"
+  },
+  {
+    "symbol": "fyUSD",
+    "address": "0x66142b3c234c054ba91374732c10cea0f72390fe",
+    "underlyingAddress": "0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c",
+    "underlyingSymbol": "yUSD"
+  },
+  {
+    "symbol": "fQC",
+    "address": "0x161190d29cc015eaefd6c4ad0aa7519b6b75b9c0",
+    "underlyingAddress": "0xE74B35425fE7E33EA190b149805baF31139a8290",
+    "underlyingSymbol": "QC"
+  },
+  {
+    "symbol": "fyWETH",
+    "address": "0xd136b32330e539aa9411c4e8968eb26b35c5917b",
+    "underlyingAddress": "0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7",
+    "underlyingSymbol": "yWETH"
+  },
+  {
+    "symbol": "fYFII",
+    "address": "0x4ffc92ddd9439c93fc79dd5560e06026a445037d",
+    "underlyingAddress": "0xa1d0e215a23d7030842fc67ce582a6afa3ccab83",
+    "underlyingSymbol": "YFII"
+  },
+  {
+    "symbol": "fNEST",
+    "address": "0xbd3df917a7e69fba3e1d912577be7ecc01be1d12",
+    "underlyingAddress": "0x04abeda201850ac0124161f037efd70c74ddc74c",
+    "underlyingSymbol": "NEST"
+  },
+  {
+    "symbol": "cLINK",
+    "address": "0x0486b8d96789c6938361ab776d6b27b6fc03c471",
+    "underlyingAddress": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+    "underlyingSymbol": "LINK"
+  },
+  {
+    "symbol": "cLINK",
+    "address": "0x8a06bba4219c3f1ca705318f5848e62f3bef33d0",
+    "underlyingAddress": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+    "underlyingSymbol": "LINK"
+  },
+  {
+    "symbol": "fMKR",
+    "address": "0x9fc5d71fc9b14630a2f198f188450d26fa5788f7",
+    "underlyingAddress": "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2",
+    "underlyingSymbol": "MKR"
+  },
+  {
+    "symbol": "fLINK",
+    "address": "0x29b22befe0f5362986152a5430d03b446b8e27fb",
+    "underlyingAddress": "0x514910771af9ca656af840dff83e8264ecf986ca",
+    "underlyingSymbol": "LINK"
+  },
+  {
+    "symbol": "fUNI",
+    "address": "0xdb694cb2b58f66c5e79ff272df37ecb46dc31add",
+    "underlyingAddress": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+    "underlyingSymbol": "UNI"
+  },
+  {
+    "symbol": "cLINK",
+    "address": "0x6c2e2cec8de4a6a071065d4bd5c496636570fdc2",
+    "underlyingAddress": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+    "underlyingSymbol": "LINK"
+  },
+  {
+    "symbol": "fLEND",
+    "address": "0x45b4e177b17e2d50db6d547015a6f9723ff9c1a0",
+    "underlyingAddress": "0x80fB784B7eD66730e8b1DBd9820aFD29931aab03",
+    "underlyingSymbol": "LEND"
+  },
+  {
+    "symbol": "fSNX",
+    "address": "0x8b2ef6d7d4cc334d003398007722fdf8ca3f5e55",
+    "underlyingAddress": "0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f",
+    "underlyingSymbol": "SNX"
+  },
+  {
+    "symbol": "fHBCH",
+    "address": "0xa3423eb2426f9f7ea3224d7979125e4fd103cdac",
+    "underlyingAddress": "0xaAC679720204aAA68B6C5000AA87D789a3cA0Aa5",
+    "underlyingSymbol": "HBCH"
+  },
+  {
+    "symbol": "fHDOT",
+    "address": "0xb5c6edba1808102e9fca4cbda33af861a4e812c8",
+    "underlyingAddress": "0x9ffc3bcde7b68c46a6dc34f0718009925c1867cb",
+    "underlyingSymbol": "HDOT"
+  },
+  {
+    "symbol": "fHFIL",
+    "address": "0x9b0a69fd9858f294029cb76545106b1bd42e0eda",
+    "underlyingAddress": "0x9afb950948c2370975fb91a441f36fdc02737cd4",
+    "underlyingSymbol": "HFIL"
+  },
+  {
+    "symbol": "fAAVE",
+    "address": "0x820fabc044b198829cb11fc53b4e4048007fc415",
+    "underlyingAddress": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
+    "underlyingSymbol": "AAVE"
+  },
+  {
+    "symbol": "fQUSD",
+    "address": "0xF0027DcAfC4eF004Dfdb2871B310d682148ed8c3",
+    "underlyingAddress": "0xb8c540d00dd0bf76ea12e4b4b95efc90804f924e",
+    "underlyingSymbol": "QUSD"
+  },
+  {
+    "symbol": "fBBTC",
+    "address": "0xe61407c38bfc019bfa6751107052021b0084783a",
+    "underlyingAddress": "0x9be89d2a4cd102d8fecc6bf9da793be995c22541",
+    "underlyingSymbol": "BBTC"
+  },
+  {
+    "symbol": "fBDOT",
+    "address": "0x939b9c50ec4276f096c494c95cf363983dc10739",
+    "underlyingAddress": "0x7884F51dC1410387371ce61747CB6264E1dAeE0B",
+    "underlyingSymbol": "BDOT"
+  },
+  {
+    "symbol": "foBTC",
+    "address": "0x10e438782d0eaccecbae5fceeab5401a6816297e",
+    "underlyingAddress": "0x8fc01e6cbdffaf09b54f423f9bb1f856b22e47b2",
+    "underlyingSymbol": "oBTC"
+  },
+  {
+    "symbol": "fwOST",
+    "address": "0x99eec30c9fcb337941009d1a5bcf15067911178a",
+    "underlyingAddress": "0x4c17f7abdbf507f7f18113faf01fd78c94d60090",
+    "underlyingSymbol": "wOST"
+  }
+]

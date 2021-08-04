@@ -28,6 +28,7 @@ export default {
         { title: "Aave", value: "aave" },
         { title: "Compound", value: "compound" },
         { title: "Cream", value: "cream" },
+        { title: "ForTube", value: "fortube" },
       ]
     }
   },
