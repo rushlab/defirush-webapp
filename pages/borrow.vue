@@ -10,7 +10,7 @@
             <span>Max: {{ balanceDisplay }}</span>
           </template>
           <template v-else>
-            <span class="text-warning">Not enough balance </span> <span>Max: {{ balanceDisplay }}</span>
+            <span class="text-danger">Not enough balance </span> <span>Max: {{ balanceDisplay }}</span>
           </template>
         </div>
         <el-input v-model="amountDisplay" placeholder="Input token amount..." class="input-amount">
@@ -210,8 +210,8 @@ export default {
 .token-balance-display {
   top: 0;
 }
-.text-warning {
-  color: $--color-warning;
+.text-danger {
+  color: $--color-danger;
 }
 .token-value-to-usd {
   bottom: 0;

@@ -302,7 +302,7 @@ export default {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background-color: $--color-warning;
+    background-color: $--color-danger;
   }
   &.signer-alive::before {
     background-color: $--color-success;
