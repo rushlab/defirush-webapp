@@ -38,5 +38,6 @@ export function createBankApps($wallet: WalletInterface) {
     createBankApp('aave', $wallet),
     createBankApp('compound', $wallet),
     createBankApp('cream', $wallet),
+    createBankApp('fortube', $wallet),
   ]
 }
