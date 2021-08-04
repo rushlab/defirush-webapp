@@ -78,8 +78,6 @@ class ForTubeApp extends BankApp {
    * 返回 underlyingToken 的价格 in usd
    */
 
- 
-
   async getAssetData(underlyingToken) {
 
     const fTokenAddr = await this.bankcontroller.getFTokeAddress(underlyingToken);
@@ -93,13 +91,11 @@ class ForTubeApp extends BankApp {
     ], this.$wallet.getProvider());
 
     const decimals = await this._decimals(underlyingToken);
-    console.log("decimals: " + decimals);
     const [priceUsdMantissa, oracleSet] = await this.bankcontroller.fetchAssetPrice(underlyingToken);
     const [totalLiquidity, totalBorrows] = await Promise.all([
       fToken.totalCash(),
       fToken.totalBorrows()
     ]);
-    console.log("totalLiquidity=", this._mantissaToDisplay(totalLiquidity, decimals));
 
     const totalDeposits = totalLiquidity.add(totalBorrows);
 
@@ -130,8 +126,6 @@ class ForTubeApp extends BankApp {
     const fTokens = await this.bankcontroller.getAssetsIn(_userAddress);
     const deposits = [];
     const borrows = [];
-
-    // console.log(`fTokens = ${fTokens}`)
 
     const _promises = fTokens.map(async (fTokenAddr) => {
       const fTokens = new ethers.Contract(fTokenAddr, [
@@ -240,7 +234,6 @@ class ForTubeApp extends BankApp {
       }).then(this.$wallet.waitForTx);
     } else {
       const allowanceMantissa = await this.underlyingAllowance(underlyingToken);
-      console.log(`allowance mantissa = ${allowanceMantissa}`)
       if (allowanceMantissa.lt(amountMantissa)) {
         throw new Error('allowance of underlying token is not enough');
       }
@@ -273,7 +266,6 @@ class ForTubeApp extends BankApp {
 
     // const ftokenBalanceMantissa = await fToken.balanceOf(this.$wallet.getAddress());
     // let borrowsMantissa = await fToken.accountBorrows(this.$wallet.getAddress());
-    // console.log(`ftoken addr = ${fTokenAddr}, account borrows = ${borrowsMantissa}`);
 
     const _max = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
     await this.bank.repay(underlyingToken, _max).then(this.$wallet.waitForTx);
