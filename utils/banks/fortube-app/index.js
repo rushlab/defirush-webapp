@@ -27,10 +27,10 @@ class ForTubeApp extends BankApp {
       'function withdraw(address underlying, uint256 withdrawTokens) returns (uint256)',             // The user specifies a certain amount of ftoken and retrieves the underlying assets
       'function withdrawUnderlying(address underlying, uint256 withdrawAmount) returns (uint256)',   // The user retrieves a certain amount of underlying assets
     ], this.$wallet.getSigner());
-
-    
   }
 
+
+  
   _isFETH(fToken) {
     return fToken.toLowerCase() === this.fETH.toLowerCase();
   }
@@ -92,33 +92,27 @@ class ForTubeApp extends BankApp {
       'function totalBorrows() public view returns (uint256)',
     ], this.$wallet.getProvider());
 
-    const decimals = await this.bankcontroller.tokenDecimals(fTokenAddr);
+    const decimals = await this._decimals(underlyingToken);
+    console.log("decimals: " + decimals);
     const [priceUsdMantissa, oracleSet] = await this.bankcontroller.fetchAssetPrice(underlyingToken);
-
-    const [supplyRate, borrowRate, totalLiquidity, totalBorrows] = await Promise.all([
-      fToken.getSupplyRate(),
-      fToken.getBorrowRate(),
+    const [totalLiquidity, totalBorrows] = await Promise.all([
       fToken.totalCash(),
       fToken.totalBorrows()
     ]);
-
+    console.log("totalLiquidity=", this._mantissaToDisplay(totalLiquidity, decimals));
 
     const totalDeposits = totalLiquidity.add(totalBorrows);
 
-    const depositAPY = await fToken.APR();
-    const borrowAPY = await fToken.APY();
-
-    console.log(`total deposit = ${totalDeposits}, total borrow = ${totalBorrows}, priceUsdMantissa = ${priceUsdMantissa},
-                 decimals = ${decimals}, totalLiquidity = ${totalLiquidity}, depositAPY = ${depositAPY}, borrowAPY = ${borrowAPY}`)
-
+    const depositAPY = await fToken.APY(); //这个不太对？
+    const borrowAPY = await fToken.APR();
 
     return {
       totalDeposits: this._mantissaToDisplay(totalDeposits, decimals),
       totalBorrows: this._mantissaToDisplay(totalBorrows, decimals),
-      depositAPY: depositAPY,
-      borrowAPY: borrowAPY,
-      // getUnderlyingPrice 返回的价格是 scale 过的, price decimals + token decimals = 36
-      priceUSD: this._mantissaToDisplay(priceUsdMantissa, 36 - decimals),
+      depositAPY: this._mantissaToDisplay(depositAPY, 18),
+      borrowAPY: this._mantissaToDisplay(borrowAPY, 18),
+      // 
+      priceUSD: this._mantissaToDisplay(priceUsdMantissa, 18),
     };
 
   }
