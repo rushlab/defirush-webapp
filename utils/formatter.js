@@ -29,3 +29,17 @@ export const formatDateTime = (value) => {
   const v = dayjs(value)
   return v.isValid() ? v.format('YYYY-MM-DD HH:mm') : '-'
 }
+
+export const safeToFixed = (number, decimals) => {
+  if (number.toString().indexOf('e') >= 0) {
+    return number.toFixed(decimals)
+  } else {
+    const re = new RegExp(`(\\d+\\.\\d{${ decimals }})(\\d+)`)
+    const result = number.toString().replace(re, '$1')
+    return result
+  }
+}
+
+export const stringToNumber = (val) => {
+  return +val || 0
+}

@@ -6,6 +6,9 @@
     <div class="dialog__inner" v-loading="pending || isApproving || isRepaying" element-loading-background="rgba(0, 0, 0, 0)">
       <el-form :model="form">
         <el-form-item>
+          <div class="collateral-info">
+            <span class="collateral-label">Wallet balance:&nbsp;</span><span class="collateral-value">{{ balanceDisplay }} {{ underlyingAssetSymbol }}</span>
+          </div>
           <div class="input-hint">How much collateral do you want to repay?</div>
           <el-input
             class="dialog-input"
@@ -56,7 +59,7 @@
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import { ethers } from 'ethers'
-import { formatCurrency } from '@/utils/formatter'
+import { formatCurrency, safeToFixed, stringToNumber } from '@/utils/formatter'
 
 export default {
   name: 'RepayDialog',
@@ -76,7 +79,8 @@ export default {
   },
   data() {
     const validationAmount = (rule, value, callback) => {
-      if (!value || !+value || +value < 0) {
+      value = stringToNumber(value)
+      if (!value || value < 0) {
         callback(new Error('Amount is required'))
       } else if (value > this.balanceDisplay) {
         callback(new Error('The maximum balance was exceeded'))
@@ -123,15 +127,15 @@ export default {
       return _.get(this.underlyingTokenData, 'address', '').toLowerCase() === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase()
     },
     amountPrecentage() {
-      return +this.balanceDisplay > 0 ? (+this.form.amountDisplay / +this.balanceDisplay) * 100 : 0
+      return stringToNumber(this.balanceDisplay) > 0 ? (stringToNumber(this.form.amountDisplay) / stringToNumber(this.balanceDisplay)) * 100 : 0
     },
     needApprove() {
       if (this.isETH) return false
-      return +this.allowanceDisplay < +this.form.amountDisplay
+      return stringToNumber(this.allowanceDisplay) < stringToNumber(this.form.amountDisplay)
     },
     amountToUSD() {
       const { priceUSD = 0 } = this.assetData
-      return (+this.form.amountDisplay * +priceUSD).toString()
+      return (stringToNumber(this.form.amountDisplay) * stringToNumber(priceUSD)).toString()
     },
     amountMaxDisplay() {
       // 显示最大值为： 用户借贷的数量
@@ -148,6 +152,7 @@ export default {
   },
   methods: {
     formatCurrency,
+    stringToNumber,
     async onDialogOpen() {
       this.$emit('open')
       this.$emit('update:visible', true)
@@ -157,7 +162,8 @@ export default {
         this.pending = true
         await Promise.all([
           this.getAccountAndAssetData(),
-          this.updateAllowanceDisplay()
+          this.updateAllowanceDisplay(),
+          this.getBalanceDisplay()
         ])
       } catch (error) {
         this.$message.error(JSON.stringify(error))
@@ -181,14 +187,15 @@ export default {
       if (this.isETH) return
       this.allowanceDisplay = await this.bankApp.underlyingAllowance(this.underlyingTokenData.address)
     },
-    // async getBalanceDisplay() {
-    //   if (this.isETH) {
-    //     this.balanceDisplay = await this.$wallet.getBalance()
-    //   } else {
-    //     const { address } = this.underlyingTokenData
-    //     this.balanceDisplay = await this.$wallet.getBalance(address)
-    //   }
-    // },
+    async getBalanceDisplay() {
+      if (this.isETH) {
+        this.balanceDisplay = await this.$wallet.getBalance()
+      } else {
+        const { address } = this.underlyingTokenData
+        this.balanceDisplay = await this.$wallet.getBalance(address)
+        console.log('@@@ getBalanceDisplay', address, this.balanceDisplay)
+      }
+    },
     onDialogClose() {
       this.form.amountDisplay = ''
       this.$emit('close')
@@ -201,13 +208,14 @@ export default {
       this._updatePrecentageFromAmount()
     },
     _updatePrecentageFromAmount() {
-      this.form.amountSlideValue = +this.amountMaxDisplay > 0 ? (+this.form.amountDisplay / +this.amountMaxDisplay) * 100 : 0
+      this.form.amountSlideValue = stringToNumber(this.amountMaxDisplay) > 0 ? (stringToNumber(this.form.amountDisplay) / stringToNumber(this.amountMaxDisplay)) * 100 : 0
     },
     onChangeSlideValue() {
       this._updateAmountFromPrecentage()
     },
     _updateAmountFromPrecentage() {
-      this.form.amountDisplay = (+this.amountMaxDisplay) * +this.form.amountSlideValue / 100
+      const res = (stringToNumber(this.amountMaxDisplay)) * parseInt(this.form.amountSlideValue) / 100
+      this.form.amountDisplay = safeToFixed(res, this.underlyingAssetDecimals)
     },
     async handleApprove() {
       try {
@@ -223,6 +231,7 @@ export default {
     async handleRepay() {
       try {
         this.isRepaying = true
+        console.log(this.underlyingTokenData.address, this.form.amountDisplay)
         await this.bankApp.repay(this.underlyingTokenData.address, this.form.amountDisplay)
         this.$message({type: 'success', message: 'Repay succeed!'})
         this.handleRepaySuccess()

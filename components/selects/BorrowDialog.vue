@@ -7,7 +7,7 @@
       <el-form :model="form">
         <el-form-item>
           <div class="collateral-info">
-            <span class="collateral-label">Current Debt:&nbsp;</span><span class="collateral-value">{{ formatCurrency(accountData.userBorrowsUSD) }}</span>
+            <span class="collateral-label">Current Debt:&nbsp;</span><span class="collateral-value">{{ accountAssetData.userBorrows }}</span>
           </div>
           <div class="collateral-info">
             <span class="collateral-label">Borrow Rate:&nbsp;</span><span class="collateral-value">{{ formatPercentage(assetData.borrowAPY) }}</span>
@@ -65,7 +65,7 @@
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import { ethers } from 'ethers'
-import { formatCurrency } from '@/utils/formatter'
+import { formatCurrency, safeToFixed, stringToNumber } from '@/utils/formatter'
 
 export default {
   name: 'BorrowDialog',
@@ -85,7 +85,8 @@ export default {
   },
   data() {
     const validationAmount = (rule, value, callback) => {
-      if (!value || !+value || +value < 0) {
+      value = stringToNumber(value)
+      if (!value || value < 0) {
         callback(new Error('Amount is required'))
       } else if (value > this.amountMaxDisplay) {
         callback(new Error('The maximum balance was exceeded'))
@@ -136,7 +137,7 @@ export default {
     availableBorrowsDisplay() {
       const { availableBorrowsUSD = 0 } = this.accountData
       const { priceUSD = 0 } = this.assetData
-      return priceUSD == 0 ? '-' : (+availableBorrowsUSD / +priceUSD).toString()
+      return stringToNumber(priceUSD) == 0 ? '-' : (stringToNumber(availableBorrowsUSD) / stringToNumber(priceUSD)).toString()
     },
     amountMaxDisplay() {
       return this.availableBorrowsDisplay
@@ -149,23 +150,23 @@ export default {
     },
     borrowRate() {
       const { userBorrowsUSD = 0, availableBorrowsUSD = 0 } = this.accountData
-      const creditUSD = +userBorrowsUSD + +availableBorrowsUSD
-      return creditUSD > 0 ? (+userBorrowsUSD / creditUSD).toString() : '0.00'
+      const creditUSD = stringToNumber(userBorrowsUSD) + stringToNumber(availableBorrowsUSD)
+      return creditUSD > 0 ? (stringToNumber(userBorrowsUSD) / creditUSD).toString() : '0.00'
     },
     collateralRatio() {
       const { userBorrowsUSD = 0, userDepositsUSD = 0} = this.accountData
-      return userBorrowsUSD == 0 ? '-' : ((+userDepositsUSD / +userBorrowsUSD * 100).toFixed(2) + '%')
+      return userBorrowsUSD == 0 ? '-' : ((stringToNumber(userDepositsUSD) / stringToNumber(userBorrowsUSD) * 100).toFixed(2) + '%')
     },
     amountToUSD() {
       const { priceUSD = 0 } = this.assetData
-      return (+this.form.amountDisplay * +priceUSD).toString()
+      return (stringToNumber(this.form.amountDisplay) * stringToNumber(priceUSD)).toString()
     },
     increasedTotalDebetUSD() {
-      return +this.currentDebtUSD + +this.amountToUSD
+      return stringToNumber(this.currentDebtUSD) + stringToNumber(this.amountToUSD)
     },
     updatedCollateralRatio() {
       const { userDepositsUSD = 0} = this.accountData
-      return this.increasedTotalDebetUSD == 0 ? '-' : ((+userDepositsUSD / +this.increasedTotalDebetUSD * 100).toFixed(2) + '%')
+      return this.increasedTotalDebetUSD == 0 ? '-' : ((stringToNumber(userDepositsUSD) / stringToNumber(this.increasedTotalDebetUSD) * 100).toFixed(2) + '%')
     }
   },
   watch: {
@@ -178,8 +179,9 @@ export default {
   },
   methods: {
     formatCurrency,
+    stringToNumber,
     formatPercentage(val) {
-      return (+val * 100).toFixed(2) + '%'
+      return (stringToNumber(val) * 100).toFixed(2) + '%'
     },
     async onDialogOpen() {
       this.$emit('open')
@@ -226,13 +228,14 @@ export default {
       this._updatePrecentageFromAmount()
     },
     _updatePrecentageFromAmount() {
-      this.form.amountSlideValue = +this.amountMaxDisplay > 0 ? (+this.form.amountDisplay / +this.amountMaxDisplay) * 100 : 0
+      this.form.amountSlideValue = stringToNumber(this.amountMaxDisplay) > 0 ? (stringToNumber(this.form.amountDisplay) / stringToNumber(this.amountMaxDisplay)) * 100 : 0
     },
     onChangeSlideValue() {
       this._updateAmountFromPrecentage()
     },
     _updateAmountFromPrecentage() {
-      this.form.amountDisplay = (+this.amountMaxDisplay) * +this.form.amountSlideValue / 100
+      const res = (stringToNumber(this.amountMaxDisplay)) * parseInt(this.form.amountSlideValue) / 100
+      this.form.amountDisplay = safeToFixed(res, this.underlyingAssetDecimals)
     },
     async handleApprove() {
       try {

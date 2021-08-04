@@ -57,7 +57,7 @@
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import { ethers } from 'ethers'
-import { formatCurrency } from '@/utils/formatter'
+import { formatCurrency, safeToFixed, stringToNumber } from '@/utils/formatter'
 
 export default {
   name: 'WithdrawDialog',
@@ -77,7 +77,8 @@ export default {
   },
   data() {
     const validationAmount = (rule, value, callback) => {
-      if (!value || !+value || +value < 0) {
+      value = stringToNumber(value)
+      if (!value || value < 0) {
         callback(new Error('Amount is required'))
       } else if (value > this.amountMaxDisplay) {
         callback(new Error('The maximum balance was exceeded'))
@@ -124,16 +125,14 @@ export default {
       return _.get(this.underlyingTokenData, 'address', '').toLowerCase() === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase()
     },
     amountPrecentage() {
-      return +this.amountMaxDisplay > 0 ? (+this.form.amountDisplay / +this.amountMaxDisplay) * 100 : 0
+      return stringToNumber(this.amountMaxDisplay) > 0 ? (stringToNumber(this.form.amountDisplay) / stringToNumber(this.amountMaxDisplay)) * 100 : 0
     },
     needApprove() {
       return false
-      // if (this.isETH) return false
-      // return +this.allowanceDisplay < +this.form.amountDisplay
     },
     amountToUSD() {
       const { priceUSD = 0 } = this.assetData
-      return (+this.form.amountDisplay * +priceUSD).toString()
+      return (stringToNumber(this.form.amountDisplay) * stringToNumber(priceUSD)).toString()
     },
     amountMaxDisplay() {
       return _.get(this.accountAssetData, 'userDeposits') || 0
@@ -194,13 +193,14 @@ export default {
       this._updatePrecentageFromAmount()
     },
     _updatePrecentageFromAmount() {
-      this.form.amountSlideValue = +this.amountMaxDisplay > 0 ? (+this.form.amountDisplay / +this.amountMaxDisplay) * 100 : 0
+      this.form.amountSlideValue = stringToNumber(this.amountMaxDisplay) > 0 ? (stringToNumber(this.form.amountDisplay) / stringToNumber(this.amountMaxDisplay)) * 100 : 0
     },
     onChangeSlideValue() {
       this._updateAmountFromPrecentage()
     },
     _updateAmountFromPrecentage() {
-      this.form.amountDisplay = (+this.amountMaxDisplay) * +this.form.amountSlideValue / 100
+      const res = (stringToNumber(this.amountMaxDisplay)) * parseInt(this.form.amountSlideValue) / 100
+      this.form.amountDisplay = safeToFixed(res, this.underlyingAssetDecimals)
     },
     async handleApprove() {
       try {
