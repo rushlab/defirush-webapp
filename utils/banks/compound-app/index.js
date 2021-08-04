@@ -175,7 +175,7 @@ class CompoundApp extends BankApp {
   async enableUnderlying(underlyingToken) {
     const signer = this.$wallet.getSigner();
     const cTokenAddr = this._getMarketOfUnderlying(underlyingToken);
-    await this.comptroller.connect(signer).enterMarkets([cTokenAddr]);
+    await this.comptroller.connect(signer).enterMarkets([cTokenAddr]).then(this.$wallet.waitForTx);
   }
 
   async underlyingEnabled(underlyingToken) {
