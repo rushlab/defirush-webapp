@@ -145,6 +145,8 @@ export default {
     networkName() {
       if (this.walletChainId == 1) {
         return 'Etherum Mainnet'
+      } else if (this.walletChainId === 31337 || this.walletChainId === 71337 ) {
+        return 'Hardhat Forking'
       } else {
         return 'Unknown Network'
       }
