@@ -14,7 +14,7 @@
             :disabled="!+amountMaxDisplay || !underlyingAssetDecimals">
             <div slot="append">{{ underlyingAssetSymbol }}</div>
           </el-input>
-          <div class="balance-hint">Available: <strong class="balance__value">{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div>
+          <div class="balance-hint">Wallet balance: <strong class="balance__value">{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div>
         </el-form-item>
         <el-form-item>
           <el-slider
@@ -29,7 +29,7 @@
         <p class="hints-title">You Will</p>
         <ul>
           <li>Deposit {{ form.amountDisplay }} {{ underlyingAssetSymbol }}(≈ {{ formatCurrency(amountToUSD) }})</li>
-          <li>Credit $20000 of borrow limit(待计算)</li>
+          <!-- <li>Credit $20000 of borrow limit(待计算)</li> -->
         </ul>
       </div>
     </div>

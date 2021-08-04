@@ -14,7 +14,7 @@
             :disabled="!+amountMaxDisplay || !underlyingAssetDecimals">
             <div slot="append" v-if="underlyingAssetSymbol">{{ underlyingAssetSymbol }}</div>
           </el-input>
-          <div class="balance-hint">Available: <strong class="balance__value">{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div>
+          <div class="balance-hint">Deposits: <strong class="balance__value">{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div>
         </el-form-item>
         <el-form-item class="form__slider">
           <el-slider
