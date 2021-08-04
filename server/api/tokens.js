@@ -11,7 +11,7 @@ const createError = (status, message) => {
 
 const CHAINS = require('./_chains.json')
 const TOKENS = require('./_tokens.json')
-const LOCALHOST_CHAIN_IDS = [31337]
+const LOCALHOST_CHAIN_IDS = [31337, 71337]
 
 router.get('/', async (req, res, next) => {
   let chainId = +req.query.chain_id
