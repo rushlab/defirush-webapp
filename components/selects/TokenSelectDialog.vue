@@ -1,6 +1,6 @@
 <!-- dialog 返回的是整个对象, select 组件返回 id -->
 <template>
-  <el-dialog class="dialog--dark dialog--tokens" title="Select Token"
+  <el-dialog class="dialog-style-to-fix dialog--tokens" title="Select Token"
     width="500px" top="5vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
     <div class="dialog__inner">
@@ -132,8 +132,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/stylesheets/components/dialog.scss";
-
+@import "@/assets/stylesheets/variables.scss";
+.dialog--tokens {
+  /deep/ .el-dialog__body {
+    padding: 0;
+    height: 550px;
+  }
+}
 .dialog__inner {
   width: 100%;
   height: 100%;

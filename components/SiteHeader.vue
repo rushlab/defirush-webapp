@@ -61,7 +61,7 @@
     </template>
     <!-- connect dialog -->
     <el-dialog
-      class="dialog--dark"
+      class="dialog-style-to-fix"
       :title="dialogTitle"
       width="540px" top="10vh"
       :append-to-body="true"
@@ -280,9 +280,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// @import "@/assets/stylesheets/variables.scss";
-@import "@/assets/stylesheets/components/dialog.scss";
-
+@import "@/assets/stylesheets/variables.scss";
 .site-header {
   width: 100%;
   height: 75px;

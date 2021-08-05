@@ -1,5 +1,5 @@
 <template>
-  <el-dialog class="dialog--borrow" title="Borrow"
+  <el-dialog class="dialog-style-to-fix" title="Borrow"
     width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
@@ -270,7 +270,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '~/assets/stylesheets/components/dialog.scss';
+@import "@/assets/stylesheets/variables.scss";
 .collateral-info {
   display: flex;
   justify-content: flex-start;

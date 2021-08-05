@@ -3,44 +3,10 @@
   font-weight: 400 !important;
 }
 
-.dialog--deposit,
-.dialog--borrow,
-.dialog--withdraw,
-.dialog--repay,
-.dialog--dark {
-  .el-dialog {
-    background-color: $--background-color-base;
-    border: 1px solid $--border-color-base;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .el-dialog__title {
-    font-size: 24px;
-  }
-  .el-dialog__header {
-    padding: 15px 30px;
-    border-bottom: 1px solid $--border-color-base;
-  }
-  .el-dialog__body {
-    padding: 20px 30px 40px;
-  }
-  .el-dialog__footer {
-    padding: 0;
-  }
-  .el-loading-spinner .path {
-    stroke: $--color-text-primary;
-  }
-}
 .v-modal {
   opacity: 0.9;
 }
 
-.dialog--tokens {
-  .el-dialog__body {
-    padding: 0;
-    height: 550px;
-  }
-}
 .apy-popover {
   padding: 0;
   border-radius: 8px;

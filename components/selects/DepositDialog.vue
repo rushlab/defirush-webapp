@@ -1,5 +1,5 @@
 <template>
-  <el-dialog class="dialog--deposit" title="Deposit"
+  <el-dialog class="dialog-style-to-fix" title="Deposit"
     width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
@@ -264,5 +264,4 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '~/assets/stylesheets/components/dialog.scss';
 </style>

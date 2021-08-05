@@ -1,5 +1,5 @@
 <template>
-  <el-dialog class="dialog--withdraw" title="Withdraw"
+  <el-dialog class="dialog-style-to-fix" title="Withdraw"
     width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
@@ -235,5 +235,4 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '~/assets/stylesheets/components/dialog.scss';
 </style>
