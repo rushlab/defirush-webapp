@@ -113,7 +113,7 @@
 // dropdown menu
 .el-dropdown-menu__item:not(.is-disabled):hover,
 .el-dropdown-menu__item:focus {
-  background-color: $color-input-bg;
+  background-color: $--input-background-color;
 }
 
 .el-popover {
@@ -133,6 +133,6 @@
     // background-color: transparent;
   }
   .el-table tr:hover {
-    background-color: $color-input-bg;
+    background-color: $--input-background-color;
   }
 }

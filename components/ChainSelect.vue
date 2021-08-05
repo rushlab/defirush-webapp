@@ -63,7 +63,7 @@ export default {
   cursor: pointer;
   transition: all .25s ease-in-out;
   &:hover {
-    background-color: $color-input-bg;
+    background-color: $--input-background-color;
   }
   &.active {
     background-color: $btn-dark-bg;

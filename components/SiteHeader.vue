@@ -379,6 +379,7 @@ export default {
   margin-bottom: 50px;
 }
 .wallet-btn {
+  height: 66px;
   padding: 15px;
   display: flex;
   justify-content: flex-start;

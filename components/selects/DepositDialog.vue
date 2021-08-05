@@ -265,6 +265,5 @@ export default {
 
 
 <style lang="scss" scoped>
-// @import "./-Dialog.scss";
 @import '~/assets/stylesheets/components/dialog.scss';
 </style>

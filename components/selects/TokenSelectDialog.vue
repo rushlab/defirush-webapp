@@ -165,7 +165,7 @@ export default {
     height: 48px;
     line-height: 48px;
     color: $--color-text-primary;
-    background-color: $color-input-bg;
+    background-color: $--input-background-color;
     font-size: 16px;
     color: $--color-text-primary;
     border: none;
@@ -202,7 +202,7 @@ export default {
   margin-right: 10px;
   margin-bottom: 10px;
   &:hover {
-    background-color: $color-input-bg;
+    background-color: $--input-background-color;
   }
   .common-item__symbol {
     margin-left: 10px;
@@ -230,7 +230,7 @@ export default {
   cursor: pointer;
   padding: 15px 30px;
   &:hover {
-    background-color: $color-input-bg;
+    background-color: $--input-background-color;
   }
 }
 .token__caption {
