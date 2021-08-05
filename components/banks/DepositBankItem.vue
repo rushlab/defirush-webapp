@@ -34,7 +34,7 @@
       </el-table-column>
       <el-table-column label="Action" width="120">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" round @click="isVisible = true" :disabled="disabledDeposit">Deposit</el-button>
+          <el-button type="primary" size="small" round @click="handleClickBtn" :disabled="disabledDeposit">Deposit</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -84,6 +84,7 @@ export default {
     }
   },
   computed: {
+    ...mapState('auth', ['walletChainId', 'walletAddress', 'isAuthenticated', 'isSignerAlive']),
     disabledDeposit() {
       return _.isEmpty(this.underlyingTokenData) || this.disabled
     },
@@ -136,6 +137,18 @@ export default {
     },
     onDepositSuccess(amountDisplay) {
       this.getAllData()
+    },
+    handleClickBtn() {
+      if (!this.isSignerAlive) {
+        this.$alert('Cannot handle asset deposit without connecting to wallet, please connect your wallet first!', 'Notice', {
+          confirmButtonText: 'OK',
+          callback: action => {
+
+          }
+        })
+      } else {
+        this.isVisible = true
+      }
     },
     estimateGas() {},
   },

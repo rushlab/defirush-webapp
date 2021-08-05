@@ -172,6 +172,7 @@
 
 <script>
 import _ from 'lodash'
+import { mapState } from 'vuex'
 import dayjs from 'dayjs'
 import BankSelect from '@/components/BankSelect'
 import WithdrawDialog from '@/components/selects/WithdrawDialog'
@@ -220,6 +221,7 @@ export default {
     }
   },
   computed: {
+    ...mapState('auth', ['isSignerAlive']),
     userDepositsUSD() {
       const { userDepositsUSD } = this.bankPortfolio.summary
       return +userDepositsUSD
@@ -294,15 +296,29 @@ export default {
       this.$router.push(`/portfolio/${bankName}`)
     },
     onWithdraw(underlyingToken) {
-      this.withdrawDialog = {
-        underlyingToken: { ...underlyingToken },
-        visible: true,
+      if (!this.isSignerAlive) {
+        this.$alert('Cannot handle asset deposit without connecting to wallet, please connect your wallet first!', 'Notice', {
+          confirmButtonText: 'OK',
+          callback: action => {}
+        })
+      } else {
+        this.withdrawDialog = {
+          underlyingToken: { ...underlyingToken },
+          visible: true,
+        }
       }
     },
     onRepay(tokenData) {
-      this.repayDialog = {
-        underlyingToken: { ...tokenData },
-        visible: true,
+      if (!this.isSignerAlive) {
+        this.$alert('Cannot handle asset deposit without connecting to wallet, please connect your wallet first!', 'Notice', {
+          confirmButtonText: 'OK',
+          callback: action => {}
+        })
+      } else {
+        this.repayDialog = {
+          underlyingToken: { ...tokenData },
+          visible: true,
+        }
       }
     }
   }

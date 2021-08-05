@@ -37,7 +37,7 @@
       </el-table-column>
       <el-table-column label="action" width="120">
         <template slot-scope="scope">
-          <el-button type="success" size="small" round @click="isVisible = true" :disabled="disabledBorrow">Borrow</el-button>
+          <el-button type="success" size="small" round @click="handleClickBtn" :disabled="disabledBorrow">Borrow</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -89,6 +89,7 @@ export default {
     }
   },
   computed: {
+    ...mapState('auth', ['walletChainId', 'walletAddress', 'isAuthenticated', 'isSignerAlive']),
     disabledBorrow() {
       return _.isEmpty(this.underlyingTokenData) || this.disabled
     },
@@ -153,6 +154,18 @@ export default {
     },
     onBorrowSuccess() {
       this.getAllData()
+    },
+    handleClickBtn() {
+      if (!this.isSignerAlive) {
+        this.$alert('Cannot handle asset borrow without connecting to wallet, please connect your wallet first!', 'Notice', {
+          confirmButtonText: 'OK',
+          callback: action => {
+
+          }
+        })
+      } else {
+        this.isVisible = true
+      }
     },
     estimateGas() {},
   },
