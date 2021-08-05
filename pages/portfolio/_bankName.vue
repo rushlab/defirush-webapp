@@ -99,15 +99,15 @@
           </template>
         </el-table-column>
         <el-table-column label="CF">
-          <template slot-scope="{ row }">-</template>
-        </el-table-column>
-        <el-table-column label="APY" width="160">
           <div class="table-column-label" slot="header">
-            <span>APY</span><!--
+            <span>CF</span><!--
             --><el-tooltip effect="dark" content="Collateral factor" placement="top">
               <i class="el-icon-question"></i>
             </el-tooltip>
           </div>
+          <template slot-scope="{ row }">-</template>
+        </el-table-column>
+        <el-table-column label="APY" width="160">
           <template slot-scope="{ row }">{{ formatPercentage(row.depositAPY) }}</template>
         </el-table-column>
         <el-table-column label="Action" width="200" align="center">
