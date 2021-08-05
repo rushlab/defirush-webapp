@@ -31,6 +31,8 @@ export const formatDateTime = (value) => {
 }
 
 export const safeToFixed = (number, decimals) => {
+  // (0.2313871230128309).toFixed(20) 后面补的不是全部 0
+  // TODO 处理一下补全 0, 现在只做了截断
   if (number.toString().indexOf('e') >= 0) {
     return number.toFixed(decimals)
   } else {
@@ -40,6 +42,6 @@ export const safeToFixed = (number, decimals) => {
   }
 }
 
-export const stringToNumber = (val) => {
+export const toNumberOrZero = (val) => {
   return +val || 0
 }

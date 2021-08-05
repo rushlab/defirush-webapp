@@ -56,7 +56,7 @@
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import { ethers } from 'ethers'
-import { formatCurrency, safeToFixed, stringToNumber } from '@/utils/formatter'
+import { formatCurrency, safeToFixed, toNumberOrZero } from '@/utils/formatter'
 
 export default {
   name: 'BorrowDialog',
@@ -80,7 +80,7 @@ export default {
   },
   data() {
     const validationAmount = (rule, value, callback) => {
-      value = stringToNumber(value)
+      value = toNumberOrZero(value)
       if (!value || value < 0) {
         callback(new Error('Amount is required'))
       } else if (value > this.amountMaxDisplay) {
@@ -131,7 +131,7 @@ export default {
     availableBorrowsDisplay() {
       const { availableBorrowsUSD = 0 } = this.accountData
       const { priceUSD = 0 } = this.assetData
-      return stringToNumber(priceUSD) == 0 ? '-' : (stringToNumber(availableBorrowsUSD) / stringToNumber(priceUSD)).toString()
+      return toNumberOrZero(priceUSD) == 0 ? '-' : (toNumberOrZero(availableBorrowsUSD) / toNumberOrZero(priceUSD)).toString()
     },
     amountMaxDisplay() {
       return this.availableBorrowsDisplay
@@ -141,23 +141,23 @@ export default {
     },
     borrowRate() {
       const { userBorrowsUSD = 0, availableBorrowsUSD = 0 } = this.accountData
-      const creditUSD = stringToNumber(userBorrowsUSD) + stringToNumber(availableBorrowsUSD)
-      return creditUSD > 0 ? (stringToNumber(userBorrowsUSD) / creditUSD).toString() : '0.00'
+      const creditUSD = toNumberOrZero(userBorrowsUSD) + toNumberOrZero(availableBorrowsUSD)
+      return creditUSD > 0 ? (toNumberOrZero(userBorrowsUSD) / creditUSD).toString() : '0.00'
     },
     collateralRatio() {
       const { userBorrowsUSD = 0, userDepositsUSD = 0} = this.accountData
-      return userBorrowsUSD == 0 ? '-' : ((stringToNumber(userDepositsUSD) / stringToNumber(userBorrowsUSD) * 100).toFixed(2) + '%')
+      return userBorrowsUSD == 0 ? '-' : ((toNumberOrZero(userDepositsUSD) / toNumberOrZero(userBorrowsUSD) * 100).toFixed(2) + '%')
     },
     amountToUSD() {
       const { priceUSD = 0 } = this.assetData
-      return (stringToNumber(this.form.amountDisplay) * stringToNumber(priceUSD)).toString()
+      return (toNumberOrZero(this.form.amountDisplay) * toNumberOrZero(priceUSD)).toString()
     },
     increasedTotalDebetUSD() {
-      return stringToNumber(this.currentDebtUSD) + stringToNumber(this.amountToUSD)
+      return toNumberOrZero(this.currentDebtUSD) + toNumberOrZero(this.amountToUSD)
     },
     updatedCollateralRatio() {
       const { userDepositsUSD = 0} = this.accountData
-      return this.increasedTotalDebetUSD == 0 ? '-' : ((stringToNumber(userDepositsUSD) / stringToNumber(this.increasedTotalDebetUSD) * 100).toFixed(2) + '%')
+      return this.increasedTotalDebetUSD == 0 ? '-' : ((toNumberOrZero(userDepositsUSD) / toNumberOrZero(this.increasedTotalDebetUSD) * 100).toFixed(2) + '%')
     }
   },
   watch: {
@@ -170,9 +170,9 @@ export default {
   },
   methods: {
     formatCurrency,
-    stringToNumber,
+    toNumberOrZero,
     formatPercentage(val) {
-      return (stringToNumber(val) * 100).toFixed(2) + '%'
+      return (toNumberOrZero(val) * 100).toFixed(2) + '%'
     },
     async onDialogOpen() {
       this.$emit('open')
@@ -219,13 +219,13 @@ export default {
       this._updatePrecentageFromAmount()
     },
     _updatePrecentageFromAmount() {
-      this.form.amountSlideValue = stringToNumber(this.amountMaxDisplay) > 0 ? (stringToNumber(this.form.amountDisplay) / stringToNumber(this.amountMaxDisplay)) * 100 : 0
+      this.form.amountSlideValue = toNumberOrZero(this.amountMaxDisplay) > 0 ? (toNumberOrZero(this.form.amountDisplay) / toNumberOrZero(this.amountMaxDisplay)) * 100 : 0
     },
     onChangeSlideValue() {
       this._updateAmountFromPrecentage()
     },
     _updateAmountFromPrecentage() {
-      const res = (stringToNumber(this.amountMaxDisplay)) * parseInt(this.form.amountSlideValue) / 100
+      const res = (toNumberOrZero(this.amountMaxDisplay)) * parseInt(this.form.amountSlideValue) / 100
       this.form.amountDisplay = safeToFixed(res, this.underlyingAssetDecimals)
     },
     async handleBorrow() {
