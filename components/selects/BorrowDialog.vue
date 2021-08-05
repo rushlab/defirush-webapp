@@ -10,7 +10,7 @@
             <span class="collateral-label">Current Debt:&nbsp;</span><span class="collateral-value">{{ accountAssetData.userBorrows }} {{ underlyingAssetSymbol }}</span>
           </div>
           <div class="collateral-info">
-            <span class="collateral-label">Borrow Rate:&nbsp;</span><span class="collateral-value">{{ formatPercentage(assetData.borrowAPY) }}</span>
+            <span class="collateral-label">Borrow APY:&nbsp;</span><span class="collateral-value">{{ formatPercentage(assetData.borrowAPY) }}</span>
           </div>
 
           <div class="input-hint">How much collateral do you want to borrow?</div>

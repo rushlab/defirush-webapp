@@ -43,7 +43,6 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/assets/stylesheets/variables.scss";
-
 .btn-group {
   display: flex;
   justify-content: flex-start;
@@ -72,4 +71,3 @@ export default {
   }
 }
 </style>
-

@@ -1,13 +1,6 @@
 <template>
   <div>
-    <div class="page--borrow">
-      <el-form>
-        <el-form-item>
-          <bank-select :value="bankName" @change="changeBankRoute"/>
-        </el-form-item>
-      </el-form>
-    </div>
-
+    <bank-select :value="bankName" @change="changeBankRoute"/>
     <div class="bank-data-card">
       <el-row :gutter="20">
         <el-col :span="12">

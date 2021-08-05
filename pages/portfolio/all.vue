@@ -1,13 +1,6 @@
 <template>
   <div>
-    <div class="page--borrow">
-      <el-form>
-        <el-form-item>
-          <bank-select :value="bankName" @change="changeBankRoute"/>
-        </el-form-item>
-      </el-form>
-    </div>
-
+    <bank-select :value="bankName" @change="changeBankRoute"/>
     <div class="bank-data-card">
       <div class="card__row">
         <div class="data-item">
@@ -64,33 +57,33 @@
                 </div>
               </div>
             </el-table-column>
-            <el-table-column label="Supplying">
+            <el-table-column label="APY" width="80" align="center">
+              <template slot-scope="{ row }">{{ formatPercentage(row.averageDepositAPY) }}</template>
+            </el-table-column>
+            <el-table-column label="Supplying" align="right">
               <template slot-scope="{ row }">
                 <div>{{ row.userDeposits }} {{ row.underlyingToken.symbol }}</div>
                 <div class="asset-value-to-usd">{{ formatCurrency(row.userDepositsUSD) }}</div>
               </template>
             </el-table-column>
-            <el-table-column label="APY" width="80">
-              <template slot-scope="{ row }">{{ formatPercentage(row.averageDepositAPY) }}</template>
-            </el-table-column>
-            <el-table-column width="60">
+            <el-table-column width="80" align="center">
               <template slot-scope="{ row }">
-                <el-popover popper-class="apy-popover" placement="left" width="320" trigger="hover">
+                <el-popover popper-class="tables-popover" placement="left" width="400" trigger="hover">
                   <el-table :data="banksDepositsTableData(row.underlyingToken)">
-                    <el-table-column width="120" property="" label="Bank">
+                    <el-table-column width="160" label="Bank">
                       <template slot-scope="{ row: popoverRow }">
                         <el-image :src="popoverRow.bank.logo" style="width: 28px; height: 28px; display: inline-block;vertical-align: middle;"></el-image>
                         <span style="display: inline-block;line-height: 28px;vertical-align: middle;">{{ popoverRow.bank.title }}</span>
                       </template>
                     </el-table-column>
-                    <el-table-column property="apy" label="Supplying">
+                    <el-table-column width="80" label="APY" align="center">
+                      <template slot-scope="{ row: popoverRow }">{{ formatPercentage(popoverRow.depositAPY) }}</template>
+                    </el-table-column>
+                    <el-table-column label="Supplying" align="right">
                       <template slot-scope="{ row: popoverRow }">
                         <div>{{ popoverRow.userDeposits }} {{ row.underlyingToken.symbol }}</div>
                         <div class="asset-value-to-usd">{{ formatCurrency(popoverRow.userDepositsUSD) }}</div>
                       </template>
-                    </el-table-column>
-                    <el-table-column width="80" property="apy" label="APY">
-                      <template slot-scope="{ row: popoverRow }">{{ formatPercentage(popoverRow.depositAPY) }}</template>
                     </el-table-column>
                   </el-table>
                   <i slot="reference" class="el-icon-view"></i>
@@ -118,33 +111,33 @@
                 </div>
               </div>
             </el-table-column>
-            <el-table-column label="Borrowing">
+            <el-table-column label="APY" width="80" align="center">
+              <template slot-scope="{ row }">{{ formatPercentage(row.averageBorrowAPY) }}</template>
+            </el-table-column>
+            <el-table-column label="Borrowing" align="right">
               <template slot-scope="{ row }">
                 <div>{{ row.userBorrows }} {{ row.underlyingToken.symbol }}</div>
                 <div class="asset-value-to-usd">{{ formatCurrency(row.userBorrowsUSD) }}</div>
               </template>
             </el-table-column>
-            <el-table-column label="APY" width="80">
-              <template slot-scope="{ row }">{{ formatPercentage(row.averageBorrowAPY) }}</template>
-            </el-table-column>
-            <el-table-column width="60">
+            <el-table-column width="80" align="center">
               <template slot-scope="{ row }">
-                <el-popover popper-class="apy-popover" placement="left" width="320" trigger="hover">
+                <el-popover popper-class="tables-popover" placement="left" width="400" trigger="hover">
                   <el-table :data="banksBorrowsTableData(row.underlyingToken)">
-                    <el-table-column width="120" property="" label="Bank">
+                    <el-table-column width="160" label="Bank">
                       <template slot-scope="{ row: popoverRow }">
                         <el-image :src="popoverRow.bank.logo" style="width: 28px; height: 28px; display: inline-block;vertical-align: middle;"></el-image>
                         <span style="display: inline-block;line-height: 28px;vertical-align: middle;">{{ popoverRow.bank.title }}</span>
                       </template>
                     </el-table-column>
-                    <el-table-column property="apy" label="Borrowing">
+                    <el-table-column width="80" label="APY" align="center">
+                      <template slot-scope="{ row: popoverRow }">{{ formatPercentage(popoverRow.borrowAPY) }}</template>
+                    </el-table-column>
+                    <el-table-column label="Borrowing" align="right">
                       <template slot-scope="{ row: popoverRow }">
                         <div>{{ popoverRow.userBorrows }} {{ row.underlyingToken.symbol }}</div>
                         <div class="asset-value-to-usd">{{ formatCurrency(popoverRow.userBorrowsUSD) }}</div>
                       </template>
-                    </el-table-column>
-                    <el-table-column width="80" property="apy" label="APY">
-                      <template slot-scope="{ row: popoverRow }">{{ formatPercentage(popoverRow.borrowAPY) }}</template>
                     </el-table-column>
                   </el-table>
                   <i slot="reference" class="el-icon-view"></i>
