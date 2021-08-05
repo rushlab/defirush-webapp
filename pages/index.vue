@@ -23,7 +23,6 @@ export default {
   },
   methods: {
     onSelectToken(token) {
-      console.log(12345, token)
     }
   },
 }

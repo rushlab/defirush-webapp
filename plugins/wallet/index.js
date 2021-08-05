@@ -56,7 +56,6 @@ function listenToMetaMask(store) {
       selectedChainId = +((await signer.provider.getNetwork()).chainId)
       selectedAddress = await signer.getAddress()
     } catch(error) {}  // 无法获取就直接忽略, 然后更新 signer 状态
-    console.log(walletChainId, walletAddress, selectedChainId, selectedAddress)
     if (!selectedChainId || !selectedAddress) {
       store.commit('auth/setSignerStatus', false)
     } else if (+walletChainId === selectedChainId && walletAddress.toLowerCase() === selectedAddress.toLowerCase()) {

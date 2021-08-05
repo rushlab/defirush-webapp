@@ -130,7 +130,6 @@ export default {
     },
     async checkSimulationNetwork() {
       try {
-        console.log('@@@ checkSimulationNetwork', this.simulationChainId)
         await this.execSwitchChainId(this.simulationChainId)
       } catch (error) {
         console.log('@@@ checkSimulationNetwork', error)

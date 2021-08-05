@@ -79,12 +79,10 @@ async function listMarkets() {
 
 async function run() {
   const tokens = await listMarkets()
-  console.log(`${tokens.length} tokens fetched`)
   for (const token of tokens) {
     try {
       // 会直接修改 token 的内容
       await fetchToken(token)
-      console.log(`Token ${token.symbol} fetched`)
       await save(tokens)
     } catch(error) {
       console.log(token.symbol, error)

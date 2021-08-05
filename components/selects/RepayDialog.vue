@@ -193,7 +193,6 @@ export default {
       } else {
         const { address } = this.underlyingTokenData
         this.balanceDisplay = await this.$wallet.getBalance(address)
-        console.log('@@@ getBalanceDisplay', address, this.balanceDisplay)
       }
     },
     onDialogClose() {
@@ -231,7 +230,6 @@ export default {
     async handleRepay() {
       try {
         this.isRepaying = true
-        console.log(this.underlyingTokenData.address, this.form.amountDisplay)
         await this.bankApp.repay(this.underlyingTokenData.address, this.form.amountDisplay)
         this.$message({type: 'success', message: 'Repay succeed!'})
         this.handleRepaySuccess()

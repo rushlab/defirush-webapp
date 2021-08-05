@@ -25,7 +25,6 @@ const fetchCrTokens = async () => {
       ], ethers.provider);
       result.underlyingSymbol = await erc20Token.symbol();
     }
-    console.log(result);
     results.push(result);
   }
   const content = JSON.stringify(results, null, 2);

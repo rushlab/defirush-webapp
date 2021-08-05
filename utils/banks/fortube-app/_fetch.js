@@ -12,7 +12,7 @@ const fetchFTokens = async () => {
   const fTokensAddresses = await bankController.getAllMarkets();
 
   for (let address of fTokensAddresses) {
-    
+
     const fToken = new ethers.Contract(address, [
       'function symbol() view returns (string)',
       'function underlying() view returns (address)',
@@ -30,7 +30,6 @@ const fetchFTokens = async () => {
       ], ethers.provider);
       result.underlyingSymbol = await erc20Token.symbol().catch((err) => '');
     }
-    console.log(result);
     results.push(result);
   }
   const content = JSON.stringify(results, null, 2);
