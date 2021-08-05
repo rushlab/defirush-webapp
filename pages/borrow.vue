@@ -46,7 +46,7 @@
           </template>
         </el-table-column>
         <el-table-column label="Gas Fee" width="120" align="center"></el-table-column>
-        <el-table-column label="Action" width="120" align="center"></el-table-column>
+        <el-table-column label="Action" width="160" align="center"></el-table-column>
         <span slot="empty"></span>
       </el-table>
       <borrow-bank-item

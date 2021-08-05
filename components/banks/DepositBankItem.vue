@@ -30,7 +30,7 @@
       <el-table-column label="Gas Fee" width="120" align="center">
         <template slot-scope="{ row }">-</template>
       </el-table-column>
-      <el-table-column label="Action" width="120" align="center">
+      <el-table-column label="Action" width="160" align="center">
         <template slot-scope="{ row }">
           <el-button type="primary" size="small" round @click="handleClickBtn" :disabled="disabledDeposit">Deposit</el-button>
         </template>
