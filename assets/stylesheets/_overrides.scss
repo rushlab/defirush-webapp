@@ -1,35 +1,26 @@
-// table styles
-.el-table th > .cell {
-  font-weight: 400 !important;
+.el-table th,
+.el-table thead {
+  font-weight: normal;
 }
 
 .v-modal {
   opacity: 0.9;
 }
 
-.apy-popover {
+.tables-popover {
   padding: 0;
   border-radius: 8px;
   border: none;
-  .el-table {
-    border-radius: 8px;
-    overflow: hidden;
+  overflow: hidden;
+  .el-table::before {
+    display: none;
   }
-  .el-table__header,
+  .el-table td,
+  .el-table th {
+    border-color: transparent;
+  }
   .el-table th {
     background-color: #f9f9f9;
-  }
-  .el-table__header,
-  .el-table__body {
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-  .el-table__header {
-    font-size: 14px;
-    color: $--color-text-primary;
-  }
-  .el-table td, .el-table th.is-leaf {
-    border: none;
   }
 }
 
@@ -80,25 +71,4 @@
 .el-dropdown-menu__item:not(.is-disabled):hover,
 .el-dropdown-menu__item:focus {
   background-color: $--input-background-color;
-}
-
-.el-popover {
-  .el-table__body {
-    // padding-left: 0;
-    // padding-right: 0;
-  }
-  .el-table__header,
-  .el-table__body,
-  .el-table__footer {
-    table-layout: initial;
-  }
-  .el-table__body {
-    // padding: 0;
-  }
-  .el-table--enable-row-hover .el-table__body tr:hover > td {
-    // background-color: transparent;
-  }
-  .el-table tr:hover {
-    background-color: $--input-background-color;
-  }
 }
