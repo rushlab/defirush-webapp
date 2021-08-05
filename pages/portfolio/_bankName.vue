@@ -57,7 +57,11 @@
             <div class="card__row">
               <div class="data-item">
                 <div class="data-item__label">
-                  <span>Utilization</span> <span class="utilization-tag" :class="{'is-danger': isDanger}">{{ isDanger ? 'Danger' : 'Safe' }}: {{ formatPercentage(utilization) }}</span>
+                  <span>Utilization</span>&nbsp;<!--
+                  --><el-tooltip effect="dark" content="The ratio of your debt to your credit limit. If it hits 100%, your loan will be liquidated." placement="top">
+                    <i class="el-icon-question"></i>
+                  </el-tooltip><!--
+                  --><span class="utilization-tag" :class="{'is-danger': isDanger}">{{ isDanger ? 'Danger' : 'Safe' }}: {{ formatPercentage(utilization) }}</span>
                 </div>
                 <div class="data-item__value">
                   <div class="utilization-progress-bar">
@@ -68,7 +72,6 @@
                       :percentage="utilization * 100"
                       :color="progressCustomColors"></el-progress>
                   </div>
-                  <div class="utilization-hint">The ratio of your debt to your credit limit. If it hits 100%, your loan will be liquidated.</div>
                 </div>
               </div>
             </div>

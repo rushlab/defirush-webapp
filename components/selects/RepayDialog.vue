@@ -6,8 +6,8 @@
     <div class="dialog__inner" v-loading="pending || isApproving || isRepaying" element-loading-background="rgba(0, 0, 0, 0)">
       <el-form :model="form">
         <el-form-item>
-          <div class="collateral-info">
-            <span class="collateral-label">Wallet balance:&nbsp;</span><span class="collateral-value">{{ balanceDisplay }} {{ underlyingAssetSymbol }}</span>
+          <div class="input-hint">
+            <span>Wallet balance:&nbsp;</span><span class="collateral-value">{{ balanceDisplay }} {{ underlyingAssetSymbol }}</span>
           </div>
           <div class="input-hint">How much collateral do you want to repay?</div>
           <el-input

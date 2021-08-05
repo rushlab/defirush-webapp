@@ -49,7 +49,12 @@
       <el-col :span="12">
         <el-card header="Collateral" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
           <h2 slot="header">Collateral</h2>
-          <el-table :data="depositsTableData" v-loading="!!pending" element-loading-spinner="el-icon-loading" element-loading-background="transparent">
+          <el-table
+            :data="depositsTableData"
+            v-loading="!!pending"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="transparent"
+          >
             <el-table-column label="Asset">
               <div slot-scope="{ row }" class="asset-info">
                 <img :src="row.underlyingToken.logoURI">
@@ -98,7 +103,12 @@
       <el-col :span="12">
         <el-card header="Debts" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
           <h2 slot="header">Debts</h2>
-          <el-table :data="borrowsTableData" v-loading="!!pending" element-loading-spinner="el-icon-loading" element-loading-background="transparent">
+          <el-table
+            :data="borrowsTableData"
+            v-loading="!!pending"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="transparent"
+          >
             <el-table-column label="Asset">
               <div slot-scope="{ row }" class="asset-info">
                 <img :src="row.underlyingToken.logoURI">
