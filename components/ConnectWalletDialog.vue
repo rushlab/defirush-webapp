@@ -1,0 +1,288 @@
+<!-- dialog 返回的是整个对象, select 组件返回 id -->
+<template>
+  <el-dialog
+    class="dialog--connect"
+    :title="dialogTitle"
+    width="540px" top="10vh"
+    :append-to-body="true"
+    :modal-append-to-body="true"
+    :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose"
+  >
+    <div class="dialog__inner" element-loading-background="rgba(0, 0, 0, 0)">
+      <template v-if="!address">
+        <!-- 选择钱包，点击链接 -->
+        <div class="dialog__notice">Please select a wallet to connect:</div>
+        <div class="wallet-items">
+          <button
+            class="wallet-btn"
+            :disabled="isConnecting"
+            @click="connectBrowserWallet">
+            <metamask-logo class="wallet-icon" /> <span>MetaMask</span>
+          </button>
+          <button
+            class="wallet-btn"
+            :disabled="isConnecting"
+            @click="connectBrowserWallet">
+            <img class="wallet-icon--img" src="~/assets/icons/wallet-connect.png" alt=""> <span>WalletConnect</span>
+          </button>
+        </div>
+        <a href="javascript:void(0);" class="help-hint">What is a wallet?</a>
+      </template>
+
+      <template v-if="address && !verified">
+        <!-- 没有验证过，点击进行验证 -->
+        <div class="input-hint">Please sign to let us verify that you are the owner of this address</div>
+        <div class="dialog-verify__address">{{ address }}</div>
+      </template>
+    </div>
+    <div
+      v-if="address && !verified"
+      slot="footer" class="dialog-footer">
+      <el-button
+        type="primary"
+        class="btn--dark footer__btn"
+        :disabled="isVerifying"
+        :loading="isVerifying"
+        @click="verifyUserWallet">Verify</el-button>
+    </div>
+  </el-dialog>
+</template>
+
+<script>
+import _ from 'lodash'
+import { ethers } from 'ethers'
+import { mapState, mapGetters, mapActions } from 'vuex'
+import MetamaskLogo from '@/components/MetamaskLogo'
+
+export default {
+  name: 'ConnectWalletDialog',
+  components: {
+    MetamaskLogo,
+  },
+  props: {
+    visible: {
+      type: Boolean,
+      required: true
+    },
+  },
+  data() {
+    return {
+      isVisible: this.visible,
+      address: '',
+      signer: null,
+      verified: false,
+      isConnecting: false,
+      isVerifying: false,
+    }
+  },
+  computed: {
+    dialogTitle() {
+      if (!this.address) return 'Sellect a Wallet'
+      if (this.address && !this.verified) return 'Verify'
+      return ''
+    },
+  },
+  mounted() {},
+  methods: {
+    onDialogOpen() {
+      this.$emit('open')
+      this.$emit('update:visible', true)
+    },
+    onDialogClose() {
+      this.$emit('close')
+      this.$emit('update:visible', false)
+    },
+    async connectBrowserWallet() {
+      if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
+        this.isConnecting = true
+        try {
+          await global.ethereum.request({ method: 'eth_requestAccounts' })
+        } catch(error) {
+          console.log(error)
+          this.isVisible = false
+        }
+        const provider = new ethers.providers.Web3Provider(global.ethereum)
+        const signer = provider.getSigner()
+        const address = await signer.getAddress()
+        this.signer = signer
+        this.address = address
+        this.isConnecting = false
+      } else {
+        this.$confirm('请先安装 MetaMask 扩展应用', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          window.open('https://metamask.io/download.html')
+        }).catch(() => {})
+      }
+    },
+    async verifyUserWallet() {
+      const { signer, address } = this
+      const tip = 'Please sign to let us verify that you are the owner of this address'
+      const timestamp = (new Date()).valueOf()
+      const message = `${tip}\n${address}\n${timestamp}`
+      let signature, signerAddress, chainId
+      this.isVerifying = true
+      try {
+        chainId = (await signer.provider.getNetwork()).chainId
+        signature = await signer.signMessage(message)
+        signerAddress = await ethers.utils.verifyMessage(message, signature)
+      } catch(error) {
+        this.$message.error(error.message || error.toString())
+        return
+      }
+      this.isVerifying = false
+      if (signerAddress.toLowerCase() === address.toLowerCase()) {
+        this.isVisible = false
+        this.verified = true
+        await this.$store.dispatch('auth/login', { chainId, address, message, signature })
+      } else {
+        this.$message.error('Wrong signature ...... ')
+      }
+    },
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+@import "@/assets/stylesheets/variables.scss";
+.dialog--connect {
+  /deep/ {
+    .el-dialog {
+      background-color: $--background-color-base;
+      border: 1px solid $--border-color-base;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .el-dialog__title {
+      font-size: 24px;
+    }
+    .el-dialog__header {
+      padding: 15px 30px;
+      border-bottom: 1px solid $--border-color-base;
+    }
+    .el-dialog__body {
+      padding: 20px 30px 40px;
+    }
+    .el-dialog__footer {
+      padding: 0;
+    }
+    .el-loading-spinner .path {
+      stroke: $--color-text-primary;
+    }
+  }
+}
+// dialog styles
+.wallet-items {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+.wallet-btn {
+  height: 66px;
+  padding: 15px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  border: none;
+  background-color: #E6E8EC;
+  flex: 1;
+  cursor: pointer;
+  &:hover,
+  &:active {
+    box-shadow: inset 0 0 1px 0px rgba(0, 0, 0, 0.2);
+  }
+  & + & {
+    margin-left: 25px;
+  }
+  .wallet-icon {
+    height: 36px;
+    width: 36px;
+    margin-right: 15px;
+  }
+  .wallet-icon--img {
+    width: 36px;
+    margin-right: 15px;
+  }
+  > span {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 28px;
+  }
+}
+.dialog__notice {
+  font-size: 16px;
+  line-height: 1;
+  margin-bottom: 10px;
+  color: $--color-text-secondary;
+}
+.balance-hint {
+  display: block;
+  text-align: right;
+  line-height: 20px;
+  margin: 5px 0 10px;
+  color: #858E99;
+}
+.balance__value {
+  color: $--color-text-primary;
+}
+.dialog__hints {
+  padding: 0;
+  margin-top: 60px;
+  color: $--color-text-regular;
+  .hints-title {
+    font-size: 18px;
+    color: $--color-text-primary;
+  }
+  ul {
+    padding-left: 20px;
+    margin-top: 10px;
+  }
+  li {
+    line-height: 1.7;
+  }
+}
+.dialog-footer {
+  height: 80px;
+}
+.footer__btn {
+  display: block;
+  height: 80px;
+  width: 100%;
+  line-height: 40px;
+  padding: 20px;
+  outline: none;
+  appearance: none;
+  border: none;
+  border-radius: 0;
+  position: relative;
+  font-size: 24px;
+  font-weight: 400;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-top: 1px solid $--border-color-base;
+  }
+}
+.help-hint {
+  font-size: 16px;
+  color: #033FFF;
+  cursor: pointer;
+}
+
+.dialog-verify__address {
+  margin-top: 50px;
+  margin-bottom: 20px;
+  color: $--color-text-primary;
+  background-color: #E6E8EC;
+  font-size: 16px;
+  padding: 25px 35px;
+}
+</style>

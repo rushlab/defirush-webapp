@@ -55,67 +55,22 @@
     <template v-else>
       <el-button
         type="primary" round
-        class="btn--dark"
+        class="btn--dark btn--connect"
         @click="openConnectDialog"
       >Connect Wallet</el-button>
     </template>
     <!-- connect dialog -->
-    <el-dialog
-      class="dialog-style-to-fix"
-      :title="dialogTitle"
-      width="540px" top="10vh"
-      :append-to-body="true"
-      :modal-append-to-body="true"
-      :visible.sync="connectDialog.visible"
-    >
-      <div class="dialog__inner" element-loading-background="rgba(0, 0, 0, 0)">
-        <template v-if="!connectDialog.address">
-          <!-- 选择钱包，点击链接 -->
-          <div class="input-hint">Please select a wallet to connect:</div>
-          <div class="wallet-items">
-            <button
-              class="wallet-btn"
-              :disabled="connectDialog.isConnecting"
-              @click="connectBrowserWallet">
-              <metamask-logo class="wallet-icon" /> <span>MetaMask</span>
-            </button>
-            <button
-              class="wallet-btn"
-              :disabled="connectDialog.isConnecting"
-              @click="connectBrowserWallet">
-              <img class="wallet-icon--img" src="~/assets/icons/wallet-connect.png" alt=""> <span>WalletConnect</span>
-            </button>
-          </div>
-          <a href="javascript(0);" class="help-hint">What is a wallet?</a>
-        </template>
-
-        <template v-if="connectDialog.address && !connectDialog.verified">
-          <!-- 没有验证过，点击进行验证 -->
-          <div class="input-hint">Please sign to let us verify that you are the owner of this address</div>
-          <div class="dialog-verify__address">{{ connectDialog.address }}</div>
-        </template>
-      </div>
-      <div
-        v-if="connectDialog.address && !connectDialog.verified"
-        slot="footer" class="dialog-footer">
-        <el-button
-          type="primary"
-          class="footer__btn"
-          :disabled="connectDialog.isVerifying"
-          :loading="connectDialog.isVerifying"
-          @click="verifyUserWallet">Verify</el-button>
-      </div>
-    </el-dialog>
+    <connect-wallet-dialog v-if="visibleConnectWallet" :visible.sync="visibleConnectWallet" />
   </div>
 </template>
 
 <script>
 import _ from 'lodash'
 import { ethers } from 'ethers'
-import dayjs from 'dayjs'
 import { mapState, mapGetters } from 'vuex'
 import MetamaskLogo from '@/components/MetamaskLogo'
 import CircleProgress from '@/components/CircleProgress'
+import ConnectWalletDialog from '@/components/ConnectWalletDialog'
 import { copyToClipboard } from '@/utils/copy'
 
 export default {
@@ -123,6 +78,7 @@ export default {
   components: {
     MetamaskLogo,
     CircleProgress,
+    ConnectWalletDialog,
   },
   data() {
     return {
@@ -141,6 +97,7 @@ export default {
       },
       progress: 0,
       gasPricePending: false,
+      visibleConnectWallet: false
     }
   },
   computed: {
@@ -159,15 +116,6 @@ export default {
       if (!walletAddress) return ''
       return walletAddress.substring(0, 6) + '...' + walletAddress.substring(walletAddress.length - 4)
     },
-    dialogTitle() {
-      if (!this.connectDialog.address) return 'Sellect a Wallet'
-      if (this.connectDialog.address && !this.connectDialog.verified) return 'Verify'
-      return ''
-    },
-    verifyBtnText() {
-      return this.connectDialog.isVerifying ? 'Verifying' : 'Verify'
-    },
-
   },
   mounted() {
     this.getGasPrice()
@@ -200,62 +148,6 @@ export default {
       } catch (error) {}
       this.gasPricePending = false
     },
-    async connectBrowserWallet() {
-      if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
-        this.connectDialog.isConnecting = true
-        try {
-          await global.ethereum.request({ method: 'eth_requestAccounts' })
-        } catch(error) {
-          console.log(error)
-          this.connectDialog.visible = false
-        }
-        const provider = new ethers.providers.Web3Provider(global.ethereum)
-        const signer = provider.getSigner()
-        const address = await signer.getAddress()
-        this.connectDialog.signer = signer
-        this.connectDialog.address = address
-        this.connectDialog.isConnecting = false
-      } else {
-        this.$confirm('请先安装 MetaMask 扩展应用', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          window.open('https://metamask.io/download.html')
-        }).catch(() => {})
-      }
-    },
-    async verifyUserWallet() {
-      const { signer, address } = this.connectDialog
-      const tip = 'Please sign to let us verify that you are the owner of this address'
-      const timestamp = (new Date()).valueOf()
-      const message = `${tip}\n${address}\n${timestamp}`
-      let signature, signerAddress, chainId
-      this.connectDialog.isVerifying = true
-      try {
-        chainId = (await signer.provider.getNetwork()).chainId
-        signature = await signer.signMessage(message)
-        signerAddress = await ethers.utils.verifyMessage(message, signature)
-      } catch(error) {
-        this.$message.error(error.message || error.toString())
-        return
-      }
-      this.connectDialog.isVerifying = false
-      if (signerAddress.toLowerCase() === address.toLowerCase()) {
-        this.connectDialog.visible = false
-        this.connectDialog.verified = true
-        await this.$store.dispatch('auth/login', { chainId, address, message, signature })
-      } else {
-        this.$message.error('Wrong signature ...... ')
-      }
-    },
-    async connectCurrentWallet() {
-      if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
-        try {
-          await global.ethereum.request({ method: 'eth_requestAccounts' })
-        } catch(error) {}
-      }
-    },
     async copyWalletAddress() {
       try {
         await this.copyToClipboard(this.walletAddress)
@@ -263,14 +155,15 @@ export default {
       } catch (error) {}
     },
     openConnectDialog() {
-      this.connectDialog = {
-        visible: true,
-        address: '',
-        signer: null,
-        verified: false,
-        isConnecting: false,
-        isVerifying: false
-      }
+      // this.connectDialog = {
+      //   visible: true,
+      //   address: '',
+      //   signer: null,
+      //   verified: false,
+      //   isConnecting: false,
+      //   isVerifying: false
+      // }
+      this.visibleConnectWallet = true
     },
     async handleLogout() {
       await this.$store.dispatch('auth/logout')
@@ -353,7 +246,7 @@ export default {
     margin: 10px auto;
   }
 }
-.btn--dark {
+.btn--connect {
   height: 40px;
   line-height: 22px;
   padding-top: 9px;
@@ -366,63 +259,6 @@ export default {
     opacity: 0.9;
   }
 }
-
-// dialog styles
-.wallet-items {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 50px;
-  margin-bottom: 50px;
-}
-.wallet-btn {
-  height: 66px;
-  padding: 15px;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  border: none;
-  background-color: #E6E8EC;
-  flex: 1;
-  cursor: pointer;
-  &:hover,
-  &:active {
-    box-shadow: inset 0 0 1px 0px rgba(0, 0, 0, 0.2);
-  }
-  & + & {
-    margin-left: 25px;
-  }
-  .wallet-icon {
-    height: 36px;
-    width: 36px;
-    margin-right: 15px;
-  }
-  .wallet-icon--img {
-    width: 36px;
-    margin-right: 15px;
-  }
-  > span {
-    font-size: 18px;
-    font-weight: 400;
-    line-height: 28px;
-  }
-}
-.help-hint {
-  font-size: 16px;
-  color: #033FFF;
-  cursor: pointer;
-}
-
-.dialog-verify__address {
-  margin-top: 50px;
-  margin-bottom: 20px;
-  color: $--color-text-primary;
-  background-color: #E6E8EC;
-  font-size: 16px;
-  padding: 25px 35px;
-}
-
 
 .gas-fee-btn {
   width: 40px;
@@ -522,6 +358,9 @@ export default {
     line-height: 10px;
     color: #777E91;
   }
+}
+.dialog--connect {
+
 }
 /deep/ {
   .el-dialog__body {
