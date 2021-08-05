@@ -7,7 +7,7 @@
       <el-form :model="form">
         <el-form-item>
           <div class="collateral-info">
-            <span class="collateral-label">Current Debt:&nbsp;</span><span class="collateral-value">{{ accountAssetData.userBorrows }}</span>
+            <span class="collateral-label">Current Debt:&nbsp;</span><span class="collateral-value">{{ accountAssetData.userBorrows }} {{ underlyingAssetSymbol }}</span>
           </div>
           <div class="collateral-info">
             <span class="collateral-label">Borrow Rate:&nbsp;</span><span class="collateral-value">{{ formatPercentage(assetData.borrowAPY) }}</span>
@@ -18,7 +18,7 @@
             class="dialog-input"
             v-model="form.amountDisplay"
             @input="onInputAmountDisplay"
-            :disabled="!+amountMaxDisplay || !underlyingAssetDecimals">
+            :disabled="pending || !+amountMaxDisplay || !underlyingAssetDecimals">
             <div slot="append">{{ underlyingAssetSymbol }}</div>
           </el-input>
           <div class="balance-hint">Available to borrow: <strong class="balance__value">{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div>
@@ -30,7 +30,7 @@
             :show-tooltip="false"
             v-model="form.amountSlideValue"
             @change="onChangeSlideValue"
-            :disabled="!+amountMaxDisplay || !underlyingAssetDecimals"></el-slider>
+            :disabled="pending || !+amountMaxDisplay || !underlyingAssetDecimals"></el-slider>
         </el-form-item>
       </el-form>
       <div class="dialog__hints">
@@ -48,14 +48,14 @@
         type="primary"
         class="footer__btn"
         :loading="isApproving"
-        :disabled="pending || isApproving"
+        :disabled="pending || isApproving || !+form.amountDisplay"
         @click="handleApprove">Approve</el-button>
       <el-button
         v-else
         type="primary"
         class="footer__btn"
         :loading="isBorrowing"
-        :disabled="pending || isBorrowing"
+        :disabled="pending || isBorrowing || !+form.amountDisplay"
         @click="handleBorrow">Borrow</el-button>
     </div>
   </el-dialog>

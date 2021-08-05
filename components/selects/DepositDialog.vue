@@ -11,7 +11,7 @@
             class="dialog-input"
             v-model="form.amountDisplay"
             @input="onInputAmountDisplay"
-            :disabled="!+amountMaxDisplay || !underlyingAssetDecimals">
+            :disabled="pending || !+amountMaxDisplay || !underlyingAssetDecimals">
             <div slot="append">{{ underlyingAssetSymbol }}</div>
           </el-input>
           <div class="balance-hint">Wallet balance: <strong class="balance__value">{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div>
@@ -22,7 +22,7 @@
             :show-tooltip="false"
             v-model="form.amountSlideValue"
             @change="onChangeSlideValue"
-            :disabled="!+amountMaxDisplay || !underlyingAssetDecimals"></el-slider>
+            :disabled="pending || !+amountMaxDisplay || !underlyingAssetDecimals"></el-slider>
         </el-form-item>
       </el-form>
       <div class="dialog__hints">
@@ -44,13 +44,13 @@
         v-else-if="needApprove"
         class="footer__btn" type="primary"
         :loading="isApproving"
-        :disabled="pending || isApproving"
+        :disabled="pending || isApproving || !+form.amountDisplay"
         @click="handleApprove">Approve</el-button>
       <el-button
         v-else
         class="footer__btn" type="primary"
         :loading="isDepositing"
-        :disabled="pending || isDepositing"
+        :disabled="pending || isDepositing || !+form.amountDisplay"
         @click="handleDeposit" >Deposit</el-button>
     </div>
   </el-dialog>
