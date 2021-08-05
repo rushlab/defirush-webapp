@@ -11,7 +11,10 @@ export class WalletApp implements WalletInterface {
   }
 
   getAddress(): Address {
-    return this.$store.state.auth.walletAddress
+    // return this.$store.state.auth.walletAddress
+    // 无论如何返回个有效的地址, 这样合约不会出现无效地址(ENS)的错误, 0地址不会有余额没关系
+    const address = this.$store.state.auth.walletAddress
+    return address || '0x0000000000000000000000000000000000000000'
   }
 
   /**

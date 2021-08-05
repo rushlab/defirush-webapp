@@ -289,7 +289,9 @@ export default {
       const tableData = []
       _.forEach(this.banks, (bank) => {
         const bankPortfolio = this.bankPortfolioDict[bank.name]
-        if (!bankPortfolio) return
+        if (!bankPortfolio) {
+          return
+        }
         const depositData = bankPortfolio.depositsDict[underlyingToken.address.toLowerCase()]
         if (depositData) {
           const { userDeposits, depositAPY, userDepositsUSD } = depositData
@@ -305,7 +307,9 @@ export default {
       const tableData = []
       _.forEach(this.banks, (bank) => {
         const bankPortfolio = this.bankPortfolioDict[bank.name]
-        if (!bankPortfolio) return
+        if (!bankPortfolio) {
+          return
+        }
         const borrowData = bankPortfolio.borrowsDict[underlyingToken.address.toLowerCase()]
         if (borrowData) {
           const { userBorrows, borrowAPY, userBorrowsUSD } = borrowData
