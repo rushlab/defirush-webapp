@@ -1,14 +1,11 @@
 <!-- dialog 返回的是整个对象, select 组件返回 id -->
 <template>
   <el-dialog
-    class="dialog--connect"
-    :title="dialogTitle"
-    width="540px" top="10vh"
-    :append-to-body="true"
-    :modal-append-to-body="true"
+    class="dialog--connect" :title="dialogTitle" width="540px" top="10vh"
+    :append-to-body="true" :modal-append-to-body="true"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose"
   >
-    <div class="dialog__inner" element-loading-background="rgba(0, 0, 0, 0)">
+    <div class="dialog__inner">
       <template v-if="!address">
         <!-- 选择钱包，点击链接 -->
         <div class="dialog__notice">Please select a wallet to connect:</div>
@@ -77,19 +74,27 @@ export default {
   },
   computed: {
     dialogTitle() {
-      if (!this.address) return 'Sellect a Wallet'
+      if (!this.address) return 'Select a wallet'
       if (this.address && !this.verified) return 'Verify'
       return ''
     },
   },
   mounted() {},
   methods: {
+    resetStatus() {
+      this.address = ''
+      this.signer = null
+      this.verified = false
+      this.isConnecting = false
+      this.isVerifying = false
+    },
     onDialogOpen() {
-      this.$emit('open')
+      this.resetStatus()
+      // this.$emit('open')
       this.$emit('update:visible', true)
     },
     onDialogClose() {
-      this.$emit('close')
+      // this.$emit('close')
       this.$emit('update:visible', false)
     },
     async connectBrowserWallet() {
@@ -128,19 +133,26 @@ export default {
         chainId = (await signer.provider.getNetwork()).chainId
         signature = await signer.signMessage(message)
         signerAddress = await ethers.utils.verifyMessage(message, signature)
+        this.isVerifying = false
       } catch(error) {
+        this.isVerifying = false
         this.$message.error(error.message || error.toString())
         return
       }
-      this.isVerifying = false
       if (signerAddress.toLowerCase() === address.toLowerCase()) {
         this.isVisible = false
         this.verified = true
         await this.$store.dispatch('auth/login', { chainId, address, message, signature })
+        this.$message.success('Connected')
       } else {
         this.$message.error('Wrong signature ...... ')
       }
     },
+  },
+  watch: {
+    visible(newVal) {
+      this.isVisible = newVal
+    }
   }
 }
 </script>
@@ -226,9 +238,6 @@ export default {
   line-height: 20px;
   margin: 5px 0 10px;
   color: #858E99;
-}
-.balance__value {
-  color: $--color-text-primary;
 }
 .dialog__hints {
   padding: 0;

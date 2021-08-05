@@ -16,8 +16,12 @@
   }
 }
 
+.el-loading-mask {
+  background-color: rgba($--background-color-base, 0.9);
+}
+
 .v-modal {
-  opacity: 0.9;
+  opacity: 0.6;
 }
 
 .tables-popover {

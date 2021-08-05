@@ -44,7 +44,7 @@
           <h2 slot="header">Collateral</h2>
           <el-table
             :data="depositsTableData" v-loading="!!pending" class="no-bottom-border"
-            element-loading-spinner="el-icon-loading" element-loading-background="transparent"
+            element-loading-spinner="el-icon-loading"
           >
             <el-table-column label="" width="60" align="right">
               <template slot-scope="{ row }">
@@ -98,7 +98,7 @@
           <h2 slot="header">Debts</h2>
           <el-table
             :data="borrowsTableData" v-loading="!!pending" class="no-bottom-border"
-            element-loading-spinner="el-icon-loading" element-loading-background="transparent"
+            element-loading-spinner="el-icon-loading"
           >
             <el-table-column label="" width="60" align="right">
               <template slot-scope="{ row }">

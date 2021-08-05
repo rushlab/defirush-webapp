@@ -5,11 +5,7 @@
     </div>
     <div style="margin-left: auto;"></div>
     <div class="gas-fees">
-      <el-popover
-        placement="bottom"
-        width="240"
-        trigger="hover"
-      >
+      <el-popover placement="bottom" width="240" trigger="hover">
         <div class="gas-fees__inner" :class="{'is-loading': !!gasPricePending}">
           <div class="inner__title">Ethereum Gas Price Forecast</div>
           <div class="inner__body">
@@ -56,11 +52,11 @@
       <el-button
         type="primary" round
         class="btn--dark btn--connect"
-        @click="openConnectDialog"
+        @click="connectDialogVisible = true"
       >Connect Wallet</el-button>
     </template>
     <!-- connect dialog -->
-    <connect-wallet-dialog v-if="visibleConnectWallet" :visible.sync="visibleConnectWallet" />
+    <connect-wallet-dialog :visible.sync="connectDialogVisible" />
   </div>
 </template>
 
@@ -82,14 +78,6 @@ export default {
   },
   data() {
     return {
-      connectDialog: {
-        visible: false,
-        address: '',
-        signer: null,
-        verified: false,
-        isConnecting: false,
-        isVerifying: false,
-      },
       gasPriceTable: {
         fase: {},
         normal: {},
@@ -97,7 +85,7 @@ export default {
       },
       progress: 0,
       gasPricePending: false,
-      visibleConnectWallet: false
+      connectDialogVisible: false
     }
   },
   computed: {
@@ -154,17 +142,6 @@ export default {
         this.$message({ type: 'success', message: 'Copied successfully!' })
       } catch (error) {}
     },
-    openConnectDialog() {
-      // this.connectDialog = {
-      //   visible: true,
-      //   address: '',
-      //   signer: null,
-      //   verified: false,
-      //   isConnecting: false,
-      //   isVerifying: false
-      // }
-      this.visibleConnectWallet = true
-    },
     async handleLogout() {
       await this.$store.dispatch('auth/logout')
     }
@@ -195,9 +172,9 @@ export default {
     position: absolute;
     top: 50%;
     left: 0px;
-    margin-top: -5px;
-    width: 10px;
-    height: 10px;
+    margin-top: -4px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background-color: $--color-danger;
   }
@@ -238,14 +215,6 @@ export default {
 .logout-button {
   margin-left: 1em;
 }
-.step-connect,
-.step-verify,
-.step-verified {
-  text-align: center;
-  /deep/ .el-button {
-    margin: 10px auto;
-  }
-}
 .btn--connect {
   height: 40px;
   line-height: 22px;
@@ -259,7 +228,6 @@ export default {
     opacity: 0.9;
   }
 }
-
 .gas-fee-btn {
   width: 40px;
   height: 40px;
@@ -276,12 +244,6 @@ export default {
   // transition: all .25s ease-in-out;
 }
 .gas-fee-icon {
-  // width: 11px;
-  // height: 11px;
-  // background-repeat: no-repeat;
-  // background-position: center;
-  // background-size: contain;
-  // background-image: url('~/assets/icons/icon-gas.png');
   font-size: 11px;
 }
 .gas-fee-value {
@@ -357,14 +319,6 @@ export default {
     font-size: 10px;
     line-height: 10px;
     color: #777E91;
-  }
-}
-.dialog--connect {
-
-}
-/deep/ {
-  .el-dialog__body {
-    padding: 30px;
   }
 }
 </style>

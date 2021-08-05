@@ -1,9 +1,11 @@
 <template>
-  <el-dialog class="dialog-style-to-fix" title="Borrow"
+  <el-dialog
+    class="dialog-style-to-fix" :title="`Borrow from ${bankData.title}`"
     width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
-    <div class="dialog__inner" v-loading="pending || isApproving || isBorrowing" element-loading-background="rgba(0, 0, 0, 0)">
+    <div class="dialog__inner" v-loading="pending || isApproving || isBorrowing"
+  >
       <el-form :model="form">
         <el-form-item>
           <div class="collateral-info">
@@ -21,8 +23,7 @@
             :disabled="pending || !+amountMaxDisplay || !underlyingAssetDecimals">
             <div slot="append">{{ underlyingAssetSymbol }}</div>
           </el-input>
-          <div class="balance-hint">Available to borrow: <strong class="balance__value">{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div>
-          <!-- <div class="balance-hint">available to borrow: <strong class="balance__value">{{ amountMaxDisplay }}</strong></div> -->
+          <div class="balance-hint">Available to borrow: <strong>{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div>
         </el-form-item>
         <el-form-item>
           <el-slider
@@ -42,18 +43,14 @@
         </ul>
       </div>
     </div>
-    <div slot="footer" class="dialog-footer">
+    <div slot="footer">
       <el-button
         v-if="needApprove"
-        type="primary"
-        class="footer__btn"
         :loading="isApproving"
         :disabled="pending || isApproving || !+form.amountDisplay"
         @click="handleApprove">Approve</el-button>
       <el-button
         v-else
-        type="primary"
-        class="footer__btn"
         :loading="isBorrowing"
         :disabled="pending || isBorrowing || !+form.amountDisplay"
         @click="handleBorrow">Borrow</el-button>
@@ -74,13 +71,17 @@ export default {
       type: Boolean,
       required: true
     },
+    bankData: {
+      type: Object,
+      default: () => ({ title: '' })
+    },
     bankApp: {
       type: Object,
-      default: () => ({})
+      required: true
     },
     underlyingTokenData: {
       type: Object,
-      default: () => ({})
+      required: true
     }
   },
   data() {

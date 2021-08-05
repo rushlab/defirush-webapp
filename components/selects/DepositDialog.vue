@@ -1,9 +1,11 @@
 <template>
-  <el-dialog class="dialog-style-to-fix" title="Deposit"
+  <el-dialog
+    class="dialog-style-to-fix" :title="`Deposit to ${bankData.title}`"
     width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :close-on-click-modal="false" :close-on-press-escape="false"
-    :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
-    <div class="dialog__inner" v-loading="pending || isApproving || isDepositing" element-loading-background="rgba(0, 0, 0, 0)">
+    :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose"
+  >
+    <div class="dialog__inner" v-loading="pending || isApproving || isDepositing">
       <el-form :model="form">
         <el-form-item>
           <div class="input-hint">How much collateral do you want to deposit?</div>
@@ -14,7 +16,7 @@
             :disabled="pending || !+amountMaxDisplay || !underlyingAssetDecimals">
             <div slot="append">{{ underlyingAssetSymbol }}</div>
           </el-input>
-          <div class="balance-hint">Wallet balance: <strong class="balance__value">{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div>
+          <div class="balance-hint">Wallet balance: <strong>{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div>
         </el-form-item>
         <el-form-item>
           <el-slider
@@ -33,22 +35,19 @@
         </ul>
       </div>
     </div>
-    <div slot="footer" class="dialog-footer">
+    <div slot="footer">
       <el-button
         v-if="!underlyingEnabled"
-        class="footer__btn" type="primary"
         :loading="isEnabling"
         :disabled="pending || isEnabling"
         @click="enableUnderlying">Enable Underlying</el-button>
       <el-button
         v-else-if="needApprove"
-        class="footer__btn" type="primary"
         :loading="isApproving"
         :disabled="pending || isApproving || !+form.amountDisplay"
         @click="handleApprove">Approve</el-button>
       <el-button
         v-else
-        class="footer__btn" type="primary"
         :loading="isDepositing"
         :disabled="pending || isDepositing || !+form.amountDisplay"
         @click="handleDeposit" >Deposit</el-button>
@@ -69,13 +68,17 @@ export default {
       type: Boolean,
       required: true
     },
+    bankData: {
+      type: Object,
+      default: () => ({ title: '' })
+    },
     bankApp: {
       type: Object,
-      default: () => ({})
+      required: true
     },
     underlyingTokenData: {
       type: Object,
-      default: () => ({})
+      required: true
     }
   },
   data() {

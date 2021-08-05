@@ -3,7 +3,6 @@
     <el-table
       :data="[bankData]" v-loading="!!pending"
       element-loading-spinner="el-icon-loading"
-      element-loading-background="transparent"
       :show-header="false" class="no-bottom-border"
     >
       <el-table-column label="" width="60">
@@ -39,11 +38,11 @@
     <deposit-dialog
       v-if="isVisible && bankApp"
       :visible.sync="isVisible"
-      :bankApp="bankApp"
+      :bank-data="bankData"
+      :bank-app="bankApp"
       :underlying-token-data="underlyingTokenData"
       @success="onDepositSuccess"/>
   </div>
-
 </template>
 
 <script>

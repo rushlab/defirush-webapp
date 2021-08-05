@@ -84,7 +84,7 @@
       <el-table
         :data="depositsTableData" v-loading="!!pending"
         empty-text="No collateral positions" class="no-bottom-border"
-        element-loading-spinner="el-icon-loading" element-loading-background="transparent"
+        element-loading-spinner="el-icon-loading"
       >
         <el-table-column label="" width="60" align="right">
           <template slot-scope="{ row }">
@@ -131,7 +131,7 @@
       <el-table
         :data="borrowsTableData" v-loading="!!pending"
         empty-text="No debt positions" class="no-bottom-border"
-        element-loading-spinner="el-icon-loading" element-loading-background="transparent"
+        element-loading-spinner="el-icon-loading"
       >
         <el-table-column label="" width="60" align="right">
           <template slot-scope="{ row }">
@@ -167,6 +167,7 @@
     <withdraw-dialog
       v-if="bank && withdrawDialog.visible"
       :visible.sync="withdrawDialog.visible"
+      :bank-data="bank"
       :bank-app="bank.app"
       :underlying-token-data="withdrawDialog.underlyingToken"
       @success="fetchData"
@@ -174,6 +175,7 @@
     <repay-dialog
       v-if="bank && repayDialog.visible"
       :visible.sync="repayDialog.visible"
+      :bank-data="bank"
       :bank-app="bank.app"
       :underlying-token-data="repayDialog.underlyingToken"
       @success="fetchData"

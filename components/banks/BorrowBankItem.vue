@@ -1,9 +1,8 @@
 <template>
-  <div class="bank-item" >
+  <div class="bank-item">
     <el-table
       :data="[bankData]" v-loading="!!pending"
       element-loading-spinner="el-icon-loading"
-      element-loading-background="transparent"
       :show-header="false" class="no-bottom-border"
     >
       <el-table-column label="" width="60">
@@ -42,7 +41,8 @@
     <borrow-dialog
       v-if="isVisible && bankApp"
       :visible.sync="isVisible"
-      :bankApp="bankApp"
+      :bank-data="bankData"
+      :bank-app="bankApp"
       :underlying-token-data="underlyingTokenData"
       @success="onBorrowSuccess"/>
   </div>
@@ -157,9 +157,7 @@ export default {
       if (!this.isSignerAlive) {
         this.$alert('Cannot handle asset borrow without connecting to wallet, please connect your wallet first!', 'Notice', {
           confirmButtonText: 'OK',
-          callback: action => {
-
-          }
+          callback: action => {}
         })
       } else {
         this.isVisible = true

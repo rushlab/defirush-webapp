@@ -1,9 +1,11 @@
 <template>
-  <el-dialog class="dialog-style-to-fix" title="Withdraw"
+  <el-dialog
+    class="dialog-style-to-fix" :title="`Withdraw ${bankApp.title} asset`"
     width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :close-on-click-modal="false" :close-on-press-escape="false"
-    :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
-    <div class="dialog__inner" v-loading="pending || isApproving || isWithdrawing" element-loading-background="rgba(0, 0, 0, 0)">
+    :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose"
+  >
+    <div class="dialog__inner" v-loading="pending || isApproving || isWithdrawing">
       <el-form :model="form">
         <el-form-item>
           <div class="input-hint">How much collateral do you want to widthdraw?</div>
@@ -14,7 +16,7 @@
             :disabled="pending || !+amountMaxDisplay || !underlyingAssetDecimals">
             <div slot="append" v-if="underlyingAssetSymbol">{{ underlyingAssetSymbol }}</div>
           </el-input>
-          <div class="balance-hint">Deposits: <strong class="balance__value">{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div>
+          <div class="balance-hint">Deposits: <strong>{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div>
         </el-form-item>
         <el-form-item class="form__slider">
           <el-slider
@@ -34,18 +36,14 @@
         </ul>
       </div>
     </div>
-    <div slot="footer" class="dialog-footer">
+    <div slot="footer">
       <el-button
         v-if="needApprove"
-        type="primary"
-        class="footer__btn"
         :loading="isApproving"
         :disabled="pending || isApproving || !+form.amountDisplay"
         @click="handleApprove">Approve</el-button>
       <el-button
         v-else
-        type="primary"
-        class="footer__btn"
         :loading="isWithdrawing"
         :disabled="pending || isWithdrawing || !+form.amountDisplay"
         @click="handleWithdraw">Withdraw</el-button>
@@ -66,13 +64,17 @@ export default {
       type: Boolean,
       required: true
     },
+    bankData: {
+      type: Object,
+      default: () => ({ title: '' })
+    },
     bankApp: {
       type: Object,
-      default: () => ({})
+      required: true
     },
     underlyingTokenData: {
       type: Object,
-      default: () => ({})
+      required: true
     }
   },
   data() {
