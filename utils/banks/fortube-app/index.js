@@ -18,23 +18,15 @@ class ForTubeApp extends BankApp {
       'function oracle() view returns(address)',
       'function getAssetsIn(address account) view returns (address[])',
       'function getAccountLiquidity(address account) view returns (uint256, uint256)'
-    ], this.$wallet.getSigner());
-
+    ], this.$wallet.getProvider());
     this.bank = new ethers.Contract(this.addresses['Bank'], [
       'function borrow(address underlying, uint256 borrowAmount)',
       'function deposit(address token, uint256 amount) payable',
       'function repay(address token, uint256 repayAmount) payable',                                  // User repayment
       'function withdraw(address underlying, uint256 withdrawTokens) returns (uint256)',             // The user specifies a certain amount of ftoken and retrieves the underlying assets
       'function withdrawUnderlying(address underlying, uint256 withdrawAmount) returns (uint256)',   // The user retrieves a certain amount of underlying assets
-    ], this.$wallet.getSigner());
+    ], this.$wallet.getProvider());
   }
-
-
-  
-  _isFETH(fToken) {
-    return fToken.toLowerCase() === this.fETH.toLowerCase();
-  }
-
 
   _getUnderlyingOfMarket(fTokenAddr) {
     const result = this.markets.find((item) => {
@@ -58,28 +50,11 @@ class ForTubeApp extends BankApp {
     }
   }
 
-
-  async _getUnderlyingPriceMantissa(underlyingToken) {
-    if (!this._priceOracle) {
-
-      const _address = await this.bankcontroller.oracle();
-      this._priceOracle = new ethers.Contract(_address, [
-      ], this.$wallet.getProvider());
-    }
-
-    const fTokenAddr = this._getMarketOfUnderlying(underlyingToken);
-    const priceMantissa = await this._priceOracle.getUnderlyingPrice(fTokenAddr);
-
-    return priceMantissa;
-  }
-
-
   /**
    * 返回 underlyingToken 的价格 in usd
    */
 
   async getAssetData(underlyingToken) {
-
     const fTokenAddr = await this.bankcontroller.getFTokeAddress(underlyingToken);
     const fToken = new ethers.Contract(fTokenAddr, [
       'function getSupplyRate() public view returns (uint256)',
@@ -92,15 +67,13 @@ class ForTubeApp extends BankApp {
 
     const decimals = await this._decimals(underlyingToken);
     const [priceUsdMantissa, oracleSet] = await this.bankcontroller.fetchAssetPrice(underlyingToken);
-    const [totalLiquidity, totalBorrows] = await Promise.all([
+    const [depositAPY, borrowAPY, totalLiquidity, totalBorrows] = await Promise.all([
+      fToken.APY(),
+      fToken.APR(),
       fToken.totalCash(),
       fToken.totalBorrows()
     ]);
-
     const totalDeposits = totalLiquidity.add(totalBorrows);
-
-    const depositAPY = await fToken.APY(); //这个不太对？
-    const borrowAPY = await fToken.APR();
 
     return {
       totalDeposits: this._mantissaToDisplay(totalDeposits, decimals),
@@ -113,7 +86,6 @@ class ForTubeApp extends BankApp {
 
   }
 
-
   /**
    * 返回用户有头寸的资产
    *
@@ -121,22 +93,16 @@ class ForTubeApp extends BankApp {
    */
 
   async getAccountAssets() {
-
     const _userAddress = this.$wallet.getAddress();
     const fTokens = await this.bankcontroller.getAssetsIn(_userAddress);
     const deposits = [];
     const borrows = [];
-
     const _promises = fTokens.map(async (fTokenAddr) => {
       const fTokens = new ethers.Contract(fTokenAddr, [
         'function underlying() view returns (address)',
         'function getAccountState(address account) view returns (uint256, uint256, uint256)'
       ], this.$wallet.getProvider());
-
-
       const [fTokensBalance,borrowBalance] = await fTokens.getAccountState(_userAddress);
-
-
       const underlyingToken = this._getUnderlyingOfMarket(fTokenAddr);
       if (fTokensBalance.gt(0)) {
         deposits.push(underlyingToken);
@@ -146,10 +112,7 @@ class ForTubeApp extends BankApp {
       }
     });
     await Promise.all(_promises);
-
     return { deposits, borrows };
-
-
   }
 
 /**
@@ -159,12 +122,9 @@ class ForTubeApp extends BankApp {
    */
 
   async getAccountData() {
-
     const _userAddress = this.$wallet.getAddress();
-
     const [deposit, borrow] = await this.bankcontroller.getTotalDepositAndBorrow(_userAddress);
     const [availableBorrows,] = await this.bankcontroller.getAccountLiquidity(_userAddress);
-
     return {
       userDepositsUSD: this._mantissaToDisplay(deposit, 18),
       userBorrowsUSD: this._mantissaToDisplay(borrow, 18),
@@ -181,19 +141,15 @@ class ForTubeApp extends BankApp {
  */
 
   async getAccountAssetData(underlyingToken) {
-
     const decimals = await this._decimals(underlyingToken);
     const _userAddress = this.$wallet.getAddress();
     const _1e18 = ethers.utils.parseUnits('1', 18);
-
     const fTokenAddr = await this.bankcontroller.getFTokeAddress(underlyingToken);
     const fToken = new ethers.Contract(fTokenAddr, [
       'function getAccountState(address account) view returns (uint256, uint256, uint256)'
     ], this.$wallet.getProvider());
-
     const [fTokenBalance, borrowBalance, exchangeRate] = await fToken.getAccountState(_userAddress);
     const underlyingBalance = fTokenBalance.mul(exchangeRate).div(_1e18);
-
     return {
       userDeposits: this._mantissaToDisplay(underlyingBalance, decimals),
       userBorrows: this._mantissaToDisplay(borrowBalance, decimals)
@@ -204,11 +160,9 @@ class ForTubeApp extends BankApp {
   async underlyingEnabled(underlyingToken) { return true; }
 
   async approveUnderlying(underlyingToken, amountDisplay) {
-
     const decimals = await this._decimals(underlyingToken);
     const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
     // const spender = this._getMarketOfUnderlying(underlyingToken);
-
     const spender = this.addresses['BankController'];
     await super._approve(underlyingToken, spender, amountMantissa);
   }
@@ -216,84 +170,71 @@ class ForTubeApp extends BankApp {
   async underlyingAllowance(underlyingToken) {
     // const spender = this._getMarketOfUnderlying(underlyingToken);
     const spender = this.addresses['BankController'];
-    return await super._allowance(underlyingToken, spender);
+    const allowanceMantissa = await super._allowance(underlyingToken, spender);
+    return this._mantissaToDisplay(allowanceMantissa, decimals);
   }
 
   async deposit(underlyingToken, amountDisplay) {
-
+    const signer = this.$wallet.getSigner();
     const decimals = await this._decimals(underlyingToken);
     const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
-
-    const fTokenAddr = this._getMarketOfUnderlying(underlyingToken);
-
-    // console.log(`underlyingToken = ${underlyingToken}, amountDisplay = ${amountDisplay}, amountMantissa = ${amountMantissa}`)
-
-    if (this._isFETH(fTokenAddr)) {
-      await this.bank.deposit(underlyingToken, amountMantissa, {
+    if (this._isETH(underlyingToken)) {
+      await this.bank.connect(signer).deposit(underlyingToken, amountMantissa, {
         value: amountMantissa
       }).then(this.$wallet.waitForTx);
     } else {
-      const allowanceMantissa = await this.underlyingAllowance(underlyingToken);
+      const spender = this.addresses['BankController'];
+      // const allowanceMantissa = await this.underlyingAllowance(underlyingToken);
+      const allowanceMantissa = await super._allowance(underlyingToken, spender);
       if (allowanceMantissa.lt(amountMantissa)) {
         throw new Error('allowance of underlying token is not enough');
       }
-      await this.bank.deposit(underlyingToken, amountMantissa).then(this.$wallet.waitForTx);
+      await this.bank.connect(signer)
+        .deposit(underlyingToken, amountMantissa).then(this.$wallet.waitForTx);
     }
-
   }
 
   async borrow(underlyingToken, amountDisplay) {
+    const signer = this.$wallet.getSigner();
     const decimals = await this._decimals(underlyingToken);
     const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
-    await this.bank.borrow(underlyingToken, amountMantissa).then(this.$wallet.waitForTx);
+    await this.bank.connect(signer)
+      .borrow(underlyingToken, amountMantissa).then(this.$wallet.waitForTx);
   }
 
   async repay(underlyingToken, amountDisplay) {
-
+    const signer = this.$wallet.getSigner();
     const decimals = await this._decimals(underlyingToken);
     const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
-
-    this.bank.repay(underlyingToken, amountMantissa).then(this.$wallet.waitForTx);
-
+    await this.bank.connect(signer)
+      .repay(underlyingToken, amountMantissa).then(this.$wallet.waitForTx);
   }
 
   async repayAll(underlyingToken) {
-
-    const fTokenAddr = await this.bankcontroller.getFTokeAddress(underlyingToken);
-    const fToken = new ethers.Contract(fTokenAddr, [
-      'function accountBorrows(address) view returns (uint256)'
-    ], this.$wallet.getSigner());
-
-    // const ftokenBalanceMantissa = await fToken.balanceOf(this.$wallet.getAddress());
-    // let borrowsMantissa = await fToken.accountBorrows(this.$wallet.getAddress());
-
+    const signer = this.$wallet.getSigner();
     const _max = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-    await this.bank.repay(underlyingToken, _max).then(this.$wallet.waitForTx);
-
+    await this.bank.connect(signer)
+      .repay(underlyingToken, _max).then(this.$wallet.waitForTx);
   }
 
   async withdraw(underlyingToken, amountDisplay) {
-
+    const signer = this.$wallet.getSigner();
     const decimals = await this._decimals(underlyingToken);
     const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
-
-    await this.bank.withdrawUnderlying(underlyingToken, amountMantissa).then(this.$wallet.waitForTx);
-
+    await this.bank.connect(signer)
+      .withdrawUnderlying(underlyingToken, amountMantissa).then(this.$wallet.waitForTx);
   }
 
   async withdrawAll(underlyingToken) {
-
-
+    const signer = this.$wallet.getSigner();
     const fTokenAddr = await this.bankcontroller.getFTokeAddress(underlyingToken);
     const fToken = new ethers.Contract(fTokenAddr, [
       'function balanceOfUnderlying(address) returns (uint256)',
       'function balanceOf(address) view returns (uint256)'
-    ], this.$wallet.getSigner());
-
+    ], this.$wallet.getProvider());
     const balanceMantissa = await fToken.balanceOf(this.$wallet.getAddress());
-
-    await this.bank.withdraw(underlyingToken, balanceMantissa).then(this.$wallet.waitForTx);;
-
+    await this.bank.connect(signer)
+      .withdraw(underlyingToken, balanceMantissa).then(this.$wallet.waitForTx);;
   }
 }
 
