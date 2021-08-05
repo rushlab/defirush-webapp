@@ -43,6 +43,9 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/assets/stylesheets/variables.scss";
+.bank-select {
+  margin-bottom: 20px;
+}
 .btn-group {
   display: flex;
   justify-content: flex-start;

@@ -1,13 +1,11 @@
 <template>
   <div class="bank-item">
     <el-table
-      :data="[bankData]"
-      style="width: 100%"
-      v-loading="!!pending"
+      :data="[bankData]" v-loading="!!pending"
       element-loading-spinner="el-icon-loading"
       element-loading-background="transparent"
-      :show-header="false"
-      border>
+      :show-header="false" class="no-bottom-border"
+    >
       <el-table-column label="Bank" width="200">
         <div slot-scope="scope" class="table-cell" style="padding-left: 10px;">
           <el-image class="exchange__icon" fit="contain" :src="scope.row.logo"></el-image>
@@ -210,15 +208,6 @@ export default {
   }
   .el-loading-spinner i {
     color: $--color-text-primary;
-  }
-  .el-table {
-    color: $--color-text-primary;
-  }
-  .el-table td {
-    border-right: none;
-  }
-  .el-table--group, .el-table--border {
-    border: none;
   }
 }
 </style>

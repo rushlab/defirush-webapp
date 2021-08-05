@@ -1,6 +1,19 @@
-.el-table th,
-.el-table thead {
-  font-weight: normal;
+.el-table {
+  background-color: $--background-color-base;
+  tr, th {
+    background-color: $--background-color-base;
+  }
+  th, thead {
+    font-weight: normal;
+  }
+  &.no-bottom-border {
+    &::before {
+      display: none;
+    }
+    .el-table__row:last-child td {
+      border-bottom-color: transparent;
+    }
+  }
 }
 
 .v-modal {
@@ -9,7 +22,7 @@
 
 .tables-popover {
   padding: 0;
-  border-radius: 8px;
+  border-radius: 4px;
   border: none;
   overflow: hidden;
   .el-table::before {

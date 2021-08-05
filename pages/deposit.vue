@@ -26,22 +26,17 @@
       </el-form-item>
     </el-form>
     <div class="bank-list">
-      <el-table :data="[0]" :show-header="false">
-        <el-table-column>
-          <div slot-scope="scope" class="table-refresh-head">
-            <span>Data updated&nbsp;</span><span class="last-updated-at">{{ lastUpdatedAtDisplay }}</span><span>&nbsp;ago</span>
-            <div class="btn-text btn--refresh" :class="{'is-refreshing': isRefreshing}" @click="refreshTable">REFRESH</div>
-          </div>
-        </el-table-column>
-      </el-table>
-      <el-table :data="[]">
-        <el-table-column label="Exchange" width="200"></el-table-column>
+      <div class="table-refresh-head">
+        <span>Data updated&nbsp;</span><span class="last-updated-at">{{ lastUpdatedAtDisplay }}</span><span>&nbsp;ago</span>
+        <div class="btn-text btn--refresh" :class="{'is-refreshing': isRefreshing}" @click="refreshTable">REFRESH</div>
+      </div>
+      <el-table :data="[]" class="table--headers-only">
+        <el-table-column label="Bank" width="200"></el-table-column>
         <el-table-column label="TVL"></el-table-column>
         <el-table-column label="APY"></el-table-column>
         <el-table-column label="Supplying"></el-table-column>
         <el-table-column label="Gas Fee" width="120"></el-table-column>
         <el-table-column label="Action" width="120"></el-table-column>
-        <span slot="empty"></span>
       </el-table>
       <deposit-bank-item
         v-for="bank in banksList" :key="`${bank.name}-${underlyingToken.address}`"
@@ -160,21 +155,14 @@ export default {
 
 <style lang="scss" scoped>
 @import '@/assets/stylesheets/variables.scss';
-/deep/ {
-  .el-table__empty-block {
+.table--headers-only {
+  /deep/ > .el-table__body-wrapper > .el-table__empty-block {
     display: none;
-  }
-  .el-table th, .el-table tr {
-    background-color: $--background-color-base;
-  }
-  .el-table th:first-child {
-    padding-left: 10px;
   }
 }
 .token-amount /deep/ .el-form-item__content {
   position: relative;
   padding: 20px 0;
-
 }
 .token-balance-display,
 .token-value-to-usd {
@@ -226,7 +214,9 @@ export default {
 }
 .bank-list {
   border: 1px solid $--border-color-base;
-  border-bottom-width: 0;
+  /deep/ .bank-item + .bank-item {
+    border-top: 1px solid $--border-color-base;
+  }
 }
 @keyframes rotating {
   0% {
@@ -241,7 +231,8 @@ export default {
   justify-content: flex-start;
   align-items: center;
   color: $--color-text-regular;
-  padding-left: 10px;
+  padding: 15px 10px;
+  border-bottom: 1px solid $--border-color-base;
   .btn-text {
     margin-left: 10px;
     cursor: pointer;

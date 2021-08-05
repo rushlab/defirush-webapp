@@ -40,13 +40,11 @@
     <div style="margin-top: 20px;"></div>
     <el-row :gutter="20">
       <el-col :span="12">
-        <el-card header="Collateral" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
+        <el-card header="Collateral" shadow="never" :body-style="{'padding':0}">
           <h2 slot="header">Collateral</h2>
           <el-table
-            :data="depositsTableData"
-            v-loading="!!pending"
-            element-loading-spinner="el-icon-loading"
-            element-loading-background="transparent"
+            :data="depositsTableData" v-loading="!!pending" class="no-bottom-border"
+            element-loading-spinner="el-icon-loading" element-loading-background="transparent"
           >
             <el-table-column label="Asset">
               <div slot-scope="{ row }" class="asset-info">
@@ -63,7 +61,7 @@
             <el-table-column label="Supplying" align="right">
               <template slot-scope="{ row }">
                 <div>{{ row.userDeposits }} {{ row.underlyingToken.symbol }}</div>
-                <div class="asset-value-to-usd">{{ formatCurrency(row.userDepositsUSD) }}</div>
+                <div class="text-light">{{ formatCurrency(row.userDepositsUSD) }}</div>
               </template>
             </el-table-column>
             <el-table-column width="80" align="center">
@@ -82,7 +80,7 @@
                     <el-table-column label="Supplying" align="right">
                       <template slot-scope="{ row: popoverRow }">
                         <div>{{ popoverRow.userDeposits }} {{ row.underlyingToken.symbol }}</div>
-                        <div class="asset-value-to-usd">{{ formatCurrency(popoverRow.userDepositsUSD) }}</div>
+                        <div class="text-light">{{ formatCurrency(popoverRow.userDepositsUSD) }}</div>
                       </template>
                     </el-table-column>
                   </el-table>
@@ -94,13 +92,11 @@
         </el-card>
       </el-col>
       <el-col :span="12">
-        <el-card header="Debts" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
+        <el-card header="Debts" shadow="never" :body-style="{'padding':0}">
           <h2 slot="header">Debts</h2>
           <el-table
-            :data="borrowsTableData"
-            v-loading="!!pending"
-            element-loading-spinner="el-icon-loading"
-            element-loading-background="transparent"
+            :data="borrowsTableData" v-loading="!!pending" class="no-bottom-border"
+            element-loading-spinner="el-icon-loading" element-loading-background="transparent"
           >
             <el-table-column label="Asset">
               <div slot-scope="{ row }" class="asset-info">
@@ -117,7 +113,7 @@
             <el-table-column label="Borrowing" align="right">
               <template slot-scope="{ row }">
                 <div>{{ row.userBorrows }} {{ row.underlyingToken.symbol }}</div>
-                <div class="asset-value-to-usd">{{ formatCurrency(row.userBorrowsUSD) }}</div>
+                <div class="text-light">{{ formatCurrency(row.userBorrowsUSD) }}</div>
               </template>
             </el-table-column>
             <el-table-column width="80" align="center">
@@ -136,7 +132,7 @@
                     <el-table-column label="Borrowing" align="right">
                       <template slot-scope="{ row: popoverRow }">
                         <div>{{ popoverRow.userBorrows }} {{ row.underlyingToken.symbol }}</div>
-                        <div class="asset-value-to-usd">{{ formatCurrency(popoverRow.userBorrowsUSD) }}</div>
+                        <div class="text-light">{{ formatCurrency(popoverRow.userBorrowsUSD) }}</div>
                       </template>
                     </el-table-column>
                   </el-table>
@@ -359,26 +355,9 @@ export default {
 /deep/ {
   .el-card {
     background-color: $--background-color-base;
-    box-shadow: 0 0 0 1px $--border-color-base;
-    border-radius: 0;
   }
-  .el-table__empty-block {
-    display: none;
-  }
-  .el-table__body {
-    color: $--color-text-primary;
-  }
-  .el-table th:first-child > .cell {
-    padding-left: 20px;
-  }
-  .el-table th, .el-table tr {
-    background-color: $--background-color-base;
-  }
-  .el-table--border th, .el-table--border td {
-    // border-right-color: $--border-color-base;
-  }
-  .el-table th.is-leaf, .el-table td {
-    border-bottom-color: $--border-color-base;
+  .el-card__header {
+    border-bottom: none;
   }
   .el-progress-bar__outer {
     background-color: #DFE2E8;
@@ -410,7 +389,7 @@ export default {
     line-height: 1;
   }
 }
-.asset-value-to-usd {
+.text-light {
   color: $--color-text-regular;
 }
 .card__row {
@@ -436,12 +415,5 @@ export default {
   &.text-larger {
     font-size: 28px;
   }
-}
-
-.table-card {
-  padding: 20px;
-  width: 100%;
-  background-color: $--background-color-base;
-  box-shadow: 0 0 0 1px $--border-color-base;
 }
 </style>

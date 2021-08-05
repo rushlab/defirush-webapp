@@ -50,11 +50,14 @@
             <div class="card__row">
               <div class="data-item">
                 <div class="data-item__label">
-                  <span>Utilization</span>&nbsp;<!--
-                  --><el-tooltip effect="dark" content="The ratio of your debt to your credit limit. If it hits 100%, your loan will be liquidated." placement="top">
-                    <i class="el-icon-question"></i>
-                  </el-tooltip><!--
-                  --><span class="utilization-tag" :class="{'is-danger': isDanger}">{{ isDanger ? 'Danger' : 'Safe' }}: {{ formatPercentage(utilization) }}</span>
+                  <span>Utilization </span>
+                  <el-tooltip
+                    effect="dark" placement="top"
+                    content="The ratio of your debt to your credit limit. If it hits 100%, your loan will be liquidated."
+                  ><i class="el-icon-question"></i></el-tooltip>
+                  <span
+                    class="utilization-tag" :class="{'is-danger': isDanger}"
+                  >{{ isDanger ? 'Danger' : 'Safe' }}: {{ formatPercentage(utilization) }}</span>
                 </div>
                 <div class="data-item__value">
                   <div class="utilization-progress-bar">
@@ -63,7 +66,8 @@
                       stroke-linecap="square"
                       :show-text="false"
                       :percentage="utilization * 100"
-                      :color="progressCustomColors"></el-progress>
+                      :color="progressCustomColors"
+                    ></el-progress>
                   </div>
                 </div>
               </div>
@@ -75,10 +79,14 @@
 
     <div style="margin-top: 1em;"></div>
 
-    <el-card header="Deposits" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
+    <el-card header="Deposits" shadow="never" :body-style="{'padding':0}">
       <h2 slot="header">Collateral</h2>
-      <el-table :data="depositsTableData" v-loading="!!pending" element-loading-spinner="el-icon-loading" element-loading-background="transparent">
-        <el-table-column label="Asset">
+      <el-table
+        :data="depositsTableData" v-loading="!!pending"
+        empty-text="No collateral positions" class="no-bottom-border"
+        element-loading-spinner="el-icon-loading" element-loading-background="transparent"
+      >
+        <el-table-column label="Asset" width="200">
           <div slot-scope="{ row }" class="asset-info">
             <img :src="row.underlyingToken.logoURI">
             <!-- <div class="asset-icon" :style="{backgroundImage: `url(${row.info.logoURI})`}"></div> -->
@@ -88,23 +96,23 @@
             </div>
           </div>
         </el-table-column>
-        <el-table-column label="Supplying">
-          <template slot-scope="{ row }">
-            <div>{{ row.userDeposits }} {{ row.underlyingToken.symbol }}</div>
-            <div class="asset-value-to-usd">{{ formatCurrency(row.userDepositsUSD) }}</div>
-          </template>
-        </el-table-column>
-        <el-table-column label="CF">
+        <el-table-column label="CF" width="80" align="center">
           <div class="table-column-label" slot="header">
-            <span>CF</span><!--
-            --><el-tooltip effect="dark" content="Collateral factor" placement="top">
+            <span>CF </span>
+            <el-tooltip effect="dark" content="Collateral factor" placement="top">
               <i class="el-icon-question"></i>
             </el-tooltip>
           </div>
           <template slot-scope="{ row }">-</template>
         </el-table-column>
-        <el-table-column label="APY" width="160">
+        <el-table-column label="APY" width="160" align="center">
           <template slot-scope="{ row }">{{ formatPercentage(row.depositAPY) }}</template>
+        </el-table-column>
+        <el-table-column label="Supplying" align="right">
+          <template slot-scope="{ row }">
+            <div>{{ row.userDeposits }} {{ row.underlyingToken.symbol }}</div>
+            <div class="text-light">{{ formatCurrency(row.userDepositsUSD) }}</div>
+          </template>
         </el-table-column>
         <el-table-column label="Action" width="200" align="center">
           <template slot-scope="{ row }">
@@ -117,10 +125,14 @@
       </el-table>
     </el-card>
     <div style="margin-top: 1em;"></div>
-    <el-card header="Borrows" shadow="never" :body-style="{'padding':0, 'marginBottom':'-1px'}">
-      <h2 slot="header">Borrows</h2>
-      <el-table :data="borrowsTableData" v-loading="!!pending" element-loading-spinner="el-icon-loading" element-loading-background="transparent">
-        <el-table-column label="Asset">
+    <el-card header="Debts" shadow="never" :body-style="{'padding':0}">
+      <h2 slot="header">Debts</h2>
+      <el-table
+        :data="borrowsTableData" v-loading="!!pending"
+        empty-text="No debt positions" class="no-bottom-border"
+        element-loading-spinner="el-icon-loading" element-loading-background="transparent"
+      >
+        <el-table-column label="Asset" width="200">
           <div slot-scope="{ row }" class="asset-info">
             <img :src="row.underlyingToken.logoURI">
             <div>
@@ -129,15 +141,15 @@
             </div>
           </div>
         </el-table-column>
-        <el-table-column label="Borrowing">
+        <el-table-column label="" width="80" align="center"></el-table-column>
+        <el-table-column label="APY" width="160" align="center">
+          <template slot-scope="{ row }">{{ formatPercentage(row.borrowAPY) }}</template>
+        </el-table-column>
+        <el-table-column label="Borrowing" align="right">
           <template slot-scope="{ row }">
             <div>{{ row.userBorrows }} {{ row.underlyingToken.symbol }}</div>
-            <div>{{ formatCurrency(row.userBorrowsUSD) }}</div>
+            <div class="text-light">{{ formatCurrency(row.userBorrowsUSD) }}</div>
           </template>
-        </el-table-column>
-        <el-table-column></el-table-column>
-        <el-table-column label="APY" width="160">
-          <template slot-scope="{ row }">{{ formatPercentage(row.borrowAPY) }}</template>
         </el-table-column>
         <el-table-column label="Action" width="200" align="center">
           <template slot-scope="{ row }">
@@ -325,7 +337,7 @@ export default {
 @import '@/assets/stylesheets/variables.scss';
 .bank-data-card {
   padding: 20px;
-  height: 240px;
+  height: 200px;
   background-color: $--background-color-base;
   box-shadow: 0 0 0 1px $--border-color-base;
 }
@@ -345,27 +357,9 @@ export default {
 /deep/ {
   .el-card {
     background-color: $--background-color-base;
-    box-shadow: 0 0 0 1px $--border-color-base;
-    border-radius: 0;
-    border: none;
   }
-  .el-table__empty-block {
-    display: none;
-  }
-  .el-table__body {
-    color: $--color-text-primary;
-  }
-  .el-table th:first-child > .cell {
-    padding-left: 20px;
-  }
-  .el-table th, .el-table tr {
-    background-color: $--background-color-base;
-  }
-  .el-table--border th, .el-table--border td {
-    // border-right-color: $--border-color-base;
-  }
-  .el-table th.is-leaf, .el-table td {
-    border-bottom-color: $--border-color-base;
+  .el-card__header {
+    border-bottom: none;
   }
   .el-progress-bar__outer {
     background-color: #DFE2E8;
@@ -400,7 +394,7 @@ export default {
     line-height: 1;
   }
 }
-.asset-value-to-usd {
+.text-light {
   color: $--color-text-regular;
 }
 .card__row + .card__row {
@@ -437,7 +431,7 @@ export default {
   background-color: $--color-success;
   border-radius: 4px;
   &.is-danger {
-    background-color: $--color-warning;
+    background-color: $--color-danger;
   }
 }
 .utilization-progress-bar {
