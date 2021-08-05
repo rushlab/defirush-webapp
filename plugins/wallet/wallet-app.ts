@@ -21,12 +21,17 @@ export class WalletApp implements WalletInterface {
    * 所有地方的 signer 都要通过这个方法来获得, 不要自己构造 signer
    */
   getSigner(): Signer {
+    const provider = this.getProvider()
+    const address = this.getAddress()
     if (this.$store.state.auth.isSignerAlive) {
-      // 目前只支持
-      if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
-        const provider = new ethers.providers.Web3Provider(global.ethereum)
-        return provider.getSigner()
-      }
+      return provider.getSigner(address)
+    } else {
+      // MessageBox.confirm('Current page will be reloaded by changing network or account?', 'Notice', {
+      //   confirmButtonText: 'Yes',
+      //   cancelButtonText: 'Cancel',
+      //   type: 'warning'
+      // }).then(() => global.location.reload()).catch(() => {})
+      return new ethers.VoidSigner(address, provider)
     }
   }
 
@@ -34,9 +39,14 @@ export class WalletApp implements WalletInterface {
    * 所有地方的 provider 都要通过这个方法来获得, 不要自己构造 provider
    */
   getProvider(): Provider {
-    const signer = this.getSigner()
-    if (signer) {
-      return signer.provider
+    if (this.$store.state.auth.isSignerAlive) {
+      // const signer = this.getSigner()
+      // return signer.provider
+      if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
+        return new ethers.providers.Web3Provider(global.ethereum)
+      } else {
+        throw new Error('Requires MetaMask') // 目前只支持 metamask
+      }
     } else {
       const { walletChainId } = this.$store.state.auth
       let url

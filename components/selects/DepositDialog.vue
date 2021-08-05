@@ -222,7 +222,6 @@ export default {
     _updatePrecentageFromAmount() {
       const amountMaxDisplay = stringToNumber(this.amountMaxDisplay)
       const amountDisplay = stringToNumber(this.form.amountDisplay)
-      console.log(amountMaxDisplay, amountDisplay)
       this.form.amountSlideValue = amountMaxDisplay > 0 ? (amountDisplay / amountMaxDisplay) * 100 : 0
     },
     onChangeSlideValue() {
