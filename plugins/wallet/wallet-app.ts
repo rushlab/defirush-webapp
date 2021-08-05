@@ -115,17 +115,17 @@ export class WalletApp implements WalletInterface {
   }
 
   /**
-   *
    * @param asset underlyingToken address
    * @returns 当前 assetToken 对 USD的价格
    */
   async getPriceUSD(asset: Address): Promise<AmountDisplay> {
     const token = this.$store.getters['tokens/getToken'](asset)
+    if (!token) {
+      return '0.00'
+    }
     try {
       const res = await axios.get(`/api/tokens/${token.id}/price/`, {
-        params: {
-          currency: 'usd'
-        }
+        params: { currency: 'usd' }
       })
       const price = res.data['usd'].toString()
       return price

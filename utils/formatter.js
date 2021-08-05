@@ -34,7 +34,7 @@ export const safeToFixed = (number, decimals) => {
   if (number.toString().indexOf('e') >= 0) {
     return number.toFixed(decimals)
   } else {
-    const re = new RegExp(`(\\d+\\.\\d{${ decimals }})(\\d+)`)
+    const re = new RegExp(`(\\d+\\.\\d{${decimals}})(\\d+)`)
     const result = number.toString().replace(re, '$1')
     return result
   }
