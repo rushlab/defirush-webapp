@@ -19,15 +19,16 @@
               <span class="item__duration">{{ item.waiting_seconds }} sec</span>
             </div>
           </div>
+          <div class="inner__loading">
+            <i class="el-icon-loading"></i>
+          </div>
         </div>
         <div class="gas-fee-btn" slot="reference">
           <div class="gas-fee-icon">
             <i class="rush-icon-gas"></i>
           </div>
           <div class="gas-fee-value">{{ gasPriceTable.normal.price_gwei || '-' }}</div>
-        </div>
-        <div class="inner__loading">
-          <i class="el-icon-loading"></i>
+          <circle-progress class="gas-fee__progress" :radius="24" :stroke="2" :progress="progress" colorStorke="#000000"/>
         </div>
       </el-popover>
     </div>
@@ -114,12 +115,14 @@ import { ethers } from 'ethers'
 import dayjs from 'dayjs'
 import { mapState, mapGetters } from 'vuex'
 import MetamaskLogo from '@/components/MetamaskLogo'
+import CircleProgress from '@/components/CircleProgress'
 import { copyToClipboard } from '@/utils/copy'
 
 export default {
   name: 'SiteHeader',
   components: {
-    MetamaskLogo
+    MetamaskLogo,
+    CircleProgress,
   },
   data() {
     return {
@@ -136,8 +139,8 @@ export default {
         normal: {},
         slow: {}
       },
-      currentTime: 0,
-      gasPricePending: false
+      progress: 0,
+      gasPricePending: false,
     }
   },
   computed: {
@@ -163,24 +166,28 @@ export default {
     },
     verifyBtnText() {
       return this.connectDialog.isVerifying ? 'Verifying' : 'Verify'
-    }
+    },
+
   },
   mounted() {
-    this.getGasPrice(true)
+    this.getGasPrice()
   },
   watch: {
-    currentTime: {
+    progress: {
       handler() {
         setTimeout(() => {
-          this.getGasPrice()
-        }, 15000)
+          this.progress = (this.progress + 1) % 100
+          if (this.progress === 0) {
+            this.getGasPrice()
+          }
+        }, 200)
       },
       immediate: true
     }
   },
   methods: {
     copyToClipboard,
-    async getGasPrice(isInit = false) {
+    async getGasPrice() {
       this.gasPricePending = true
       try {
         const res = await this.$axios.get('/api/gas_price_table/')
@@ -190,7 +197,6 @@ export default {
           normal: { ...normal, price_gwei: parseInt(normal.price_gwei) },
           slow: { ...slow, price_gwei: parseInt(slow.price_gwei) }
         }
-        if (!isInit) this.currentTime = dayjs()
       } catch (error) {}
       this.gasPricePending = false
     },
@@ -431,6 +437,7 @@ export default {
   margin-right: 12px;
   cursor: pointer;
   color: $--color-text-primary;
+  position: relative;
   // transition: all .25s ease-in-out;
 }
 .gas-fee-icon {
@@ -452,6 +459,11 @@ export default {
   .gas-fee-value {
     color: #ffffff;
   }
+}
+.gas-fee__progress {
+  position: absolute;
+  top: -4px;
+  left: -4px;
 }
 
 .gas-fees__inner {
