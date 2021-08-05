@@ -6,32 +6,32 @@
       element-loading-background="transparent"
       :show-header="false" class="no-bottom-border"
     >
-      <el-table-column label="Bank" width="200">
-        <div slot-scope="scope" class="table-cell" style="padding-left: 10px;">
-          <el-image class="exchange__icon" fit="contain" :src="scope.row.logo"></el-image>
-          <span class="exchange__title">{{ scope.row.title }}</span>
-        </div>
+      <el-table-column label="" width="60">
+        <template slot-scope="{ row }">
+          <el-image class="bank-image" fit="contain" :src="row.logo"></el-image>
+        </template>
       </el-table-column>
-      <el-table-column label="锁仓量">
-        <template slot-scope="scope">
+      <el-table-column label="Bank" width="100" prop="title"></el-table-column>
+      <el-table-column label="APY" width="100" align="center">
+        <template slot-scope="{ row }">{{ depositAPYPercent }}</template>
+      </el-table-column>
+      <el-table-column label="TVL" align="right">
+        <template slot-scope="{ row }">
           <div>{{ assetData.totalDeposits || '0' }} {{ underlyingTokenData.symbol }}</div>
           <div class="asset-value-to-usd">{{totalDepositsInUSD}}</div>
         </template>
       </el-table-column>
-      <el-table-column label="APY">
-        <template slot-scope="scope">{{ depositAPYPercent }}</template>
-      </el-table-column>
-      <el-table-column label="已存款金额">
-        <template slot-scope="scope">
+      <el-table-column label="Supplying" align="right">
+        <template slot-scope="{ row }">
           <div>{{ accountAssetData.userDeposits || '0' }} {{ underlyingTokenData.symbol }}</div>
           <div class="asset-value-to-usd">{{ userDepositsInUSD }}</div>
         </template>
       </el-table-column>
-      <el-table-column label="Gas Fee" width="120">
-        <template slot-scope="scope"></template>
+      <el-table-column label="Gas Fee" width="120" align="center">
+        <template slot-scope="{ row }">-</template>
       </el-table-column>
-      <el-table-column label="Action" width="120">
-        <template slot-scope="scope">
+      <el-table-column label="Action" width="120" align="center">
+        <template slot-scope="{ row }">
           <el-button type="primary" size="small" round @click="handleClickBtn" :disabled="disabledDeposit">Deposit</el-button>
         </template>
       </el-table-column>
@@ -163,40 +163,11 @@ export default {
   align-items: stretch;
   color: $--color-text-primary;
 }
-.item__column {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 10px 20px;
-}
-.exchange {
-  flex: 1;
-}
-.exchange__icon {
+.bank-image {
   width: 40px;
-  height: 40px;
+  margin-left: 10px;
+  display: block;
   border-radius: 50%;
-  margin-right: 10px;
-}
-.exchange__title {
-  font-size: 14px;
-}
-.apy {
-  width: 15%;
-}
-.tvl {
-  width: 15%;
-}
-.gas-fee {
-  width: 15%;
-}
-.actions {
-  flex: 1;
-}
-.table-cell {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
 }
 .asset-value-to-usd {
   color: $--color-text-regular;

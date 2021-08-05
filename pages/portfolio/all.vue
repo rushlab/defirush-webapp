@@ -46,14 +46,16 @@
             :data="depositsTableData" v-loading="!!pending" class="no-bottom-border"
             element-loading-spinner="el-icon-loading" element-loading-background="transparent"
           >
-            <el-table-column label="Asset">
-              <div slot-scope="{ row }" class="asset-info">
-                <img :src="row.underlyingToken.logoURI">
-                <div>
-                  <div>{{ row.underlyingToken.symbol }}</div>
-                  <div class="asset-name">{{ row.underlyingToken.name }}</div>
-                </div>
-              </div>
+            <el-table-column label="" width="60" align="right">
+              <template slot-scope="{ row }">
+                <img :src="row.underlyingToken.logoURI" class="asset-image">
+              </template>
+            </el-table-column>
+            <el-table-column label="Asset" width="100">
+              <template slot-scope="{ row }">
+                <div>{{ row.underlyingToken.symbol }}</div>
+                <div class="cell-text-light">{{ row.underlyingToken.name }}</div>
+              </template>
             </el-table-column>
             <el-table-column label="APY" width="80" align="center">
               <template slot-scope="{ row }">{{ formatPercentage(row.averageDepositAPY) }}</template>
@@ -61,7 +63,7 @@
             <el-table-column label="Supplying" align="right">
               <template slot-scope="{ row }">
                 <div>{{ row.userDeposits }} {{ row.underlyingToken.symbol }}</div>
-                <div class="text-light">{{ formatCurrency(row.userDepositsUSD) }}</div>
+                <div class="cell-text-light">{{ formatCurrency(row.userDepositsUSD) }}</div>
               </template>
             </el-table-column>
             <el-table-column width="80" align="center">
@@ -80,7 +82,7 @@
                     <el-table-column label="Supplying" align="right">
                       <template slot-scope="{ row: popoverRow }">
                         <div>{{ popoverRow.userDeposits }} {{ row.underlyingToken.symbol }}</div>
-                        <div class="text-light">{{ formatCurrency(popoverRow.userDepositsUSD) }}</div>
+                        <div class="cell-text-light">{{ formatCurrency(popoverRow.userDepositsUSD) }}</div>
                       </template>
                     </el-table-column>
                   </el-table>
@@ -98,14 +100,16 @@
             :data="borrowsTableData" v-loading="!!pending" class="no-bottom-border"
             element-loading-spinner="el-icon-loading" element-loading-background="transparent"
           >
-            <el-table-column label="Asset">
-              <div slot-scope="{ row }" class="asset-info">
-                <img :src="row.underlyingToken.logoURI">
-                <div>
-                  <div>{{ row.underlyingToken.symbol }}</div>
-                  <div class="asset-name">{{ row.underlyingToken.name }}</div>
-                </div>
-              </div>
+            <el-table-column label="" width="60" align="right">
+              <template slot-scope="{ row }">
+                <img :src="row.underlyingToken.logoURI" class="asset-image">
+              </template>
+            </el-table-column>
+            <el-table-column label="Asset" width="100">
+              <template slot-scope="{ row }">
+                <div>{{ row.underlyingToken.symbol }}</div>
+                <div class="cell-text-light">{{ row.underlyingToken.name }}</div>
+              </template>
             </el-table-column>
             <el-table-column label="APY" width="80" align="center">
               <template slot-scope="{ row }">{{ formatPercentage(row.averageBorrowAPY) }}</template>
@@ -113,7 +117,7 @@
             <el-table-column label="Borrowing" align="right">
               <template slot-scope="{ row }">
                 <div>{{ row.userBorrows }} {{ row.underlyingToken.symbol }}</div>
-                <div class="text-light">{{ formatCurrency(row.userBorrowsUSD) }}</div>
+                <div class="cell-text-light">{{ formatCurrency(row.userBorrowsUSD) }}</div>
               </template>
             </el-table-column>
             <el-table-column width="80" align="center">
@@ -132,7 +136,7 @@
                     <el-table-column label="Borrowing" align="right">
                       <template slot-scope="{ row: popoverRow }">
                         <div>{{ popoverRow.userBorrows }} {{ row.underlyingToken.symbol }}</div>
-                        <div class="text-light">{{ formatCurrency(popoverRow.userBorrowsUSD) }}</div>
+                        <div class="cell-text-light">{{ formatCurrency(popoverRow.userBorrowsUSD) }}</div>
                       </template>
                     </el-table-column>
                   </el-table>
@@ -370,27 +374,16 @@ export default {
     color: $--color-text-primary;
   }
 }
-.asset-info {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  color: $--color-text-primary;
-  padding-left: 10px;
-  img {
-    width: 40px;
-    display: block;
-    margin-right: 10px;
-    border-radius: 50%;
-  }
-  .asset-name {
-    font-size: 0.8em;
-    // opacity: 0.75;
-    color: $--color-text-regular;
-    line-height: 1;
-  }
+.asset-image {
+  width: 40px;
+  margin-left: 10px;
+  display: block;
+  border-radius: 50%;
 }
-.text-light {
+.cell-text-light {
   color: $--color-text-regular;
+  font-size: 0.9em;
+  line-height: 1;
 }
 .card__row {
   width: 100%;

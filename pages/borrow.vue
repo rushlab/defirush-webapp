@@ -32,11 +32,12 @@
         <div class="btn-text btn--refresh" :class="{'is-refreshing': isRefreshing}" @click="refreshTable">REFRESH</div>
       </div>
       <el-table :data="[]" class="table--headers-only">
-        <el-table-column label="Bank" width="200"></el-table-column>
-        <el-table-column label="Total borrowed"></el-table-column>
-        <el-table-column label="APY"></el-table-column>
+        <el-table-column label="" width="60"></el-table-column>
+        <el-table-column label="Bank" width="100"></el-table-column>
+        <el-table-column label="APY" width="100" align="center"></el-table-column>
+        <el-table-column label="Total borrows" align="right"></el-table-column>
         <!-- <el-table-column label="Borrowing"></el-table-column> -->
-        <el-table-column label="Available">
+        <el-table-column label="Available" align="right">
           <template slot="header">
             <span>Available</span>
             <el-tooltip effect="dark" content="The amount you can borrow" placement="top">
@@ -44,8 +45,8 @@
             </el-tooltip>
           </template>
         </el-table-column>
-        <el-table-column label="Gas Fee" width="120"></el-table-column>
-        <el-table-column label="Action" width="120"></el-table-column>
+        <el-table-column label="Gas Fee" width="120" align="center"></el-table-column>
+        <el-table-column label="Action" width="120" align="center"></el-table-column>
         <span slot="empty"></span>
       </el-table>
       <borrow-bank-item
