@@ -1,6 +1,6 @@
 <template>
   <div class="page--deposit">
-    <el-form>
+    <el-form @submit.native.prevent>
       <el-form-item>
         <chain-select :value.sync="currentChain"/>
       </el-form-item>
