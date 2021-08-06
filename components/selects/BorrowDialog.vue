@@ -4,7 +4,7 @@
     width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
-    <div class="dialog__inner" v-loading="pending || isApproving || isBorrowing"
+    <div class="dialog__inner" v-loading="pending || isBorrowing"
   >
       <el-form :model="form">
         <el-form-item>
@@ -45,12 +45,6 @@
     </div>
     <div slot="footer">
       <el-button
-        v-if="needApprove"
-        :loading="isApproving"
-        :disabled="pending || isApproving || !+form.amountDisplay"
-        @click="handleApprove">Approve</el-button>
-      <el-button
-        v-else
         :loading="isBorrowing"
         :disabled="pending || isBorrowing || !+form.amountDisplay"
         @click="handleBorrow">Borrow</el-button>
@@ -97,7 +91,6 @@ export default {
     }
     return {
       isVisible: this.visible,
-      isApproving: false,
       marks: {
         0: '0%',
         25: '25%',
@@ -142,9 +135,6 @@ export default {
     },
     amountMaxDisplay() {
       return this.availableBorrowsDisplay
-    },
-    needApprove() {
-      return false
     },
     currentDebtUSD() {
       return _.get(this.accountData, 'userBorrowsUSD', 0)
@@ -237,17 +227,6 @@ export default {
     _updateAmountFromPrecentage() {
       const res = (stringToNumber(this.amountMaxDisplay)) * parseInt(this.form.amountSlideValue) / 100
       this.form.amountDisplay = safeToFixed(res, this.underlyingAssetDecimals)
-    },
-    async handleApprove() {
-      try {
-        this.isApproving = true
-        await this.bankApp.approveUnderlying(this.underlyingTokenData.address, this.form.amountDisplay)
-        await this.updateAllowanceMantissa()
-      } catch (error) {
-        console.log('handleApprove error: ', error)
-        this.$message.error(JSON.stringify(error))
-      }
-      this.isApproving = false
     },
     async handleBorrow() {
       try {

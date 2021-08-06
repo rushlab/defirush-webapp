@@ -5,7 +5,7 @@
     :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose"
   >
-    <div class="dialog__inner" v-loading="pending || isApproving || isWithdrawing">
+    <div class="dialog__inner" v-loading="pending || isWithdrawing">
       <el-form :model="form">
         <el-form-item>
           <div class="input-hint">How much collateral do you want to widthdraw?</div>
@@ -38,12 +38,6 @@
     </div>
     <div slot="footer">
       <el-button
-        v-if="needApprove"
-        :loading="isApproving"
-        :disabled="pending || isApproving || !+form.amountDisplay"
-        @click="handleApprove">Approve</el-button>
-      <el-button
-        v-else
         :loading="isWithdrawing"
         :disabled="pending || isWithdrawing || !+form.amountDisplay"
         @click="handleWithdraw">Withdraw</el-button>
@@ -90,7 +84,6 @@ export default {
     }
     return {
       isVisible: this.visible,
-      isApproving: false,
       marks: {
         0: '0%',
         25: '25%',
@@ -128,9 +121,6 @@ export default {
     },
     amountPrecentage() {
       return stringToNumber(this.amountMaxDisplay) > 0 ? (stringToNumber(this.form.amountDisplay) / stringToNumber(this.amountMaxDisplay)) * 100 : 0
-    },
-    needApprove() {
-      return false
     },
     amountToUSD() {
       const { priceUSD = 0 } = this.assetData
@@ -203,17 +193,6 @@ export default {
     _updateAmountFromPrecentage() {
       const res = (stringToNumber(this.amountMaxDisplay)) * parseInt(this.form.amountSlideValue) / 100
       this.form.amountDisplay = safeToFixed(res, this.underlyingAssetDecimals)
-    },
-    async handleApprove() {
-      try {
-        this.isApproving = true
-        await this.bankApp.approveUnderlying(this.underlyingTokenData.address, this.form.amountDisplay)
-        await this.updateAllowanceDisplay()
-      } catch (error) {
-        console.log('handleApprove error: ', error)
-        this.$message.error(JSON.stringify(error))
-      }
-      this.isApproving = false
     },
     async handleWithdraw() {
       try {
