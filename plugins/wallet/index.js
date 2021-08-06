@@ -45,9 +45,9 @@ async function verifyLoginData({ chainId, address, message, signature }) {
 function listenToMetaMask(store) {
   const handler = async () => {
     const { walletChainId, walletAddress } = store.state.auth
-    if (!walletAddress) {
-      return
-    }
+    // if (!walletAddress) {
+    //   return
+    // }
     const provider = new ethers.providers.Web3Provider(global.ethereum)
     const signer = provider.getSigner()
     let selectedChainId = 0
@@ -70,15 +70,8 @@ function listenToMetaMask(store) {
     }
   }
   if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
-    // global.ethereum.on('chainChanged', handler)
+    global.ethereum.on('chainChanged', handler)
     global.ethereum.on('accountsChanged', handler)
-    global.ethereum.on('chainChanged', () => {
-      store.commit('auth/setWallet', {
-        walletChainId: +global.ethereum.chainId,
-        walletAddress: store.state.auth.walletAddress
-      })
-      handler()
-    })
   }
 }
 
