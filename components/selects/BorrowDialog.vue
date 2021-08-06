@@ -3,9 +3,9 @@
     class="dialog-style-to-fix" :title="`Borrow from ${bankData.title}`"
     width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :close-on-click-modal="false" :close-on-press-escape="false"
-    :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
-    <div class="dialog__inner" v-loading="pending || isBorrowing"
+    :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose"
   >
+    <div v-loading="pending || isBorrowing">
       <el-form :model="form">
         <el-form-item>
           <div class="collateral-info">
@@ -43,11 +43,11 @@
         </ul>
       </div>
     </div>
-    <div slot="footer">
+    <div slot="footer" class="call-to-action">
       <el-button
-        :loading="isBorrowing"
-        :disabled="pending || isBorrowing || !+form.amountDisplay"
-        @click="handleBorrow">Borrow</el-button>
+        type="primary" @click="handleBorrow"
+        :loading="isBorrowing" :disabled="pending || isBorrowing || !+form.amountDisplay"
+      >Borrow</el-button>
     </div>
   </el-dialog>
 </template>

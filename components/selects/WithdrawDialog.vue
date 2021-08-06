@@ -5,7 +5,7 @@
     :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose"
   >
-    <div class="dialog__inner" v-loading="pending || isWithdrawing">
+    <div v-loading="pending || isWithdrawing">
       <el-form :model="form">
         <el-form-item>
           <div class="input-hint">How much collateral do you want to widthdraw?</div>
@@ -36,9 +36,9 @@
         </ul>
       </div>
     </div>
-    <div slot="footer">
+    <div slot="footer" class="call-to-action">
       <el-button
-        :loading="isWithdrawing"
+        type="primary" :loading="isWithdrawing"
         :disabled="pending || isWithdrawing || !+form.amountDisplay"
         @click="handleWithdraw">Withdraw</el-button>
     </div>

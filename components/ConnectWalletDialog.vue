@@ -6,7 +6,7 @@
     :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose"
   >
-    <div class="dialog__inner">
+    <div>
       <template v-if="!address">
         <!-- 选择钱包，点击链接 -->
         <div class="dialog__notice">Please select a wallet to connect:</div>
@@ -26,22 +26,17 @@
         </div>
         <a href="javascript:void(0);" class="help-hint">What is a wallet?</a>
       </template>
-
       <template v-if="address && !verified">
         <!-- 没有验证过，点击进行验证 -->
         <div class="input-hint">Please sign to let us verify that you are the owner of this address</div>
         <div class="dialog-verify__address">{{ address }}</div>
       </template>
     </div>
-    <div
-      v-if="address && !verified"
-      slot="footer" class="dialog-footer">
+    <div v-if="address && !verified" slot="footer" class="call-to-action">
       <el-button
-        type="primary"
-        class="btn--dark footer__btn"
-        :disabled="isVerifying"
-        :loading="isVerifying"
-        @click="verifyUserWallet">Verify</el-button>
+        type="primary" @click="verifyUserWallet"
+        :disabled="isVerifying" :loading="isVerifying"
+      >Verify</el-button>
     </div>
   </el-dialog>
 </template>
@@ -161,32 +156,6 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/assets/stylesheets/variables.scss";
-.dialog--connect {
-  /deep/ {
-    .el-dialog {
-      background-color: $--background-color-base;
-      border: 1px solid $--border-color-base;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .el-dialog__title {
-      font-size: 24px;
-    }
-    .el-dialog__header {
-      padding: 15px 30px;
-      border-bottom: 1px solid $--border-color-base;
-    }
-    .el-dialog__body {
-      padding: 20px 30px 40px;
-    }
-    .el-dialog__footer {
-      padding: 0;
-    }
-    .el-loading-spinner .path {
-      stroke: $--color-text-primary;
-    }
-  }
-}
 // dialog styles
 .wallet-items {
   width: 100%;
@@ -260,34 +229,12 @@ export default {
 .dialog-footer {
   height: 80px;
 }
-.footer__btn {
-  display: block;
-  height: 80px;
-  width: 100%;
-  line-height: 40px;
-  padding: 20px;
-  outline: none;
-  appearance: none;
-  border: none;
-  border-radius: 0;
-  position: relative;
-  font-size: 24px;
-  font-weight: 400;
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    border-top: 1px solid $--border-color-base;
-  }
-}
+
 .help-hint {
   font-size: 16px;
   color: #033FFF;
   cursor: pointer;
 }
-
 .dialog-verify__address {
   margin-top: 50px;
   margin-bottom: 20px;

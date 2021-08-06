@@ -5,7 +5,7 @@
     :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose"
   >
-    <div class="dialog__inner" v-loading="pending || isApproving || isDepositing">
+    <div v-loading="pending || isApproving || isDepositing">
       <el-form :model="form">
         <el-form-item>
           <div class="input-hint">How much collateral do you want to deposit?</div>
@@ -35,22 +35,22 @@
         </ul>
       </div>
     </div>
-    <div slot="footer">
+    <div slot="footer" class="call-to-action">
       <el-button
         v-if="!underlyingEnabled"
-        :loading="isEnabling"
-        :disabled="pending || isEnabling"
-        @click="enableUnderlying">Enable Underlying</el-button>
+        type="primary" @click="enableUnderlying"
+        :loading="isEnabling" :disabled="pending || isEnabling"
+      >Enable Underlying</el-button>
       <el-button
         v-else-if="needApprove"
-        :loading="isApproving"
-        :disabled="pending || isApproving || !+form.amountDisplay"
-        @click="handleApprove">Approve</el-button>
+        type="primary" @click="handleApprove"
+        :loading="isApproving" :disabled="pending || isApproving || !+form.amountDisplay"
+      >Approve</el-button>
       <el-button
         v-else
-        :loading="isDepositing"
-        :disabled="pending || isDepositing || !+form.amountDisplay"
-        @click="handleDeposit" >Deposit</el-button>
+        type="primary" @click="handleDeposit"
+        :loading="isDepositing" :disabled="pending || isDepositing || !+form.amountDisplay"
+      >Deposit</el-button>
     </div>
   </el-dialog>
 </template>

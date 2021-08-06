@@ -2,9 +2,9 @@
   <el-dialog class="dialog-style-to-fix" :title="`Repay ${bankData.title} debt`"
     width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
     :close-on-click-modal="false" :close-on-press-escape="false"
-    :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose">
-    <div class="dialog__inner" v-loading="pending || isApproving || isRepaying"
+    :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose"
   >
+    <div v-loading="pending || isApproving || isRepaying">
       <el-form :model="form">
         <el-form-item>
           <div class="input-hint">
@@ -37,17 +37,17 @@
         </ul>
       </div>
     </div>
-    <div slot="footer">
+    <div slot="footer" class="call-to-action">
       <el-button
         v-if="needApprove"
-        :loading="isApproving"
-        :disabled="pending || isApproving || !+form.amountDisplay"
-        @click="handleApprove">Approve</el-button>
+        type="primary" @click="handleApprove"
+        :loading="isApproving" :disabled="pending || isApproving || !+form.amountDisplay"
+      >Approve</el-button>
       <el-button
         v-else
-        :loading="isRepaying"
-        :disabled="pending || isRepaying || !+form.amountDisplay"
-        @click="handleRepay">Repay</el-button>
+        type="primary" @click="handleRepay"
+        :loading="isRepaying" :disabled="pending || isRepaying || !+form.amountDisplay"
+      >Repay</el-button>
     </div>
   </el-dialog>
 </template>

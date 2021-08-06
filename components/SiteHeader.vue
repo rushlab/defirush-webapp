@@ -49,11 +49,7 @@
       </div>
     </template>
     <template v-else>
-      <el-button
-        type="primary" round
-        class="btn--dark btn--connect"
-        @click="connectDialogVisible = true"
-      >Connect Wallet</el-button>
+      <el-button type="primary" round @click="connectDialogVisible=true">Connect Wallet</el-button>
     </template>
     <!-- connect dialog -->
     <connect-wallet-dialog :visible.sync="connectDialogVisible" />
@@ -215,19 +211,6 @@ export default {
 }
 .logout-button {
   margin-left: 1em;
-}
-.btn--connect {
-  height: 40px;
-  line-height: 22px;
-  padding-top: 9px;
-  padding-bottom: 9px;
-  background-color: $--color-text-primary;
-  border: 0;
-  color: #ffffff;
-  &:hover,
-  &:active {
-    opacity: 0.9;
-  }
 }
 .gas-fee-btn {
   width: 40px;

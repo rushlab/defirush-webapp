@@ -1,28 +1,6 @@
 .dialog-style-to-fix {
-  .el-dialog {
-    background-color: $--background-color-base;
-    // border: 1px solid $--border-color-base;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .el-dialog__title {
-    font-size: 20px;
-  }
-  .el-dialog__header {
-    padding: 20px 30px;
-    border-bottom: 1px solid $--border-color-base;
-  }
-  .el-dialog__body {
-    padding: 30px;
-  }
   .el-loading-spinner .path {
     stroke: $--color-text-primary;
-  }
-  .dialog__inner.el-loading-parent--relative .el-loading-mask {
-    top: -30px;
-    right: -30px;
-    bottom: -30px;
-    left: -30px;
   }
   .balance-hint {
     display: block;
@@ -45,34 +23,6 @@
     }
     li {
       line-height: 1.7;
-    }
-  }
-  .el-dialog__footer {
-    padding: 0;
-    .el-button {
-      background-color: $--color-black;
-      color: $--color-white;
-      border-color: transparent;
-      border-radius: 0;
-      width: 100%;
-      height: 100%;
-      display: block;
-      padding-top: 25px;
-      padding-bottom: 25px;
-      font-size: 20px;
-      font-weight: bold;
-      &:hover, &:active {
-        background-color: mix($--color-white, $--color-black, 10%);
-      }
-    }
-  }
-  .el-dialog__close {
-    font-size: 20px;
-    color: $--color-text-primary;
-    font-weight: 400;
-    &:hover {
-      color: inherit;
-      opacity: 0.8;
     }
   }
   .el-form-item {
