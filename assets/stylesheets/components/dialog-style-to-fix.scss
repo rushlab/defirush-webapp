@@ -18,6 +18,12 @@
   .el-loading-spinner .path {
     stroke: $--color-text-primary;
   }
+  .dialog__inner.el-loading-parent--relative .el-loading-mask {
+    top: -30px;
+    right: -30px;
+    bottom: -30px;
+    left: -30px;
+  }
   .balance-hint {
     display: block;
     text-align: right;

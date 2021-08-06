@@ -1,7 +1,7 @@
 <template>
   <div>
     <bank-select :value="bankName" @change="changeBankRoute"/>
-    <div class="bank-data-card">
+    <div class="bank-data-card" v-loading="!!pending" element-loading-spinner="el-icon-loading">
       <div class="card__row">
         <div class="data-item">
           <div class="data-item__label">Value locked in all banks</div>

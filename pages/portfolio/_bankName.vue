@@ -1,7 +1,7 @@
 <template>
   <div>
     <bank-select :value="bankName" @change="changeBankRoute"/>
-    <div class="bank-data-card">
+    <div class="bank-data-card" v-loading="!!pending" element-loading-spinner="el-icon-loading">
       <el-row :gutter="20">
         <el-col :span="12">
           <div class="card__child">
