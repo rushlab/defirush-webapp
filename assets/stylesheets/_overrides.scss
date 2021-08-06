@@ -2,6 +2,9 @@
 
 .el-table {
   background-color: $--background-color-base;
+  .el-loading-mask {
+    background-color: rgba($--background-color-base, 0.9);
+  }
   tr, th {
     background-color: $--background-color-base;
   }
@@ -20,11 +23,17 @@
 
 .el-card {
   background-color: $--background-color-base;
+  .el-loading-mask {
+    background-color: rgba($--background-color-base, 0.9);
+  }
 }
 
 .el-dialog {
   border-radius: 8px;
   overflow: hidden;
+  .el-loading-mask {
+    background-color: rgba($--background-color-base, 0.9);
+  }
   .el-dialog__header {
     padding: ($--dialog-padding-primary + 5px) ($--dialog-padding-primary + 10px) $--dialog-padding-primary;
     border-bottom: 1px solid $--border-color-lighter;
@@ -98,9 +107,6 @@
   }
 }
 
-.el-loading-mask {
-  background-color: rgba($--background-color-base, 0.9);
-}
 .el-loading-spinner {
   margin-top: 0;
   transform: translateY(-50%);

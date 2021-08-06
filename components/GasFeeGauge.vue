@@ -1,7 +1,7 @@
 <template>
   <div class="gas-fees">
     <el-popover placement="bottom" width="240" trigger="hover">
-      <div class="gas-fees__inner" :class="{'is-loading': !!gasPricePending}">
+      <div class="gas-fees__inner" v-loading="gasPricePending" element-loading-spinner="el-icon-loading">
         <div class="inner__title">Ethereum Gas Price Forecast</div>
         <div class="inner__body">
           <div class="item" v-for="(item, key) in gasPriceTable" :key="key">
@@ -9,9 +9,6 @@
             <span class="item__value">{{ item.price_gwei }}</span>
             <span class="item__duration">{{ item.waiting_seconds }} sec</span>
           </div>
-        </div>
-        <div class="inner__loading">
-          <i class="el-icon-loading"></i>
         </div>
       </div>
       <div class="gas-fee-btn" slot="reference">
@@ -150,24 +147,6 @@ export default {
   text-align: center;
   color: $--color-text-primary;
   position: relative;
-}
-.inner__loading {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.05);
-  z-index: -10;
-  opacity: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: $--color-text-primary;
-}
-.gas-fees__inner.is-loading .inner__loading {
-  z-index: 1;
-  opacity: 1;
 }
 .inner__title {
   font-weight: normal;
