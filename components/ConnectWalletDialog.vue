@@ -34,7 +34,7 @@
     </div>
     <div v-if="address && !verified" slot="footer" class="call-to-action">
       <el-button
-        type="primary" @click="verifyUserWallet"
+        type="dark" @click="verifyUserWallet"
         :disabled="isVerifying" :loading="isVerifying"
       >Verify</el-button>
     </div>

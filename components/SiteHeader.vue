@@ -49,7 +49,7 @@
       </div>
     </template>
     <template v-else>
-      <el-button type="primary" round @click="connectDialogVisible=true">Connect Wallet</el-button>
+      <el-button type="dark" round @click="connectDialogVisible=true">Connect Wallet</el-button>
     </template>
     <!-- connect dialog -->
     <connect-wallet-dialog :visible.sync="connectDialogVisible" />

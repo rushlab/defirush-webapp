@@ -1,3 +1,5 @@
+@import "~element-ui/packages/theme-chalk/src/mixins/_button.scss";
+
 .el-table {
   background-color: $--background-color-base;
   tr, th {
@@ -69,6 +71,18 @@
   }
 }
 
+.el-button--dark {
+  @include button-variant($--color-white, $--color-black, $--color-black);
+  &.is-disabled {
+    background-color: $--color-black;
+    border-color: $--color-black;
+    &:hover, &:focus, &:active {
+      background-color: mix($--color-white, $--color-black, 15%);
+      border-color: mix($--color-white, $--color-black, 15%);
+    }
+  }
+}
+
 .el-loading-mask {
   background-color: rgba($--background-color-base, 0.9);
 }
@@ -102,7 +116,7 @@
 
 // Notification styles
 .el-notification {
-  box-shadow: 0px 9px 30px 8px $color-box-shadow;
+  box-shadow: 0px 9px 30px 8px rgba(119, 126, 144, 0.05);
   border-radius: 4px;
   padding: 25px 20px;
 }
@@ -124,8 +138,9 @@
 // Message styles
 .el-message {
   padding: 25px 20px;
+  // TODO: override 样式别随便加 !important, 想办法逐个类型覆盖
   background: $--color-white !important;
-  box-shadow: 0px 9px 30px 8px $color-box-shadow;
+  box-shadow: 0px 9px 30px 8px rgba(119, 126, 144, 0.05);
   border-radius: 8px;
   border: none;
 }
@@ -133,6 +148,7 @@
   // font-size: 22px;
 }
 .el-message__content {
+  // TODO: override 样式别随便加 !important, 想办法逐个类型覆盖
   color: $--color-text-primary !important;
   font-weight: normal;
 }

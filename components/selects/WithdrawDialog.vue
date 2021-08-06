@@ -38,7 +38,7 @@
     </div>
     <div slot="footer" class="call-to-action">
       <el-button
-        type="primary" :loading="isWithdrawing"
+        type="dark" :loading="isWithdrawing"
         :disabled="pending || isWithdrawing || !+form.amountDisplay"
         @click="handleWithdraw">Withdraw</el-button>
     </div>

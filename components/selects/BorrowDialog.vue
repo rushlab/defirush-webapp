@@ -45,7 +45,7 @@
     </div>
     <div slot="footer" class="call-to-action">
       <el-button
-        type="primary" @click="handleBorrow"
+        type="dark" @click="handleBorrow"
         :loading="isBorrowing" :disabled="pending || isBorrowing || !+form.amountDisplay"
       >Borrow</el-button>
     </div>

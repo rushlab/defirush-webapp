@@ -38,17 +38,17 @@
     <div slot="footer" class="call-to-action">
       <el-button
         v-if="!underlyingEnabled"
-        type="primary" @click="enableUnderlying"
+        type="dark" @click="enableUnderlying"
         :loading="isEnabling" :disabled="pending || isEnabling"
       >Enable Underlying</el-button>
       <el-button
         v-else-if="needApprove"
-        type="primary" @click="handleApprove"
+        type="dark" @click="handleApprove"
         :loading="isApproving" :disabled="pending || isApproving || !+form.amountDisplay"
       >Approve</el-button>
       <el-button
         v-else
-        type="primary" @click="handleDeposit"
+        type="dark" @click="handleDeposit"
         :loading="isDepositing" :disabled="pending || isDepositing || !+form.amountDisplay"
       >Deposit</el-button>
     </div>

@@ -40,12 +40,12 @@
     <div slot="footer" class="call-to-action">
       <el-button
         v-if="needApprove"
-        type="primary" @click="handleApprove"
+        type="dark" @click="handleApprove"
         :loading="isApproving" :disabled="pending || isApproving || !+form.amountDisplay"
       >Approve</el-button>
       <el-button
         v-else
-        type="primary" @click="handleRepay"
+        type="dark" @click="handleRepay"
         :loading="isRepaying" :disabled="pending || isRepaying || !+form.amountDisplay"
       >Repay</el-button>
     </div>
