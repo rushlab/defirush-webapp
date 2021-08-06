@@ -3,6 +3,7 @@
   <el-dialog
     class="dialog--connect" :title="dialogTitle" width="540px" top="10vh"
     :append-to-body="true" :modal-append-to-body="true"
+    :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose"
   >
     <div class="dialog__inner">

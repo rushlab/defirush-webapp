@@ -44,6 +44,7 @@ export const actions = {
   async login({ dispatch, commit }, { chainId, address, message, signature }) {
     const content = JSON.stringify({ chainId, address, message, signature })
     global.localStorage.setItem(AUTH_STORAGE_KEY, content)
+    global.location.reload()
     commit('_setApiToken', btoa(content))
     commit('setWallet', { walletChainId: chainId, walletAddress: address })
     commit('setSignerStatus', true)
@@ -53,6 +54,7 @@ export const actions = {
     commit('setWallet', { walletChainId: 1, walletAddress: '' })
     commit('setSignerStatus', false)
     global.localStorage.removeItem(AUTH_STORAGE_KEY)
+    global.location.reload()
   },
   async getLoginData({ dispatch, commit }) {
     const content = global.localStorage.getItem(AUTH_STORAGE_KEY)
