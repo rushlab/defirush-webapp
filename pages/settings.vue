@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <el-card shadow="never" :body-style="{'padding':0}">
+    <el-card shadow="never" :body-style="{'padding':0}" v-loading="pending" element-loading-spinner="el-icon-loading">
       <el-descriptions class="telegram-info" title="Telegram" :column="1">
         <template slot="extra">
           <el-button type="text" size="small" @click="fetchProfile">REFRESH</el-button>
@@ -25,7 +25,8 @@ import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
 export default {
   data() {
     return {
-      profile: {}
+      profile: {},
+      pending: false,
     }
   },
   mounted() {
@@ -33,12 +34,14 @@ export default {
   },
   methods: {
     async fetchProfile() {
+      this.pending = true
       try {
         const res = await this.$axios.get('/api/account/profile/')
         this.profile = res.data
       } catch(err) {
         console.log(err)
       }
+      this.pending = false
     },
     bindTelegram() {
       this.$confirm('跳转到Telegram后，需要在聊天界面，点击「start」按钮。Start完成后返回本页，请点击「REFRESH」按钮', '提示', {
