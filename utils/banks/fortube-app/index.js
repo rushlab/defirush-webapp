@@ -80,7 +80,7 @@ class ForTubeApp extends BankApp {
       totalBorrows: this._mantissaToDisplay(totalBorrows, decimals),
       depositAPY: this._mantissaToDisplay(depositAPY, 18),
       borrowAPY: this._mantissaToDisplay(borrowAPY, 18),
-      // 
+      //
       priceUSD: this._mantissaToDisplay(priceUsdMantissa, 18),
     };
 
@@ -125,12 +125,45 @@ class ForTubeApp extends BankApp {
     const _userAddress = this.$wallet.getAddress();
     const [deposit, borrow] = await this.bankcontroller.getTotalDepositAndBorrow(_userAddress);
     const [availableBorrows,] = await this.bankcontroller.getAccountLiquidity(_userAddress);
+    let totalDeposits = ethers.constants.Zero;
+
+    const fTokens = await this.bankcontroller.getAssetsIn(_userAddress);
+
+    const _promises = fTokens.map(async (fTokenAddr) => {
+
+      const _1e18 = ethers.utils.parseUnits('1', 18);
+
+      const fToken = new ethers.Contract(fTokenAddr, [
+        'function getAccountState(address account) view returns (uint256, uint256, uint256)',
+        'function underlying() view returns (address)'
+      ], this.$wallet.getProvider());
+      const underlyingToken = await fToken.underlying();
+
+      const decimals = await this._decimals(underlyingToken);
+      const _1eDiff = ethers.utils.parseUnits('1', 18 - decimals);
+
+      const [fTokenBalance, borrowBalance, exchangeRate] = await fToken.getAccountState(_userAddress);
+
+      const underlyingBalance = fTokenBalance.mul(exchangeRate).div(_1e18);
+
+      const [priceUsdMantissa, oracleSet] = await this.bankcontroller.fetchAssetPrice(underlyingToken);
+      const underlyingValueUSD = underlyingBalance.mul(priceUsdMantissa).mul(_1eDiff);
+      //                         decimals              18                    18 - decimals
+
+      // console.log("1edecimal", _1edecimal.toString(), underlyingValueUSD.toString());
+
+      totalDeposits = totalDeposits.add(underlyingValueUSD);
+
+
+    });
+
+    await Promise.all(_promises);
+
     return {
-      userDepositsUSD: this._mantissaToDisplay(deposit, 18),
+      userDepositsUSD: this._mantissaToDisplay(totalDeposits, 18 + 18),
       userBorrowsUSD: this._mantissaToDisplay(borrow, 18),
       availableBorrowsUSD: this._mantissaToDisplay(availableBorrows, 18),
-      // availableBorrowsUSD: 0
-    }  
+    }
   }
 
 
@@ -153,7 +186,7 @@ class ForTubeApp extends BankApp {
     return {
       userDeposits: this._mantissaToDisplay(underlyingBalance, decimals),
       userBorrows: this._mantissaToDisplay(borrowBalance, decimals)
-    }  
+    }
   }
 
   async enableUnderlying(underlyingToken) {}
