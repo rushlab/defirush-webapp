@@ -357,9 +357,6 @@ export default {
   margin-bottom: 8px;
 }
 /deep/ {
-  .el-card {
-    background-color: $--background-color-base;
-  }
   .el-card__header {
     border-bottom: none;
   }

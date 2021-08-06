@@ -16,6 +16,10 @@
   }
 }
 
+.el-card {
+  background-color: $--background-color-base;
+}
+
 .el-loading-mask {
   background-color: rgba($--background-color-base, 0.9);
 }
