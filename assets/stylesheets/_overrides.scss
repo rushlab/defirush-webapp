@@ -93,3 +93,8 @@
 .el-dropdown-menu__item:focus {
   background-color: $--input-background-color;
 }
+
+.el-descriptions__body,
+.el-descriptions-item__label.is-bordered-label {
+  background-color: $--background-color-base;
+}
