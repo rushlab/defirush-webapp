@@ -4,30 +4,7 @@
       <span>{{ networkName }}</span>
     </div>
     <div style="margin-left: auto;"></div>
-    <div class="gas-fees">
-      <el-popover placement="bottom" width="240" trigger="hover">
-        <div class="gas-fees__inner" :class="{'is-loading': !!gasPricePending}">
-          <div class="inner__title">Ethereum Gas Price Forecast</div>
-          <div class="inner__body">
-            <div class="item" v-for="(item, key) in gasPriceTable" :key="key">
-              <span class="item__speed">{{ key }}</span>
-              <span class="item__value">{{ item.price_gwei }}</span>
-              <span class="item__duration">{{ item.waiting_seconds }} sec</span>
-            </div>
-          </div>
-          <div class="inner__loading">
-            <i class="el-icon-loading"></i>
-          </div>
-        </div>
-        <div class="gas-fee-btn" slot="reference">
-          <div class="gas-fee-icon">
-            <i class="rush-icon-gas"></i>
-          </div>
-          <div class="gas-fee-value">{{ gasPriceTable.normal.price_gwei || '-' }}</div>
-          <circle-progress class="gas-fee__progress" :radius="24" :stroke="2" :progress="progress" colorStorke="#000000"/>
-        </div>
-      </el-popover>
-    </div>
+    <gas-fee-gauge></gas-fee-gauge>
     <template v-if="isAuthenticated">
       <div class="wallet-status">
         <el-dropdown>
@@ -64,26 +41,19 @@ import _ from 'lodash'
 import { ethers } from 'ethers'
 import { mapState, mapGetters } from 'vuex'
 import MetamaskLogo from '@/components/MetamaskLogo'
-import CircleProgress from '@/components/CircleProgress'
 import ConnectWalletDialog from '@/components/ConnectWalletDialog'
+import GasFeeGauge from '@/components/GasFeeGauge'
 import { copyToClipboard } from '@/utils/copy'
 
 export default {
   name: 'SiteHeader',
   components: {
     MetamaskLogo,
-    CircleProgress,
     ConnectWalletDialog,
+    GasFeeGauge,
   },
   data() {
     return {
-      gasPriceTable: {
-        fase: {},
-        normal: {},
-        slow: {}
-      },
-      progress: 0,
-      gasPricePending: false,
       connectDialogVisible: false
     }
   },
@@ -104,37 +74,9 @@ export default {
       return walletAddress.substring(0, 6) + '...' + walletAddress.substring(walletAddress.length - 4)
     },
   },
-  mounted() {
-    this.getGasPrice()
-  },
-  watch: {
-    progress: {
-      handler() {
-        setTimeout(() => {
-          this.progress = (this.progress + 1) % 100
-          if (this.progress === 0) {
-            this.getGasPrice()
-          }
-        }, 200)
-      },
-      immediate: true
-    }
-  },
+  mounted() {},
   methods: {
     copyToClipboard,
-    async getGasPrice() {
-      this.gasPricePending = true
-      try {
-        const res = await this.$axios.get('/api/gas_price_table/')
-        const { fast, normal, slow } = res.data
-        this.gasPriceTable = {
-          fast: { ...fast, price_gwei: parseInt(fast.price_gwei) },
-          normal: { ...normal, price_gwei: parseInt(normal.price_gwei) },
-          slow: { ...slow, price_gwei: parseInt(slow.price_gwei) }
-        }
-      } catch (error) {}
-      this.gasPricePending = false
-    },
     async copyWalletAddress() {
       try {
         await this.copyToClipboard(this.walletAddress)
@@ -214,97 +156,5 @@ export default {
 }
 .logout-button {
   margin-left: 1em;
-}
-.gas-fee-btn {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #E6E8EC;
-  border-radius: 50%;
-  margin-right: 12px;
-  cursor: pointer;
-  color: $--color-text-primary;
-  position: relative;
-  // transition: all .25s ease-in-out;
-}
-.gas-fee-icon {
-  font-size: 11px;
-}
-.gas-fee-value {
-  font-size: 11px;
-  line-height: 1;
-}
-.gas-fee-btn:hover {
-  background-color: $--color-text-primary;
-  .gas-fee-icon,
-  .gas-fee-value {
-    color: #ffffff;
-  }
-}
-.gas-fee__progress {
-  position: absolute;
-  top: -4px;
-  left: -4px;
-}
-.gas-fees__inner {
-  padding: 3px 13px;
-  text-align: center;
-  color: $--color-text-primary;
-  position: relative;
-}
-.inner__loading {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.05);
-  z-index: -10;
-  opacity: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: $--color-text-primary;
-}
-.gas-fees__inner.is-loading .inner__loading {
-  z-index: 1;
-  opacity: 1;
-}
-.inner__title {
-  font-weight: normal;
-  font-size: 14px;
-  line-height: 28px;
-  margin-bottom: 15px;
-}
-.inner__body {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  .item {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-  }
-  .item__speen {
-    font-size: 12px;
-    line-height: 14px;
-    margin-bottom: 4px;
-  }
-  .item__value {
-    font-weight: 500;
-    font-size: 20px;
-    line-height: 20px;
-    margin-bottom: 4px;
-  }
-  .item__duration {
-    font-size: 10px;
-    line-height: 10px;
-    color: #777E91;
-  }
 }
 </style>
