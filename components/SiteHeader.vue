@@ -92,7 +92,7 @@ export default {
     ...mapState('auth', ['walletChainId', 'walletAddress', 'isAuthenticated', 'isSignerAlive']),
     networkName() {
       if (this.walletChainId == 1) {
-        return 'Etherum Mainnet'
+        return 'Ethereum Mainnet'
       } else if (this.walletChainId === 31337 || this.walletChainId === 71337 ) {
         return 'Hardhat Forking'
       } else {
@@ -144,6 +144,7 @@ export default {
     },
     async handleLogout() {
       await this.$store.dispatch('auth/logout')
+      global.location.reload()
     }
   },
 }

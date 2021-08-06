@@ -145,6 +145,7 @@ export default {
         this.verified = true
         await this.$store.dispatch('auth/login', { chainId, address, message, signature })
         this.$message.success('Connected')
+        global.location.reload()
       } else {
         this.$message.error('Wrong signature ...... ')
       }
