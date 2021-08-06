@@ -366,13 +366,6 @@ export default {
   .el-progress-bar__outer {
     background-color: #DFE2E8;
   }
-  .el-loading-spinner {
-    margin-top: 0;
-    transform: translateY(-50%);
-  }
-  .el-loading-spinner i {
-    color: $--color-text-primary;
-  }
   .el-icon-question:hover {
     color: $--color-text-primary;
   }

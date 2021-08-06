@@ -186,13 +186,4 @@ export default {
 .asset-value-to-usd {
   color: $--color-text-regular;
 }
-/deep/ {
-  .el-loading-spinner {
-    margin-top: 0;
-    transform: translateY(-50%);
-  }
-  .el-loading-spinner i {
-    color: $--color-text-primary;
-  }
-}
 </style>

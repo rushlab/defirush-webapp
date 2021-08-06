@@ -101,6 +101,13 @@
 .el-loading-mask {
   background-color: rgba($--background-color-base, 0.9);
 }
+.el-loading-spinner {
+  margin-top: 0;
+  transform: translateY(-50%);
+  i {
+    color: $--color-text-primary;
+  }
+}
 
 .v-modal {
   opacity: 0.6;

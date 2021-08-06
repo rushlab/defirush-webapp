@@ -155,9 +155,6 @@ export default {
     .el-dialog__footer {
       padding: 0;
     }
-    .el-loading-spinner .path {
-      stroke: $--color-text-primary;
-    }
   }
 }
 .dialog__inner {
