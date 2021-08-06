@@ -7,20 +7,19 @@
     <gas-fee-gauge></gas-fee-gauge>
     <template v-if="isAuthenticated">
       <div class="wallet-status">
-        <el-dropdown>
+        <el-dropdown @command="handleDropdownCommand">
           <div class="el-dropdown-link wallet-address-btn">
             <metamask-logo class="icon-metamask"/>
             <span class="wallet-address">{{ maskedWalletAddress }}</span> <i class="el-icon-arrow-down el-icon--right"></i>
           </div>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>
-              <el-button class="dropdown__btn" @click="copyWalletAddress" type="text">
-                {{ maskedWalletAddress }} <el-tooltip class="item" effect="dark" content="Click to copy" placement="top"><i class="el-icon-copy-document"></i></el-tooltip>
-              </el-button>
+            <el-dropdown-item command="copyWalletAddress">
+              <span>{{ maskedWalletAddress }} </span>
+              <el-tooltip class="item" effect="dark" content="Click to copy" placement="top">
+                <i class="el-icon-copy-document"></i>
+              </el-tooltip>
             </el-dropdown-item>
-            <el-dropdown-item>
-              <el-button class="dropdown__btn" @click="handleLogout" type="text">Logout</el-button>
-            </el-dropdown-item>
+            <el-dropdown-item command="logout">Logout</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
@@ -70,16 +69,24 @@ export default {
     },
     maskedWalletAddress() {
       const walletAddress = this.walletAddress || ''
-      if (!walletAddress) return ''
-      return walletAddress.substring(0, 6) + '...' + walletAddress.substring(walletAddress.length - 4)
+      if (!walletAddress) {
+        return ''
+      }
+      return walletAddress.substr(0, 6) + '...' + walletAddress.substr(walletAddress.length - 4)
     },
   },
   mounted() {},
   methods: {
-    copyToClipboard,
+    async handleDropdownCommand(command) {
+      if (command === 'copyWalletAddress') {
+        await this.copyWalletAddress()
+      } else if (command === 'logout') {
+        await this.handleLogout()
+      }
+    },
     async copyWalletAddress() {
       try {
-        await this.copyToClipboard(this.walletAddress)
+        await copyToClipboard(this.walletAddress)
         this.$message({ type: 'success', message: 'Copied successfully!' })
       } catch (error) {}
     },
@@ -142,19 +149,10 @@ export default {
     margin-top: -10px;
   }
 }
-.dropdown__btn {
-  color: $--color-text-primary;
-}
-.wallet-address {
-  //
-}
 .wallet-status {
   /deep/ .el-button,
   /deep/ .el-tag {
     margin-left: 1em;
   }
-}
-.logout-button {
-  margin-left: 1em;
 }
 </style>

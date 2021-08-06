@@ -142,6 +142,9 @@ export default {
     transform-origin: 50% 50%,
   }
 }
+.gas-fees {
+  margin-right: 5px;
+}
 .gas-fees__inner {
   padding: 3px 13px;
   text-align: center;
