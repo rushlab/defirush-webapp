@@ -28,8 +28,13 @@
     </el-form>
     <div class="bank-list">
       <div class="table-refresh-head">
-        <span>Data updated&nbsp;</span><span class="last-updated-at">{{ lastUpdatedAtDisplay }}</span><span>&nbsp;ago</span>
-        <div class="btn-text btn--refresh" :class="{'is-refreshing': isRefreshing}" @click="refreshTable">REFRESH</div>
+        <span>Data updated&nbsp;</span>
+        <span class="last-updated-at">{{ lastUpdatedAtDisplay }}</span>
+        <span>&nbsp;ago&nbsp;</span>
+        <el-button
+          type="text" class="refresh-button" :loading="isRefreshing"
+          @click="refreshTable"
+        >REFRESH <i class="el-icon-refresh"></i></el-button>
       </div>
       <el-table :data="[]" class="table--headers-only">
         <el-table-column label="" width="60"></el-table-column>
@@ -144,18 +149,19 @@ export default {
     },
     async refreshTable() {
       this.isRefreshing = true
-      const promiseList = _.map(this.banksList, bank => {
-        return new Promise((resolve) => {
-          const bankItem = this.$refs[bank.title]
-          if (bankItem && bankItem[0].getAllData) {
-            bankItem[0].getAllData()
-          }
-          resolve()
-        })
+      const promiseList = _.map(this.banksList, async (bank) => {
+        const bankItem = this.$refs[bank.title]
+        if (bankItem && bankItem[0].getAllData) {
+          await bankItem[0].getAllData()
+        }
       })
-      await Promise.all(promiseList)
-      this.lastUpdatedAt = dayjs()
+      try {
+        await Promise.all(promiseList)
+      } catch(error) {
+        console.log(error)
+      }
       this.isRefreshing = false
+      this.lastUpdatedAt = dayjs()
     }
   },
   watch: {
@@ -254,42 +260,22 @@ export default {
   justify-content: flex-start;
   align-items: center;
   color: $--color-text-regular;
-  padding: 15px 10px;
+  padding: 5px 15px;
   border-bottom: 1px solid $--border-color-base;
-  .btn-text {
-    margin-left: 10px;
-    cursor: pointer;
-    text-decoration: underline;
-    color: $--color-text-primary;
-  }
-  .btn--refresh {
-    position: relative;
-    padding-right: 20px;
-  }
-  .btn--refresh::after {
-    content: "";
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    right: 0;
-    top: 50%;
-    margin-top: -8px;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
-    background-image: url('~/assets/icons/icon-rotate.png');
-  }
-  .btn--refresh:hover::after {
-    opacity: 0.8;
-  }
-  .btn--refresh.is-refreshing::after {
-    animation: rotating infinite 1s ease-in-out;
+  .refresh-button.is-loading {
+    /deep/ .el-icon-loading {
+      display: none;
+      + span { margin-left: 0; }
+    }
+    .el-icon-refresh {
+      animation: rotating 2s linear reverse infinite;
+    }
   }
 }
 .last-updated-at {
   color: $--color-text-primary;
 }
-.input-amount  /deep/ {
+.input-amount /deep/ {
   .el-input-group__prepend {
     background-color: #E6E8EC;
     height: 56px !important;

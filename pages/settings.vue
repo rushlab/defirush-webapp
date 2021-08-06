@@ -3,11 +3,15 @@
     <el-card shadow="never" :body-style="{'padding':0}" v-loading="pending" element-loading-spinner="el-icon-loading">
       <el-descriptions class="telegram-info" title="Telegram" :column="1">
         <template slot="extra">
-          <el-button type="text" size="small" @click="fetchProfile">REFRESH</el-button>
+          <el-button type="text" @click="fetchProfile" style="padding:2px;">Refresh</el-button>
         </template>
         <el-descriptions-item label="Telegram Key">{{ profile.telegramKey }}</el-descriptions-item>
         <el-descriptions-item label="Telegram Chat ID">
-          <div v-if="!profile.telegramChatId" class="btn-text" @click="bindTelegram">Bind</div>
+          <el-button
+            v-if="!profile.telegramChatId"
+            type="text" style="padding:2px;"
+            @click="bindTelegram"
+          >Bind Telegram</el-button>
           <div v-else>{{ profile.telegramChatId }}</div>
         </el-descriptions-item>
         <el-descriptions-item
@@ -44,7 +48,7 @@ export default {
       this.pending = false
     },
     bindTelegram() {
-      this.$confirm('跳转到Telegram后，需要在聊天界面，点击「start」按钮。Start完成后返回本页，请点击「REFRESH」按钮', '提示', {
+      this.$confirm('跳转到Telegram后，需要在聊天界面，点击「start」按钮。Start完成后返回本页，请点击「Refresh」按钮', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -63,9 +67,5 @@ export default {
 }
 .telegram-info {
   padding: 20px;
-}
-.btn-text {
-  color: $--color-primary;
-  cursor: pointer;
 }
 </style>

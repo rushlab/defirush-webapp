@@ -49,7 +49,10 @@
       </div>
     </template>
     <template v-else>
-      <el-button type="dark" round @click="connectDialogVisible=true">Connect Wallet</el-button>
+      <el-button
+        type="dark" round size="medium"
+        @click="connectDialogVisible=true"
+      >Connect Wallet</el-button>
     </template>
     <!-- connect dialog -->
     <connect-wallet-dialog :visible.sync="connectDialogVisible" />
@@ -246,7 +249,6 @@ export default {
   top: -4px;
   left: -4px;
 }
-
 .gas-fees__inner {
   padding: 3px 13px;
   text-align: center;

@@ -28,12 +28,21 @@
   .el-dialog__header {
     padding: ($--dialog-padding-primary + 5px) ($--dialog-padding-primary + 10px) $--dialog-padding-primary;
     border-bottom: 1px solid $--border-color-lighter;
-  }
-  .el-dialog__title {
-    font-weight: bold;
+    .el-dialog__title {
+      font-weight: bold;
+    }
   }
   .el-dialog__headerbtn {
     top: $--dialog-padding-primary + 5px;
+    font-size: $--dialog-title-font-size;
+    .el-dialog__close {
+      color: $--link-color;
+    }
+    &:focus, &:hover {
+      .el-dialog__close {
+        color: $--link-hover-color;
+      }
+    }
   }
   .el-dialog__body {
     padding: $--dialog-padding-primary ($--dialog-padding-primary + 10px);
@@ -42,15 +51,6 @@
       right: -($--dialog-padding-primary + 10px);
       bottom: -$--dialog-padding-primary;
       left: -($--dialog-padding-primary + 10px);
-    }
-  }
-  .el-dialog__close {
-    font-size: 20px;
-    color: $--color-text-primary;
-    font-weight: 400;
-    &:hover {
-      color: inherit;
-      opacity: 0.8;
     }
   }
   .el-dialog__footer {
@@ -71,14 +71,29 @@
   }
 }
 
+.el-button {
+  &.el-button--text{
+    color: $--color-black;
+    &:hover, &:focus {
+      color: mix($--color-white, $--color-black, $--button-hover-tint-percent);
+    }
+    &:active {
+      color: mix($--color-black, $--color-black, $--button-active-shade-percent);
+    }
+    &.is-loading::before {
+      background-color: transparent;
+    }
+  }
+}
+
 .el-button--dark {
   @include button-variant($--color-white, $--color-black, $--color-black);
   &.is-disabled {
     background-color: $--color-black;
     border-color: $--color-black;
     &:hover, &:focus, &:active {
-      background-color: mix($--color-white, $--color-black, 15%);
-      border-color: mix($--color-white, $--color-black, 15%);
+      background-color: mix($--color-white, $--color-black, 20%);
+      border-color: mix($--color-white, $--color-black, 20%);
     }
   }
 }
@@ -89,23 +104,6 @@
 
 .v-modal {
   opacity: 0.6;
-}
-
-.tables-popover {
-  padding: 0;
-  border-radius: 4px;
-  border: none;
-  overflow: hidden;
-  .el-table::before {
-    display: none;
-  }
-  .el-table td,
-  .el-table th {
-    border-color: transparent;
-  }
-  .el-table th {
-    background-color: #f9f9f9;
-  }
 }
 
 .el-button--small,
@@ -129,10 +127,6 @@
   color: $--color-text-secondary;
   font-size: 14px;
   line-height: 20px;
-  a {
-    color: $--color-text-primary;
-    text-decoration: underline;
-  }
 }
 
 // Message styles
@@ -143,9 +137,6 @@
   box-shadow: 0px 9px 30px 8px rgba(119, 126, 144, 0.05);
   border-radius: 8px;
   border: none;
-}
-.el-message__icon {
-  // font-size: 22px;
 }
 .el-message__content {
   // TODO: override 样式别随便加 !important, 想办法逐个类型覆盖
@@ -162,4 +153,21 @@
 .el-descriptions__body,
 .el-descriptions-item__label.is-bordered-label {
   background-color: $--background-color-base;
+}
+
+.tables-popover {
+  padding: 0;
+  border-radius: 4px;
+  border: none;
+  overflow: hidden;
+  .el-table::before {
+    display: none;
+  }
+  .el-table td,
+  .el-table th {
+    border-color: transparent;
+  }
+  .el-table th {
+    background-color: #f9f9f9;
+  }
 }

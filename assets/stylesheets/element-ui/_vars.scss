@@ -71,8 +71,8 @@ $--background-color-base: #EEF0F4 !default;
 
 /* Link
 -------------------------- */
-$--link-color: $--color-primary-light-2 !default;
-$--link-hover-color: $--color-primary !default;
+$--link-color: $--color-text-primary !default;
+$--link-hover-color: mix($--color-white, $--color-text-primary, 20%) !default;
 
 /* Border
 -------------------------- */
