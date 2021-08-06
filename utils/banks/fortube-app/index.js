@@ -126,6 +126,7 @@ class ForTubeApp extends BankApp {
     const [deposit, borrow] = await this.bankcontroller.getTotalDepositAndBorrow(_userAddress);
     const [availableBorrows,] = await this.bankcontroller.getAccountLiquidity(_userAddress);
     let totalDeposits = ethers.constants.Zero;
+    let totalBorrows = ethers.constants.Zero;
 
     const fTokens = await this.bankcontroller.getAssetsIn(_userAddress);
 
@@ -147,13 +148,16 @@ class ForTubeApp extends BankApp {
       const underlyingBalance = fTokenBalance.mul(exchangeRate).div(_1e18);
 
       const [priceUsdMantissa, oracleSet] = await this.bankcontroller.fetchAssetPrice(underlyingToken);
-      const underlyingValueUSD = underlyingBalance.mul(priceUsdMantissa).mul(_1eDiff);
+      const underlyingDepositValueUSD = underlyingBalance.mul(priceUsdMantissa).mul(_1eDiff);
       //                         decimals              18                    18 - decimals
+      const borrowValueUSD = borrowBalance.mul(priceUsdMantissa).mul(_1eDiff);
+      //                         decimals           18           18 - decimals
+
 
       // console.log("1edecimal", _1edecimal.toString(), underlyingValueUSD.toString());
 
-      totalDeposits = totalDeposits.add(underlyingValueUSD);
-
+      totalDeposits = totalDeposits.add(underlyingDepositValueUSD);
+      totalBorrows = totalBorrows.add(borrowValueUSD);
 
     });
 
@@ -161,7 +165,7 @@ class ForTubeApp extends BankApp {
 
     return {
       userDepositsUSD: this._mantissaToDisplay(totalDeposits, 18 + 18),
-      userBorrowsUSD: this._mantissaToDisplay(borrow, 18),
+      userBorrowsUSD: this._mantissaToDisplay(totalBorrows, 18 + 18),
       availableBorrowsUSD: this._mantissaToDisplay(availableBorrows, 18),
     }
   }
@@ -174,6 +178,7 @@ class ForTubeApp extends BankApp {
  */
 
   async getAccountAssetData(underlyingToken) {
+
     const decimals = await this._decimals(underlyingToken);
     const _userAddress = this.$wallet.getAddress();
     const _1e18 = ethers.utils.parseUnits('1', 18);
@@ -201,11 +206,14 @@ class ForTubeApp extends BankApp {
   }
 
   async underlyingAllowance(underlyingToken) {
-    // const spender = this._getMarketOfUnderlying(underlyingToken);
+
+    const decimals = await this._decimals(underlyingToken);
     const spender = this.addresses['BankController'];
     const allowanceMantissa = await super._allowance(underlyingToken, spender);
     return this._mantissaToDisplay(allowanceMantissa, decimals);
+
   }
+
 
   async deposit(underlyingToken, amountDisplay) {
     const signer = this.$wallet.getSigner();
