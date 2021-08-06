@@ -11,17 +11,13 @@
         <!-- 选择钱包，点击链接 -->
         <div class="dialog__notice">Please select a wallet to connect:</div>
         <div class="wallet-items">
-          <button
-            class="wallet-btn"
-            :disabled="isConnecting"
-            @click="connectBrowserWallet">
-            <metamask-logo class="wallet-icon" /> <span>MetaMask</span>
+          <button class="wallet-btn" :disabled="isConnecting" @click="connectBrowserWallet">
+            <img class="wallet-icon" src="~/assets/icons/metamask-fox.svg" alt="">
+            <span> MetaMask</span>
           </button>
-          <button
-            class="wallet-btn"
-            :disabled="isConnecting"
-            @click="connectBrowserWallet">
-            <img class="wallet-icon--img" src="~/assets/icons/wallet-connect.png" alt=""> <span>WalletConnect</span>
+          <button class="wallet-btn" :disabled="isConnecting" @click="connectBrowserWallet">
+            <img class="wallet-icon" src="~/assets/icons/wallet-connect.png" alt="">
+            <span> WalletConnect</span>
           </button>
         </div>
         <a href="javascript:void(0);" class="help-hint">What is a wallet?</a>
@@ -45,13 +41,10 @@
 import _ from 'lodash'
 import { ethers } from 'ethers'
 import { mapState, mapGetters, mapActions } from 'vuex'
-import MetamaskLogo from '@/components/MetamaskLogo'
 
 export default {
   name: 'ConnectWalletDialog',
-  components: {
-    MetamaskLogo,
-  },
+  components: {},
   props: {
     visible: {
       type: Boolean,
@@ -183,11 +176,6 @@ export default {
     margin-left: 25px;
   }
   .wallet-icon {
-    height: 36px;
-    width: 36px;
-    margin-right: 15px;
-  }
-  .wallet-icon--img {
     width: 36px;
     margin-right: 15px;
   }

@@ -1,9 +1,6 @@
 <template>
   <div class="launcher">
-    <div class="metamask">
-      <metamask-logo class="mm-logo"/>
-    </div>
-    <div v-if="isSignerAlive" class="avtive-waller"><span>已连接钱包: MetaMask</span></div>
+    <div v-if="isSignerAlive" class="active-wallet"><span>已连接钱包: MetaMask</span></div>
     <div v-if="isSignerAlive" v-loading="!!pending">
       <el-form ref="launcher" label-position="top">
         <el-form-item label="钱包地址">
@@ -44,7 +41,6 @@ import _ from 'lodash'
 import { mapState } from 'vuex'
 import { ethers } from "ethers"
 import { BigNumber } from 'bignumber.js'
-import MetamaskLogo from '@/components/MetamaskLogo'
 
 const ERC20_TOKENS = [
   { symbol: 'WETH', address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', decimals: 18 },
@@ -68,9 +64,6 @@ const ERC20_ABI = [
 
 export default {
   name: 'Launcher',
-  components: {
-    MetamaskLogo,
-  },
   data() {
     const erc20TokenBalance = {}
     _.forEach(ERC20_TOKENS, ({ symbol }) => {
@@ -154,20 +147,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.metamask {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.mm-logo {
-  width: 60px;
-  height: 60px;
-}
-.mm-btn {
-  margin-left: 15px;
-}
-.avtive-waller {
+.active-wallet {
   text-align: center;
   margin: 10px auto;
   position: relative;

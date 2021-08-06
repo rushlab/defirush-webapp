@@ -2,12 +2,12 @@
   <div class="container">
     <el-row :gutter="20">
       <el-col :span="6">
-        <el-card>
+        <el-card shadow="never">
           <launcher ref="launcher" @init="initProvider"/>
         </el-card>
       </el-col>
       <el-col :span="18">
-        <el-card>
+        <el-card shadow="never">
           <div slot="header"><span class="card-header__title">兑换</span></div>
             <exchange @success="handleSwapSuccess"/>
         </el-card>

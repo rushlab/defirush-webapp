@@ -9,7 +9,7 @@
       <div class="wallet-status">
         <el-dropdown @command="handleDropdownCommand">
           <div class="el-dropdown-link wallet-address-btn">
-            <metamask-logo class="icon-metamask"/>
+            <img class="icon-metamask" src="~/assets/icons/metamask-fox.svg" alt="">
             <span class="wallet-address">{{ maskedWalletAddress }}</span> <i class="el-icon-arrow-down el-icon--right"></i>
           </div>
           <el-dropdown-menu slot="dropdown">
@@ -39,7 +39,6 @@
 import _ from 'lodash'
 import { ethers } from 'ethers'
 import { mapState, mapGetters } from 'vuex'
-import MetamaskLogo from '@/components/MetamaskLogo'
 import ConnectWalletDialog from '@/components/ConnectWalletDialog'
 import GasFeeGauge from '@/components/GasFeeGauge'
 import { copyToClipboard } from '@/utils/copy'
@@ -47,7 +46,6 @@ import { copyToClipboard } from '@/utils/copy'
 export default {
   name: 'SiteHeader',
   components: {
-    MetamaskLogo,
     ConnectWalletDialog,
     GasFeeGauge,
   },
