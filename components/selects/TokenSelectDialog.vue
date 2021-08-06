@@ -100,7 +100,7 @@ export default {
       return res
     },
     listedTokens() {
-      return _.take(this.filteredResults, 10)
+      return _.take(this.filteredResults, 50)
     }
   },
   mounted() {},
