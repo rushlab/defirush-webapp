@@ -25,6 +25,7 @@ declare interface WalletInterface {
   getSigner(): Signer;
   getProvider(): Provider;
   getBalance(asset: Address): Promise<AmountDisplay>;
+  waitForTx(tx: any): Promise<void>;
 }
 
 declare interface BankAppInterface {
