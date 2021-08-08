@@ -1,7 +1,10 @@
 <template>
   <div>
     <bank-select :value="bankName" @change="changeBankRoute"/>
-    <div class="bank-data-card" v-loading="!!pending" element-loading-spinner="el-icon-loading">
+    <el-card
+      class="bank-data-card" v-loading="!!pending" shadow="never"
+      element-loading-spinner="el-icon-loading"
+    >
       <div class="card__row">
         <div class="data-item">
           <div class="data-item__label">Value locked in all banks</div>
@@ -36,7 +39,7 @@
           </el-col>
         </el-row>
       </div>
-    </div>
+    </el-card>
     <div style="margin-top: 20px;"></div>
     <el-row :gutter="20">
       <el-col :span="12">
@@ -334,14 +337,12 @@ export default {
 <style lang="scss" scoped>
 @import '@/assets/stylesheets/variables.scss';
 .bank-data-card {
-  padding: 20px;
-  height: 200px;
-  background-color: $--background-color-base;
-  box-shadow: 0 0 0 1px $--border-color-base;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
+  /deep/ .el-card__body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
 }
 .card__title {
   font-size: 16px;

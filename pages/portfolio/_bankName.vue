@@ -1,7 +1,10 @@
 <template>
   <div>
     <bank-select :value="bankName" @change="changeBankRoute"/>
-    <div class="bank-data-card" v-loading="!!pending" element-loading-spinner="el-icon-loading">
+    <el-card
+      class="bank-data-card" v-loading="!!pending" shadow="never"
+      element-loading-spinner="el-icon-loading"
+    >
       <el-row :gutter="20">
         <el-col :span="12">
           <div class="card__child">
@@ -75,7 +78,7 @@
           </div>
         </el-col>
       </el-row>
-    </div>
+    </el-card>
 
     <div style="margin-top: 1em;"></div>
 
@@ -340,12 +343,6 @@ export default {
 
 <style lang="scss" scoped>
 @import '@/assets/stylesheets/variables.scss';
-.bank-data-card {
-  padding: 20px;
-  height: 200px;
-  background-color: $--background-color-base;
-  box-shadow: 0 0 0 1px $--border-color-base;
-}
 .card__title {
   font-size: 16px;
   font-weight: 400;
