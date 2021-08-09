@@ -1,28 +1,10 @@
 .dialog-style-to-fix {
-  .el-dialog {
-    background-color: $--background-color-gray;
-    // border: 1px solid $--border-color-base;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .el-dialog__title {
-    font-size: 20px;
-  }
-  .el-dialog__header {
-    padding: 20px 30px;
-    border-bottom: 1px solid $--border-color-base;
-  }
-  .el-dialog__body {
-    padding: 30px;
-  }
-  .el-loading-spinner .path {
-    stroke: $--color-text-primary;
-  }
-  .dialog__inner.el-loading-parent--relative .el-loading-mask {
-    top: -30px;
-    right: -30px;
-    bottom: -30px;
-    left: -30px;
+  // 除了这个特殊的 loading mask, 不要在这里写覆盖 el-dialog 的样式, overrides 里已经都改好了
+  .el-dialog__body .el-loading-parent--relative .el-loading-mask {
+    top: -$--dialog-padding-primary;
+    right: -($--dialog-padding-primary + 10px);
+    bottom: -$--dialog-padding-primary;
+    left: -($--dialog-padding-primary + 10px);
   }
   .balance-hint {
     display: block;

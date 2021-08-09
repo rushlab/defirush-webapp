@@ -1,13 +1,13 @@
 @import "~element-ui/packages/theme-chalk/src/mixins/_button.scss";
 
 .el-table {
-  background-color: $--background-color-base;
-  .el-loading-mask {
-    background-color: rgba($--background-color-base, 0.9);
-  }
-  tr, th {
-    background-color: $--background-color-base;
-  }
+  // background-color: $--background-color-base;
+  // .el-loading-mask {
+  //   background-color: rgba($--background-color-base, 0.9);
+  // }
+  // tr, th {
+  //   background-color: $--background-color-base;
+  // }
   th, thead {
     font-weight: normal;
   }
@@ -22,10 +22,10 @@
 }
 
 .el-card {
-  background-color: $--background-color-base;
-  .el-loading-mask {
-    background-color: rgba($--background-color-base, 0.9);
-  }
+  // background-color: $--background-color-base;
+  // .el-loading-mask {
+  //   background-color: rgba($--background-color-base, 0.9);
+  // }
 }
 
 .el-dialog {
@@ -55,12 +55,6 @@
   }
   .el-dialog__body {
     padding: $--dialog-padding-primary ($--dialog-padding-primary + 10px);
-    .el-loading-parent--relative .el-loading-mask {
-      top: -$--dialog-padding-primary;
-      right: -($--dialog-padding-primary + 10px);
-      bottom: -$--dialog-padding-primary;
-      left: -($--dialog-padding-primary + 10px);
-    }
   }
   .el-dialog__footer {
     padding: $--dialog-padding-primary ($--dialog-padding-primary + 10px);
@@ -165,7 +159,7 @@
 
 .el-descriptions__body,
 .el-descriptions-item__label.is-bordered-label {
-  background-color: $--background-color-base;
+  // background-color: $--background-color-base;
 }
 
 .tables-popover {

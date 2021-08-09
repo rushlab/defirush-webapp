@@ -105,7 +105,6 @@ export default {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  background-color: $--background-color-gray;
   z-index: 100;
 }
 .network-status {
@@ -151,115 +150,6 @@ export default {
   /deep/ .el-button,
   /deep/ .el-tag {
     margin-left: 1em;
-  }
-}
-.logout-button {
-  margin-left: 1em;
-}
-.btn--connect {
-  height: 40px;
-  line-height: 22px;
-  padding-top: 9px;
-  padding-bottom: 9px;
-  background-color: $--color-text-primary;
-  border: 0;
-  color: #ffffff;
-  &:hover,
-  &:active {
-    opacity: 0.9;
-  }
-}
-.gas-fee-btn {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #E6E8EC;
-  border-radius: 50%;
-  margin-right: 12px;
-  cursor: pointer;
-  color: $--color-text-primary;
-  position: relative;
-  // transition: all .25s ease-in-out;
-}
-.gas-fee-icon {
-  font-size: 11px;
-}
-.gas-fee-value {
-  font-size: 11px;
-  line-height: 1;
-}
-.gas-fee-btn:hover {
-  background-color: $--color-text-primary;
-  .gas-fee-icon,
-  .gas-fee-value {
-    color: #ffffff;
-  }
-}
-.gas-fee__progress {
-  position: absolute;
-  top: -4px;
-  left: -4px;
-}
-
-.gas-fees__inner {
-  padding: 3px 10px;
-  text-align: center;
-  color: $--color-text-primary;
-  position: relative;
-}
-.inner__loading {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.05);
-  z-index: -10;
-  opacity: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: $--color-text-primary;
-}
-.gas-fees__inner.is-loading .inner__loading {
-  z-index: 1;
-  opacity: 1;
-}
-.inner__title {
-  font-weight: normal;
-  font-size: 14px;
-  line-height: 28px;
-  margin-bottom: 15px;
-}
-.inner__body {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  .item {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-  }
-  .item__speen {
-    font-size: 12px;
-    line-height: 14px;
-    margin-bottom: 4px;
-  }
-  .item__value {
-    font-weight: 500;
-    font-size: 20px;
-    line-height: 20px;
-    margin-bottom: 4px;
-  }
-  .item__duration {
-    font-size: 10px;
-    line-height: 10px;
-    color: #777E91;
   }
 }
 </style>

@@ -26,7 +26,7 @@
         <div v-else class="token-value-to-usd">-</div>
       </el-form-item>
     </el-form>
-    <div class="bank-list card-white">
+    <el-card class="bank-list" :body-style="{'padding':0}" shadow="never">
       <div class="table-refresh-head">
         <span>Data updated&nbsp;</span>
         <span class="last-updated-at">{{ lastUpdatedAtDisplay }}</span>
@@ -61,7 +61,7 @@
         :bank-data="bank"
         :bank-app="bank.app"
       />
-    </div>
+    </el-card>
     <token-select-dialog
       v-if="tokenSelectDialogVisible"
       :visible.sync="tokenSelectDialogVisible"
@@ -282,39 +282,20 @@ export default {
 }
 .input-amount /deep/ {
   .el-input-group__prepend {
-    background-color: $--background-color-base;
+    background-color: $--input-background-color;
     height: 56px !important;
     color: $--color-text-primary;
     font-size: 18px;
     font-weight: 400;
     border: none;
-    // TODO override styles
-    border-right: 1px solid darken($--border-color-base, 5%);
   }
-
   .el-input__inner {
     height: 56px;
     line-height: 56px;
-    background-color: $--background-color-base;
     color: $--color-text-primary;
     font-size: 18px;
     font-weight: 400;
     border: none;
-  }
-}
-// TODO override styles
-// TODO override styles
-.card-white {
-  background-color: $--background-color-base;
-  border-radius: $--border-radius-base;
-  border: none;
-  overflow: hidden;
-  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.1);
-  /deep/ .el-table tr, .el-table th {
-    background-color: $--background-color-base;
-  }
-  /deep/ .el-table--enable-row-hover .el-table__body tr:hover > td {
-    background-color: darken($--background-color-base, 3%);
   }
 }
 </style>

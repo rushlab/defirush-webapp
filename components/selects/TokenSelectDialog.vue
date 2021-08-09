@@ -134,27 +134,8 @@ export default {
 <style lang="scss" scoped>
 @import "@/assets/stylesheets/variables.scss";
 .dialog--tokens {
-  /deep/ {
-    .el-dialog {
-      background-color: $--background-color-gray;
-      border: 1px solid $--border-color-base;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .el-dialog__title {
-      font-size: 24px;
-    }
-    .el-dialog__header {
-      padding: 15px 30px;
-      border-bottom: 1px solid $--border-color-base;
-    }
-    .el-dialog__body {
-      padding: 0;
-      height: 550px;
-    }
-    .el-dialog__footer {
-      padding: 0;
-    }
+  /deep/ .el-dialog__body {
+    padding: 0;
   }
 }
 .dialog__inner {
@@ -163,6 +144,7 @@ export default {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  height: 550px;
 }
 .upper-part {
   padding: 20px 30px 0px;

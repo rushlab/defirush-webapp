@@ -51,26 +51,24 @@ $--color-info-lighter: mix($--color-white, $--color-info, 90%) !default;
 /// color|1|Font Color|2
 $--color-text-primary: #000000 !default;
 /// color|1|Font Color|2
-$--color-text-regular: #777E90 !default;
+$--color-text-regular: #5B5D61 !default;
 /// color|1|Font Color|2
-$--color-text-secondary: #858E99 !default;
+$--color-text-secondary: #898C91 !default;
 /// color|1|Font Color|2
-// $--color-text-placeholder: #777E90 !default;
-$--color-text-placeholder: #adadad !default; // TODO override styles
+$--color-text-placeholder: #B6BAC2 !default;
 /// color|1|Border Color|3
-// $--border-color-base: #979AAA !default;
-$--border-color-base: #e2e2e2 !default; // TODO override styles
+$--border-color-base: #D1D4DB !default;
 /// color|1|Border Color|3
-$--border-color-light: #C5C5C5 !default;
+$--border-color-light: #D9DBE1 !default;
 /// color|1|Border Color|3
-$--border-color-lighter: #CFD1DC !default;
+$--border-color-lighter: #DFE2E9 !default;
 /// color|1|Border Color|3
-$--border-color-extra-light: #F2F6FC !default;
+$--border-color-extra-light: #E6EAEF !default;
 
 // Background
 /// color|1|Background Color|4
-$--background-color-base: #ffffff !default;
-$--background-color-gray:  #EEF0F4!default;  // TODO override styles
+$--background-color-base: #EEF0F4 !default;
+
 /* Link
 -------------------------- */
 $--link-color: $--color-text-primary !default;
@@ -83,8 +81,6 @@ $--border-style-base: solid !default;
 $--border-color-hover: $--color-text-placeholder !default;
 $--border-base: $--border-width-base $--border-style-base $--border-color-base !default;
 /// borderRadius|1|Radius|0
-// TODO override styles
-// $--border-radius-base: 4px !default;
 $--border-radius-base: 6px !default;
 /// borderRadius|1|Radius|0
 $--border-radius-small: 2px !default;
@@ -439,7 +435,7 @@ $--input-border-color: $--border-color-base !default;
 $--input-border-radius: $--border-radius-base !default;
 $--input-border-color-hover: $--border-color-hover !default;
 /// color||Color|0
-$--input-background-color: #E6E8EC !default;
+$--input-background-color: $--color-white !default;
 $--input-fill-disabled: $--disabled-fill-base !default;
 $--input-color-disabled: $--font-color-disabled-base !default;
 /// color||Color|0
@@ -632,14 +628,14 @@ $--dialog-padding-primary: 20px !default;
 /* Table
 -------------------------- */
 /// color||Color|0
-$--table-border-color: $--border-color-base !default;
+$--table-border-color: $--border-color-lighter !default;
 $--table-border: 1px solid $--table-border-color !default;
 /// color||Color|0
 $--table-font-color: $--color-text-primary !default;
 /// color||Color|0
 $--table-header-font-color: $--color-text-secondary !default;
 /// color||Color|0
-$--table-row-hover-background-color: mix($--color-black, $--background-color-base, 3%) !default;
+$--table-row-hover-background-color: $--background-color-base !default;
 $--table-current-row-background-color: $--color-primary-light-9 !default;
 /// color||Color|0
 $--table-header-background-color: $--color-white !default;
@@ -752,8 +748,8 @@ $--badge-size: 18px !default;
 /* Card
 --------------------------*/
 /// color||Color|0
-$--card-border-color: $--border-color-base !default;
-$--card-border-radius: 0 !default;
+$--card-border-color: $--border-color-lighter !default;
+$--card-border-radius: $--border-radius-base !default;
 /// padding||Spacing|3
 $--card-padding: 20px !default;
 

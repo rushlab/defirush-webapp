@@ -97,7 +97,7 @@
         </el-card>
       </el-col>
       <el-col :span="12">
-        <el-card class="card-white" header="Debts" shadow="never" :body-style="{'padding':0}">
+        <el-card header="Debts" shadow="never" :body-style="{'padding':0}">
           <h2 slot="header">Debts</h2>
           <el-table
             :data="borrowsTableData" v-loading="!!pending" class="no-bottom-border"
@@ -338,10 +338,6 @@ export default {
 @import '@/assets/stylesheets/variables.scss';
 .bank-data-card {
   height: 200px;
-  border-radius: $--border-radius-base;
-  border: none;
-  overflow: hidden;
-  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.1);
   /deep/ .el-card__body {
     display: flex;
     flex-direction: column;
@@ -406,20 +402,6 @@ export default {
   font-size: 22px;
   &.text-larger {
     font-size: 28px;
-  }
-}
-// TODO override styles
-.card-white {
-  background-color: $--background-color-base;
-  border-radius: $--border-radius-base;
-  border: none;
-  overflow: hidden;
-  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.1);
-  /deep/ .el-table tr, .el-table th {
-    background-color: $--background-color-base;
-  }
-  /deep/ .el-table--enable-row-hover .el-table__body tr:hover > td {
-    background-color: darken($--background-color-base, 3%);
   }
 }
 </style>

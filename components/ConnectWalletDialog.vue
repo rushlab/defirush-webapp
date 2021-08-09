@@ -149,33 +149,6 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/assets/stylesheets/variables.scss";
-.dialog--connect {
-  /deep/ {
-    .el-dialog {
-      background-color: $--background-color-gray;
-      border: 1px solid $--border-color-base;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .el-dialog__title {
-      font-size: 24px;
-    }
-    .el-dialog__header {
-      padding: 15px 30px;
-      border-bottom: 1px solid $--border-color-base;
-    }
-    .el-dialog__body {
-      padding: 20px 30px 40px;
-    }
-    .el-dialog__footer {
-      // padding: 0;
-    }
-    .el-loading-spinner .path {
-      stroke: $--color-text-primary;
-    }
-  }
-}
-// dialog styles
 .wallet-items {
   width: 100%;
   display: flex;
