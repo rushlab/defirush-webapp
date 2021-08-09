@@ -17,16 +17,16 @@
       <el-table-column label="Total borrows" align="right">
         <template slot-scope="{ row }">
           <div>{{ assetData.totalBorrows || '0' }} {{ underlyingTokenData.symbol }}</div>
-          <div class="asset-value-to-usd">{{ totalBorrowsInUSD }}</div>
+          <price class="asset-value-to-usd" :value="totalBorrowsInUSD"></price>
         </template>
       </el-table-column>
       <!-- <el-table-column label="已借款金额">
-        <template slot-scope="{ row }">{{ userBorrowsInUSD }}</template>
+        <template slot-scope="{ row }"><price :value="userBorrowsInUSD"></price></template>
       </el-table-column> -->
       <el-table-column label="Available" align="right">
         <template slot-scope="{ row }">
           <div>{{ availableBorrows || '0' }} {{ underlyingTokenData.symbol }}</div>
-          <div class="asset-value-to-usd">{{ formatCurrency(+availableBorrows * +assetData.priceUSD) }}</div>
+          <price class="asset-value-to-usd" :value="accountData.availableBorrowsUSD"></price>
         </template>
       </el-table-column>
       <el-table-column label="Gas Fee" width="120" align="center">
@@ -53,7 +53,6 @@
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import { ethers } from 'ethers'
-import { formatCurrency } from '@/utils/formatter'
 import BorrowDialog from '@/components/selects/BorrowDialog'
 
 export default {
@@ -101,7 +100,7 @@ export default {
     },
     totalBorrowsInUSD() {
       const { totalBorrows, priceUSD } = this.assetData
-      return formatCurrency((+totalBorrows || 0) * (+priceUSD || 0))
+      return (+totalBorrows || 0) * (+priceUSD || 0)
     },
     borrowAPYPercent() {
       const { borrowAPY } = this.assetData
@@ -110,14 +109,13 @@ export default {
     userBorrowsInUSD() {
       const { priceUSD } = this.assetData
       const { userBorrows } = this.accountAssetData
-      return formatCurrency((+userDeposits || 0) * (+priceUSD || 0))
+      return (+userDeposits || 0) * (+priceUSD || 0)
     }
   },
   mounted() {
     this.getAllData()
   },
   methods: {
-    formatCurrency,
     async getAllData() {
       this.pending = true
       try {

@@ -8,7 +8,7 @@
       <div class="card__row">
         <div class="data-item">
           <div class="data-item__label">Value locked in all banks</div>
-          <div class="data-item__value text-larger">{{ formatCurrency(userDepositsUSD) }}</div>
+          <price class="data-item__value text-larger" :value="userDepositsUSD"></price>
         </div>
       </div>
       <div class="card__row">
@@ -16,25 +16,25 @@
           <el-col :span="6">
             <div class="data-item">
               <div class="data-item__label">Daily earning</div>
-              <div class="data-item__value">{{ formatCurrency(averageDailyEarnUSD) }}</div>
+              <price class="data-item__value" :value="averageDailyEarnUSD"></price>
             </div>
           </el-col>
           <el-col :span="6">
             <div class="data-item">
               <div class="data-item__label">APY</div>
-              <div class="data-item__value">{{ formatPercentage(averageDepositAPY) }}</div>
+              <price class="data-item__value" :value="averageDepositAPY"></price>
             </div>
           </el-col>
           <el-col :span="6">
             <div class="data-item">
               <div class="data-item__label">Total credit</div>
-              <div class="data-item__value">{{ formatCurrency(userBorrowLimitUSD) }}</div>
+              <price class="data-item__value" :value="userBorrowLimitUSD"></price>
             </div>
           </el-col>
           <el-col :span="6">
             <div class="data-item">
               <div class="data-item__label">Total borrows</div>
-              <div class="data-item__value">{{ formatCurrency(userBorrowsUSD) }}</div>
+              <price class="data-item__value" :value="userBorrowsUSD"></price>
             </div>
           </el-col>
         </el-row>
@@ -66,7 +66,7 @@
             <el-table-column label="Supplying" align="right">
               <template slot-scope="{ row }">
                 <div>{{ row.userDeposits }} {{ row.underlyingToken.symbol }}</div>
-                <div class="cell-text-light">{{ formatCurrency(row.userDepositsUSD) }}</div>
+                <price class="cell-text-light" :value="row.userDepositsUSD"></price>
               </template>
             </el-table-column>
             <el-table-column width="80" align="center">
@@ -85,7 +85,7 @@
                     <el-table-column label="Supplying" align="right">
                       <template slot-scope="{ row: popoverRow }">
                         <div>{{ popoverRow.userDeposits }} {{ row.underlyingToken.symbol }}</div>
-                        <div class="cell-text-light">{{ formatCurrency(popoverRow.userDepositsUSD) }}</div>
+                        <price class="cell-text-light" :value="popoverRow.userDepositsUSD"></price>
                       </template>
                     </el-table-column>
                   </el-table>
@@ -120,7 +120,7 @@
             <el-table-column label="Borrowing" align="right">
               <template slot-scope="{ row }">
                 <div>{{ row.userBorrows }} {{ row.underlyingToken.symbol }}</div>
-                <div class="cell-text-light">{{ formatCurrency(row.userBorrowsUSD) }}</div>
+                <price class="cell-text-light" :value="row.userBorrowsUSD"></price>
               </template>
             </el-table-column>
             <el-table-column width="80" align="center">
@@ -139,7 +139,7 @@
                     <el-table-column label="Borrowing" align="right">
                       <template slot-scope="{ row: popoverRow }">
                         <div>{{ popoverRow.userBorrows }} {{ row.underlyingToken.symbol }}</div>
-                        <div class="cell-text-light">{{ formatCurrency(popoverRow.userBorrowsUSD) }}</div>
+                        <price class="cell-text-light" :value="popoverRow.userBorrowsUSD"></price>
                       </template>
                     </el-table-column>
                   </el-table>
@@ -159,7 +159,6 @@ import _ from 'lodash'
 import dayjs from 'dayjs'
 import BankSelect from '@/components/BankSelect'
 
-import { formatCurrency } from '@/utils/formatter'
 import { createBankApps } from '@/utils/banks/factory'
 
 import { getBankPortfolio } from './helper'
@@ -271,7 +270,6 @@ export default {
     this.fetchData()
   },
   methods: {
-    formatCurrency,
     formatPercentage(val) {
       return (+val * 100).toFixed(2) + '%'
     },

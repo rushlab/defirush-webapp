@@ -17,13 +17,13 @@
       <el-table-column label="TVL" align="right">
         <template slot-scope="{ row }">
           <div>{{ assetData.totalDeposits || '0' }} {{ underlyingTokenData.symbol }}</div>
-          <div class="asset-value-to-usd">{{totalDepositsInUSD}}</div>
+          <price class="asset-value-to-usd" :value="totalDepositsInUSD"></price>
         </template>
       </el-table-column>
       <el-table-column label="Supplying" align="right">
         <template slot-scope="{ row }">
           <div>{{ accountAssetData.userDeposits || '0' }} {{ underlyingTokenData.symbol }}</div>
-          <div class="asset-value-to-usd">{{ userDepositsInUSD }}</div>
+          <price class="asset-value-to-usd" :value="userDepositsInUSD"></price>
         </template>
       </el-table-column>
       <el-table-column label="Gas Fee" width="120" align="center">
@@ -49,7 +49,6 @@
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import { ethers } from 'ethers'
-import { formatCurrency } from '@/utils/formatter'
 import DepositDialog from '@/components/selects/DepositDialog'
 
 export default {
@@ -90,7 +89,7 @@ export default {
     },
     totalDepositsInUSD() {
       const { totalDeposits, priceUSD } = this.assetData
-      return formatCurrency((+totalDeposits || 0) * (+priceUSD || 0))
+      return (+totalDeposits || 0) * (+priceUSD || 0)
     },
     depositAPYPercent() {
       const { depositAPY } = this.assetData
@@ -99,7 +98,7 @@ export default {
     userDepositsInUSD() {
       const { priceUSD } = this.assetData
       const { userDeposits } = this.accountAssetData
-      return formatCurrency((+userDeposits || 0) * (+priceUSD || 0))
+      return (+userDeposits || 0) * (+priceUSD || 0)
     }
   },
   mounted() {

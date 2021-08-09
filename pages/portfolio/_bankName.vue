@@ -11,7 +11,7 @@
             <div class="card__row">
               <div class="data-item">
                 <div class="data-item__label">Value locked in bank</div>
-                <div class="data-item__value text-larger">{{ formatCurrency(userDepositsUSD) }}</div>
+                <price class="data-item__value text-larger" :value="userDepositsUSD"></price>
               </div>
             </div>
             <div class="card__row">
@@ -19,7 +19,7 @@
                 <el-col :span="12">
                   <div class="data-item">
                     <div class="data-item__label">Daily earning</div>
-                    <div class="data-item__value">{{ formatCurrency(averageDailyEarnUSD) }}</div>
+                    <price class="data-item__value" :value="averageDailyEarnUSD"></price>
                   </div>
                 </el-col>
                 <el-col :span="12">
@@ -39,13 +39,13 @@
                 <el-col :span="12">
                   <div class="data-item">
                     <div class="data-item__label">Borrow limit</div>
-                    <div class="data-item__value">{{ formatCurrency(userBorrowLimitUSD) }}</div>
+                    <price class="data-item__value" :value="userBorrowLimitUSD"></price>
                   </div>
                 </el-col>
                 <el-col :span="12">
                   <div class="data-item">
                     <div class="data-item__label">Total borrows</div>
-                    <div class="data-item__value">{{ formatCurrency(userBorrowsUSD) }}</div>
+                    <price class="data-item__value" :value="userBorrowsUSD"></price>
                   </div>
                 </el-col>
               </el-row>
@@ -115,7 +115,7 @@
         <el-table-column label="Supplying" align="right">
           <template slot-scope="{ row }">
             <div>{{ row.userDeposits }} {{ row.underlyingToken.symbol }}</div>
-            <div class="cell-text-light">{{ formatCurrency(row.userDepositsUSD) }}</div>
+            <price class="cell-text-light" :value="row.userDepositsUS"></price>
           </template>
         </el-table-column>
         <el-table-column label="Action" width="200" align="center">
@@ -154,7 +154,7 @@
         <el-table-column label="Borrowing" align="right">
           <template slot-scope="{ row }">
             <div>{{ row.userBorrows }} {{ row.underlyingToken.symbol }}</div>
-            <div class="cell-text-light">{{ formatCurrency(row.userBorrowsUSD) }}</div>
+            <price class="cell-text-light" :value="row.userBorrowsUS"></price>
           </template>
         </el-table-column>
         <el-table-column label="Action" width="200" align="center">
@@ -194,7 +194,6 @@ import BankSelect from '@/components/BankSelect'
 import WithdrawDialog from '@/components/selects/WithdrawDialog'
 import RepayDialog from '@/components/selects/RepayDialog'
 
-import { formatCurrency } from '@/utils/formatter'
 import { createBankApp } from '@/utils/banks/factory'
 
 import { getBankPortfolio } from './helper'
@@ -296,7 +295,6 @@ export default {
     this.fetchData()
   },
   methods: {
-    formatCurrency,
     formatPercentage(val) {
       return (+val * 100).toFixed(2) + '%'
     },
