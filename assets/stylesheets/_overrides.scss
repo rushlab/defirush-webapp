@@ -151,12 +151,6 @@
   font-weight: normal;
 }
 
-// dropdown menu
-.el-dropdown-menu__item:not(.is-disabled):hover,
-.el-dropdown-menu__item:focus {
-  background-color: $--input-background-color;
-}
-
 .el-descriptions__body,
 .el-descriptions-item__label.is-bordered-label {
   // background-color: $--background-color-base;
@@ -177,10 +171,4 @@
   .el-table th {
     background-color: #f9f9f9;
   }
-}
-
-button,
-input {
-  font-family: inherit;
-  color: inherit;
 }

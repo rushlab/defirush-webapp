@@ -135,7 +135,7 @@ export default {
   padding: 9px 20px 9px 40px;
   border-radius: 20px;
   color: $--color-text-primary;
-  box-shadow: 0 0 1px 0 $--border-color-base;
+  border: 1px solid $--border-color-base;
   cursor: pointer;
   .icon-metamask {
     position: absolute;
