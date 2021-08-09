@@ -3,7 +3,9 @@ import Vue from 'vue'
 
 /* global components */
 import Price from '@/components/common/Price'
+import Amount from '@/components/common/Amount'
 Vue.component('Price', Price)
+Vue.component('Amount', Amount)
 
 
 /* dayjs */

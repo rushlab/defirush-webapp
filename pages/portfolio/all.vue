@@ -65,7 +65,10 @@
             </el-table-column>
             <el-table-column label="Supplying" align="right">
               <template slot-scope="{ row }">
-                <div>{{ row.userDeposits }} {{ row.underlyingToken.symbol }}</div>
+                <div>
+                  <amount :value="row.userDeposits"></amount>
+                  <span>{{ row.underlyingToken.symbol }}</span>
+                </div>
                 <price class="cell-text-light" :value="row.userDepositsUSD"></price>
               </template>
             </el-table-column>
@@ -84,7 +87,10 @@
                     </el-table-column>
                     <el-table-column label="Supplying" align="right">
                       <template slot-scope="{ row: popoverRow }">
-                        <div>{{ popoverRow.userDeposits }} {{ row.underlyingToken.symbol }}</div>
+                        <div>
+                          <amount :value="popoverRow.userDeposits"></amount>
+                          <span>{{ row.underlyingToken.symbol }}</span>
+                        </div>
                         <price class="cell-text-light" :value="popoverRow.userDepositsUSD"></price>
                       </template>
                     </el-table-column>
@@ -119,7 +125,10 @@
             </el-table-column>
             <el-table-column label="Borrowing" align="right">
               <template slot-scope="{ row }">
-                <div>{{ row.userBorrows }} {{ row.underlyingToken.symbol }}</div>
+                <div>
+                  <amount :value="row.userBorrows"></amount>
+                  <span>{{ row.underlyingToken.symbol }}</span>
+                </div>
                 <price class="cell-text-light" :value="row.userBorrowsUSD"></price>
               </template>
             </el-table-column>
@@ -138,7 +147,10 @@
                     </el-table-column>
                     <el-table-column label="Borrowing" align="right">
                       <template slot-scope="{ row: popoverRow }">
-                        <div>{{ popoverRow.userBorrows }} {{ row.underlyingToken.symbol }}</div>
+                        <div>
+                          <amount :value="popoverRow.userBorrows"></amount>
+                          <span>{{ row.underlyingToken.symbol }}</span>
+                        </div>
                         <price class="cell-text-light" :value="popoverRow.userBorrowsUSD"></price>
                       </template>
                     </el-table-column>
@@ -158,9 +170,7 @@
 import _ from 'lodash'
 import dayjs from 'dayjs'
 import BankSelect from '@/components/BankSelect'
-
 import { createBankApps } from '@/utils/banks/factory'
-
 import { getBankPortfolio } from './helper'
 
 export default {

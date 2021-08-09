@@ -114,7 +114,10 @@
         </el-table-column>
         <el-table-column label="Supplying" align="right">
           <template slot-scope="{ row }">
-            <div>{{ row.userDeposits }} {{ row.underlyingToken.symbol }}</div>
+            <div>
+              <amount :value="row.userDeposits"></amount>
+              <span>{{ row.underlyingToken.symbol }}</span>
+            </div>
             <price class="cell-text-light" :value="row.userDepositsUS"></price>
           </template>
         </el-table-column>
@@ -153,7 +156,10 @@
         </el-table-column>
         <el-table-column label="Borrowing" align="right">
           <template slot-scope="{ row }">
-            <div>{{ row.userBorrows }} {{ row.underlyingToken.symbol }}</div>
+            <div>
+              <amount :value="row.userBorrows"></amount>
+              <span>{{ row.underlyingToken.symbol }}</span>
+            </div>
             <price class="cell-text-light" :value="row.userBorrowsUS"></price>
           </template>
         </el-table-column>

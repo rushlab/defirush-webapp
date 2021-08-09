@@ -1,6 +1,6 @@
 <template>
   <span v-if="invalid">-</span>
-  <span v-else class="g"><span v-if="negative">-</span><span class="s">{{ currencySymbol }}</span><span class="v">{{ formattedValue }}</span></span>
+  <span v-else class="g"><span v-if="negative">-</span><span>{{ formattedValue }}</span></span>
 </template>
 
 <script>
@@ -16,10 +16,6 @@ export default {
     precise: {
       type: Boolean,
       default: true,
-    },
-    currencySymbol: {
-      type: String,
-      default: '$',
     }
   },
   data() {
@@ -38,11 +34,11 @@ export default {
         // if (value > 1e9) {
         //   value = (value / 1e9).toFixed(2)
         //   suffix = 'B'
+        // } else if (value > 1e6) {
+        //   value = (value / 1e6).toFixed(2)
+        //   suffix = 'M'
         // } else
-        if (value > 1e6) {
-          value = (value / 1e6).toFixed(2)
-          suffix = 'M'
-        } else if (value > 1e3) {
+        if (value > 1e3) {
           value = (value / 1e3).toFixed(2)
           suffix = 'K'
         } else {
@@ -50,8 +46,6 @@ export default {
           suffix = ''
         }
       }
-      // 价格无论如何都只保留两位小数
-      value = (+value).toFixed(2)
       return ethers.utils.commify(value) + suffix
     },
     negative() {
@@ -67,9 +61,5 @@ export default {
 <style lang="scss" scoped>
 .g {
   letter-spacing: 0.5px;
-}
-.s {
-  font-size: 0.8em;
-  line-height: 1;
 }
 </style>

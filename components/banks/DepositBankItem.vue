@@ -16,13 +16,19 @@
       </el-table-column>
       <el-table-column label="TVL" align="right">
         <template slot-scope="{ row }">
-          <div>{{ assetData.totalDeposits || '0' }} {{ underlyingTokenData.symbol }}</div>
-          <price class="asset-value-to-usd" :value="totalDepositsInUSD"></price>
+          <div>
+            <amount :value="assetData.totalDeposits" :precise="false"></amount>
+            <span>{{ underlyingTokenData.symbol }}</span>
+          </div>
+          <price class="asset-value-to-usd" :value="totalDepositsInUSD" :precise="false"></price>
         </template>
       </el-table-column>
       <el-table-column label="Supplying" align="right">
         <template slot-scope="{ row }">
-          <div>{{ accountAssetData.userDeposits || '0' }} {{ underlyingTokenData.symbol }}</div>
+          <div>
+            <amount :value="accountAssetData.userDeposits"></amount>
+            <span>{{ underlyingTokenData.symbol }}</span>
+          </div>
           <price class="asset-value-to-usd" :value="userDepositsInUSD"></price>
         </template>
       </el-table-column>

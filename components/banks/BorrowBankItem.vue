@@ -16,8 +16,11 @@
       </el-table-column>
       <el-table-column label="Total borrows" align="right">
         <template slot-scope="{ row }">
-          <div>{{ assetData.totalBorrows || '0' }} {{ underlyingTokenData.symbol }}</div>
-          <price class="asset-value-to-usd" :value="totalBorrowsInUSD"></price>
+          <div>
+            <amount :value="assetData.totalBorrows" :precise="false"></amount>
+            <span>{{ underlyingTokenData.symbol }}</span>
+          </div>
+          <price class="asset-value-to-usd" :value="totalBorrowsInUSD" :precise="false"></price>
         </template>
       </el-table-column>
       <!-- <el-table-column label="已借款金额">
@@ -25,7 +28,10 @@
       </el-table-column> -->
       <el-table-column label="Available" align="right">
         <template slot-scope="{ row }">
-          <div>{{ availableBorrows || '0' }} {{ underlyingTokenData.symbol }}</div>
+          <div>
+            <amount :value="availableBorrows"></amount>
+            <span>{{ underlyingTokenData.symbol }}</span>
+          </div>
           <price class="asset-value-to-usd" :value="accountData.availableBorrowsUSD"></price>
         </template>
       </el-table-column>
