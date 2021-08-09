@@ -228,6 +228,6 @@ export default {
   color: $--color-text-primary;
   background-color: #E6E8EC;
   font-size: 16px;
-  padding: 25px 35px;
+  padding: 25px 30px;
 }
 </style>

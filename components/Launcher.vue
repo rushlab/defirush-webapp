@@ -115,9 +115,14 @@ export default {
       return (new BigNumber(balance.toString())).shiftedBy(-token.decimals).toString()
     },
     async getEtherFaucetData() {
-      const res = await this.$axios.get('https://hardhat-dev.heidian.io/api/contracts.json')
-      const { EtherFaucet } = res.data
-      this.EtherFaucet = {...EtherFaucet}
+      // const res = await this.$axios.get('https://hardhat-dev.heidian.io/api/contracts.json')
+      // const { EtherFaucet } = res.data
+      this.EtherFaucet = {
+        address: '0x28DFF79Eb03cE08137e19C4eEE9298012518ECA2',
+        abi: [
+          'function requestEther(uint256 amount)'
+        ]
+      }
     },
     onRequestEther() {
       this.$confirm('该操作会从私有链转移 1个ETH 到当前钱包', '提示', {

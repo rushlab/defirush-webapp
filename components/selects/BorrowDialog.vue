@@ -186,6 +186,7 @@ export default {
           this.updateAllowanceMantissa()
         ])
       } catch (error) {
+        console.log('getDialogData error', error)
         this.$message.error(JSON.stringify(error))
       }
       this.pending = false
