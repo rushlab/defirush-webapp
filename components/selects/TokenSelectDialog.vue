@@ -136,7 +136,7 @@ export default {
 .dialog--tokens {
   /deep/ {
     .el-dialog {
-      background-color: $--background-color-base;
+      background-color: $--background-color-gray;
       border: 1px solid $--border-color-base;
       border-radius: 8px;
       overflow: hidden;
@@ -254,6 +254,8 @@ export default {
   padding: 15px 30px;
   &:hover {
     background-color: $--input-background-color;
+    // TODO override styles
+    background-color: darken($--background-color-base, 3%);
   }
 }
 .token__caption {

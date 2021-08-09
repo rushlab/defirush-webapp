@@ -25,7 +25,7 @@
         <div class="token-value-to-usd">&asymp;${{ amountToUSD }}</div>
       </el-form-item>
     </el-form>
-    <div class="bank-list">
+    <div class="bank-list card-white">
       <div class="table-refresh-head">
         <span>Data updated&nbsp;</span>
         <span class="last-updated-at">{{ lastUpdatedAtDisplay }}</span>
@@ -86,7 +86,7 @@ export default {
         "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
         "decimals": 18
       },
-      amountDisplay: '0',
+      amountDisplay: '',
       balanceDisplay: '0',
       underlyingTokenPriceUSD: 0,
       lastUpdatedAt: dayjs(),
@@ -179,6 +179,11 @@ export default {
 .token-amount /deep/ .el-form-item__content {
   position: relative;
   padding: 20px 0;
+
+  // TODO override styles
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .token-balance-display,
 .token-value-to-usd {
@@ -229,7 +234,8 @@ export default {
   margin-right: 10px;
 }
 .bank-list {
-  border: 1px solid $--border-color-base;
+  // TODO override styles
+  // border: 1px solid $--border-color-base;
   /deep/ .bank-item + .bank-item {
     border-top: 1px solid $--border-color-base;
   }
@@ -264,22 +270,39 @@ export default {
 }
 .input-amount /deep/ {
   .el-input-group__prepend {
-    background-color: #E6E8EC;
+    background-color: $--background-color-base;
     height: 56px !important;
     color: $--color-text-primary;
     font-size: 18px;
     font-weight: 400;
     border: none;
+    // TODO override styles
+    border-right: 1px solid darken($--border-color-base, 5%);
   }
 
   .el-input__inner {
     height: 56px;
     line-height: 56px;
-    background-color: #E6E8EC;
+    background-color: $--background-color-base;
     color: $--color-text-primary;
     font-size: 18px;
     font-weight: 400;
     border: none;
+  }
+}
+// TODO override styles
+// TODO override styles
+.card-white {
+  background-color: $--background-color-base;
+  border-radius: $--border-radius-base;
+  border: none;
+  overflow: hidden;
+  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.1);
+  /deep/ .el-table tr, .el-table th {
+    background-color: $--background-color-base;
+  }
+  /deep/ .el-table--enable-row-hover .el-table__body tr:hover > td {
+    background-color: darken($--background-color-base, 3%);
   }
 }
 </style>

@@ -82,7 +82,7 @@
 
     <div style="margin-top: 1em;"></div>
 
-    <el-card header="Deposits" shadow="never" :body-style="{'padding':0}">
+    <el-card class="card-white" header="Deposits" shadow="never" :body-style="{'padding':0}">
       <h2 slot="header">Collateral</h2>
       <el-table
         :data="depositsTableData" v-loading="!!pending"
@@ -129,7 +129,7 @@
       </el-table>
     </el-card>
     <div style="margin-top: 1em;"></div>
-    <el-card header="Debts" shadow="never" :body-style="{'padding':0}">
+    <el-card class="card-white" header="Debts" shadow="never" :body-style="{'padding':0}">
       <h2 slot="header">Debts</h2>
       <el-table
         :data="borrowsTableData" v-loading="!!pending"
@@ -343,6 +343,12 @@ export default {
 
 <style lang="scss" scoped>
 @import '@/assets/stylesheets/variables.scss';
+.bank-data-card {
+  padding: 20px;
+  height: 200px;
+  // TODO override styles
+  // background-color: $--background-color-gray;
+}
 .card__title {
   font-size: 16px;
   font-weight: 400;
@@ -433,5 +439,19 @@ export default {
   font-size: 14px;
   color: $--color-text-regular;
   margin-top: 10px;
+}
+// TODO override styles
+.card-white {
+  background-color: $--background-color-base;
+  border-radius: $--border-radius-base;
+  border: none;
+  overflow: hidden;
+  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.1);
+  /deep/ .el-table tr, .el-table th {
+    background-color: $--background-color-base;
+  }
+  /deep/ .el-table--enable-row-hover .el-table__body tr:hover > td {
+    background-color: darken($--background-color-base, 3%);
+  }
 }
 </style>

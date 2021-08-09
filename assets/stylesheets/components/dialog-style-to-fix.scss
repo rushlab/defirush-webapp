@@ -1,4 +1,29 @@
 .dialog-style-to-fix {
+  .el-dialog {
+    background-color: $--background-color-gray;
+    // border: 1px solid $--border-color-base;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .el-dialog__title {
+    font-size: 20px;
+  }
+  .el-dialog__header {
+    padding: 20px 30px;
+    border-bottom: 1px solid $--border-color-base;
+  }
+  .el-dialog__body {
+    padding: 30px;
+  }
+  .el-loading-spinner .path {
+    stroke: $--color-text-primary;
+  }
+  .dialog__inner.el-loading-parent--relative .el-loading-mask {
+    top: -30px;
+    right: -30px;
+    bottom: -30px;
+    left: -30px;
+  }
   .balance-hint {
     display: block;
     text-align: right;
@@ -33,9 +58,9 @@
     width: 22px;
   }
   .el-slider__marks-text:last-child {
-    width: 32px;
+    width: 34px;
     left: auto !important;
-    right: -16px !important;
+    right: -17px !important;
     color: #3ACB6E;
   }
   .input-hint {
