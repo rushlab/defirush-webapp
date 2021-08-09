@@ -10,7 +10,7 @@
 }
 
 @font-face {
-  font-family: 'milliardhairline';
+  font-family: 'milliard';
   src: url('./fonts/milliard-hairline-webfont.eot');
   src: url('./fonts/milliard-hairline-webfont.eot?#iefix') format('embedded-opentype'),
        url('./fonts/milliard-hairline-webfont.woff2') format('woff2'),
@@ -25,13 +25,13 @@
 
 
 @font-face {
-  font-family: 'milliardlight';
+  font-family: 'milliard';
   src: url('./fonts/milliard-light-webfont.eot');
   src: url('./fonts/milliard-light-webfont.eot?#iefix') format('embedded-opentype'),
        url('./fonts/milliard-light-webfont.woff2') format('woff2'),
        url('./fonts/milliard-light-webfont.woff') format('woff'),
        url('./fonts/milliard-light-webfont.svg#milliardlight') format('svg');
-  font-weight: normal;
+  font-weight: 200;
   font-style: normal;
 
 }
@@ -40,13 +40,13 @@
 
 
 @font-face {
-  font-family: 'milliardmedium';
+  font-family: 'milliard';
   src: url('./fonts/milliard-medium-webfont.eot');
   src: url('./fonts/milliard-medium-webfont.eot?#iefix') format('embedded-opentype'),
        url('./fonts/milliard-medium-webfont.woff2') format('woff2'),
        url('./fonts/milliard-medium-webfont.woff') format('woff'),
        url('./fonts/milliard-medium-webfont.svg#milliardmedium') format('svg');
-  font-weight: normal;
+  font-weight: 400;
   font-style: normal;
 
 }
@@ -55,13 +55,12 @@
 
 
 @font-face {
-  font-family: 'milliardsemibold';
+  font-family: 'milliard';
   src: url('./fonts/milliard-semibold-webfont.eot');
   src: url('./fonts/milliard-semibold-webfont.eot?#iefix') format('embedded-opentype'),
        url('./fonts/milliard-semibold-webfont.woff2') format('woff2'),
        url('./fonts/milliard-semibold-webfont.woff') format('woff'),
        url('./fonts/milliard-semibold-webfont.svg#milliardsemibold') format('svg');
-  font-weight: normal;
+  font-weight: 500;
   font-style: normal;
-
 }

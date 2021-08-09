@@ -1,6 +1,6 @@
 <template>
   <div class="gas-fees">
-    <el-popover placement="bottom" width="240" trigger="hover">
+    <el-popover placement="bottom" width="260" trigger="hover">
       <div class="gas-fees__inner" v-loading="gasPricePending" element-loading-spinner="el-icon-loading">
         <div class="inner__title">Ethereum Gas Price Forecast</div>
         <div class="inner__body">

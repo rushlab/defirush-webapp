@@ -337,6 +337,11 @@ export default {
 <style lang="scss" scoped>
 @import '@/assets/stylesheets/variables.scss';
 .bank-data-card {
+  height: 200px;
+  border-radius: $--border-radius-base;
+  border: none;
+  overflow: hidden;
+  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.1);
   /deep/ .el-card__body {
     display: flex;
     flex-direction: column;
@@ -378,6 +383,9 @@ export default {
 }
 .card__row {
   width: 100%;
+}
+.card__row + .card__row {
+  margin-top: 15px;
 }
 .data-item {
   padding: 10px;

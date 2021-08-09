@@ -168,7 +168,7 @@ export default {
       padding: 20px 30px 40px;
     }
     .el-dialog__footer {
-      padding: 0;
+      // padding: 0;
     }
     .el-loading-spinner .path {
       stroke: $--color-text-primary;

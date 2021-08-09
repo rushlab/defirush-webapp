@@ -344,10 +344,13 @@ export default {
 <style lang="scss" scoped>
 @import '@/assets/stylesheets/variables.scss';
 .bank-data-card {
-  padding: 20px;
+  // padding: 20px;
   height: 200px;
+  border-radius: $--border-radius-base;
+  border: none;
+  overflow: hidden;
+  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.1);
   // TODO override styles
-  // background-color: $--background-color-gray;
 }
 .card__title {
   font-size: 16px;
