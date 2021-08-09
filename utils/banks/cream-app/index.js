@@ -114,25 +114,30 @@ class CreamApp extends BankApp {
 
   async getAccountData() {
     const _userAddress = this.$wallet.getAddress();
-    const _1e18 = ethers.utils.parseUnits('1', 18);
-    let totalBorrows = ethers.constants.Zero;
-    let totalDeposits = ethers.constants.Zero;
-    const [,liquidity,] = await this.comptroller.getAccountLiquidity(_userAddress);
+    let totalBorrowsUSD = ethers.constants.Zero;
+    let totalDepositsUSD = ethers.constants.Zero;
+    const [ [,liquidity,], priceEtherUsdMantissa ]= await Promise.all([
+      this.comptroller.getAccountLiquidity(_userAddress),
+      this._getEtherUsdPriceMantissa(),
+    ])
+    const _1e8 = ethers.utils.parseUnits('1', 8);  // chain link eth price 的 decimals 是 8
+    const liquidityUSD = liquidity.mul(priceEtherUsdMantissa).div(_1e8);
+    // cream 的 liquidity 是 eth 计价的, 和 _getUnderlyingPriceMantissa 一样, 但 compounud 全都是 usd 计价的
     const crTokens = await this.comptroller.getAssetsIn(_userAddress);
     const _promises = crTokens.map(async (crTokenAddr) => {
       const {
         underlyingBalance, borrowBalance, underlyingValue, borrowValue
       } = await this._getCrTokenData(crTokenAddr);
       // 不管 underlying 是啥, balance * price 的 decimals 始终是 36, 这里可以直接累加, 最后统一除以 1e36
-      totalBorrows = totalBorrows.add(borrowValue);
-      totalDeposits = totalDeposits.add(underlyingValue);
+      totalBorrowsUSD = totalBorrowsUSD.add(borrowValue);
+      totalDepositsUSD = totalDepositsUSD.add(underlyingValue);
     });
     await Promise.all(_promises);
-    // const availableCredit = totalBorrows.add(liquidity);
+    // const availableCredit = totalBorrowsUSD.add(liquidityUSD);
     return {
-      userDepositsUSD: this._mantissaToDisplay(totalDeposits, 36),
-      userBorrowsUSD: this._mantissaToDisplay(totalBorrows, 36),
-      availableBorrowsUSD: this._mantissaToDisplay(liquidity, 18),
+      userDepositsUSD: this._mantissaToDisplay(totalDepositsUSD, 36),
+      userBorrowsUSD: this._mantissaToDisplay(totalBorrowsUSD, 36),
+      availableBorrowsUSD: this._mantissaToDisplay(liquidityUSD, 18),
     }
   }
 

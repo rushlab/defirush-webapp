@@ -83,7 +83,7 @@
     <div style="margin-top: 1em;"></div>
 
     <el-card header="Deposits" shadow="never" :body-style="{'padding':0}">
-      <h2 slot="header">Collateral</h2>
+      <h2 slot="header">Collaterals</h2>
       <el-table
         :data="depositsTableData" v-loading="!!pending"
         empty-text="No collateral positions" class="no-bottom-border"
@@ -118,7 +118,7 @@
               <amount :value="row.userDeposits"></amount>
               <span>{{ row.underlyingToken.symbol }}</span>
             </div>
-            <price class="cell-text-light" :value="row.userDepositsUS"></price>
+            <price class="cell-text-light" :value="row.userDepositsUSD"></price>
           </template>
         </el-table-column>
         <el-table-column label="Action" width="200" align="center">
@@ -160,7 +160,7 @@
               <amount :value="row.userBorrows"></amount>
               <span>{{ row.underlyingToken.symbol }}</span>
             </div>
-            <price class="cell-text-light" :value="row.userBorrowsUS"></price>
+            <price class="cell-text-light" :value="row.userBorrowsUSD"></price>
           </template>
         </el-table-column>
         <el-table-column label="Action" width="200" align="center">

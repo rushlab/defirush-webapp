@@ -44,7 +44,7 @@
     <el-row :gutter="20">
       <el-col :span="12">
         <el-card class="card-white" header="Collateral" shadow="never" :body-style="{'padding':0}">
-          <h2 slot="header">Collateral</h2>
+          <h2 slot="header">Collaterals</h2>
           <el-table
             :data="depositsTableData" v-loading="!!pending" class="no-bottom-border"
             element-loading-spinner="el-icon-loading" empty-text="No collateral positions"
@@ -88,10 +88,10 @@
                     <el-table-column label="Supplying" align="right">
                       <template slot-scope="{ row: popoverRow }">
                         <div>
-                          <amount :value="popoverRow.userDeposits"></amount>
+                          <amount :value="popoverRow.userDeposits" :precise="false"></amount>
                           <span>{{ row.underlyingToken.symbol }}</span>
                         </div>
-                        <price class="cell-text-light" :value="popoverRow.userDepositsUSD"></price>
+                        <price class="cell-text-light" :value="popoverRow.userDepositsUSD" :precise="false"></price>
                       </template>
                     </el-table-column>
                   </el-table>
@@ -148,10 +148,10 @@
                     <el-table-column label="Borrowing" align="right">
                       <template slot-scope="{ row: popoverRow }">
                         <div>
-                          <amount :value="popoverRow.userBorrows"></amount>
+                          <amount :value="popoverRow.userBorrows" :precise="false"></amount>
                           <span>{{ row.underlyingToken.symbol }}</span>
                         </div>
-                        <price class="cell-text-light" :value="popoverRow.userBorrowsUSD"></price>
+                        <price class="cell-text-light" :value="popoverRow.userBorrowsUSD" :precise="false"></price>
                       </template>
                     </el-table-column>
                   </el-table>
