@@ -22,7 +22,7 @@ module.exports = {
    */
   loading: { color: '#fff' },
   loadingIndicator: {
-    name: './templates/rotate-circle.html',
+    name: './static/rotate-circle.html',
     color: '#000000',
     background: 'white'
   },
