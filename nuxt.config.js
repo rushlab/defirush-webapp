@@ -65,6 +65,12 @@ module.exports = {
     credentials: false  // cross-site Access-Control requests doesn't need to be made using credentials
   },
   /*
+   ** API server
+   */
+  serverMiddleware: [
+    { path: '/', handler: '@/server-middleware/api.js' },
+  ],
+  /*
    ** Build configuration
    */
   build: {

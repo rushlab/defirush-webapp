@@ -28,16 +28,16 @@ app.use('/api', cookieParser())
 /**
  * API routes
  */
-const clientRoutes = require('./api/client')
+const clientRoutes = require('./routes/client')
 app.use('/api', clientRoutes)
-const tokensRoutes = require('./api/tokens')
+const tokensRoutes = require('./routes/tokens')
 app.use('/api/tokens', tokensRoutes)
-const accountRoutes = require('./api/account')
+const accountRoutes = require('./routes/account')
 app.use('/api/account', accountRoutes)
 
 
 /*
- * 处理一下 404 错误, 不继续渲染 vuejs 客户端
+ * 处理一下 404 错误, 注意只处理 /api 下的 404
  */
 app.use('/api', function(req, res, next) {
   res.status(404)
@@ -45,7 +45,7 @@ app.use('/api', function(req, res, next) {
 })
 
 /**
- * default error handler
+ * default error handler, 注意只处理 /api 下的
  */
 app.use('/api', function(err, req, res, next) {
   res.status(err.status || 500)
@@ -56,3 +56,15 @@ app.use('/api', function(err, req, res, next) {
 })
 
 module.exports = app
+
+if (require.main === module) {
+  const consola = require('consola')
+  const port = process.env.PORT || 3001
+  const host = process.env.HOSTNAME || '127.0.0.1'
+  app.listen(port, host, () => {
+    consola.ready({
+      message: `Standalone API server listening on http://${host}:${port}`,
+      badge: true
+    })
+  })
+}
