@@ -35,6 +35,7 @@ const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || ''
 const gasPriceTable = new (function() {
   this._updatedAt = 0
   this._data = {
+    updated_at: 0,
     fast: { waiting_seconds: 0, price_gwei: 0 },
     normal: { waiting_seconds: 0, price_gwei: 0 },
     slow: { waiting_seconds: 0, price_gwei: 0 },
@@ -52,6 +53,7 @@ const gasPriceTable = new (function() {
       return
     }
     const result = res.data.result
+    this._data['updated_at'] = (new Date()).valueOf()
     this._data['fast']['price_gwei'] = result['FastGasPrice'].toString()
     this._data['normal']['price_gwei'] = result['ProposeGasPrice'].toString()
     this._data['slow']['price_gwei'] = result['SafeGasPrice'].toString()
@@ -75,10 +77,13 @@ const gasPriceTable = new (function() {
     setTimeout(() => this._update(), 15000)
   }
   this.get = async function() {
+    if (!this._data.updated_at) {
+      await this._update()
+    }
     return this._data
   }
-  // 构建了以后立即 update 一次
-  this._update()
+  // 构建了以后不能立即 update, 这个会导致在 npm run build 阶段就执行
+  // this._update()
 })();
 
 router.get('/gas_price_table', async (req, res, next) => {
