@@ -1,9 +1,11 @@
+const dotenv = require('dotenv')
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 // const logger = require('morgan')
 
+dotenv.config()
 const app = express()
 
 app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'])  // app.enable('trust proxy')

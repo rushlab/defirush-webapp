@@ -4,9 +4,8 @@ const { ethers } = require('ethers')
 const express = require('express')
 const router = express.Router()
 
-const { getSecret } = require('../utils/index')
-const DEFI_PULSE_API_KEY = getSecret('DEFI_PULSE_API_KEY', '')
-const ETHERSCAN_API_KEY = getSecret('ETHERSCAN_API_KEY', '')
+const DEFI_PULSE_API_KEY = process.env.DEFI_PULSE_API_KEY || ''
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || ''
 
 // TODO 可以考虑用 https://www.gasnow.org/
 // router.get('/gas_price_table', async (req, res, next) => {
