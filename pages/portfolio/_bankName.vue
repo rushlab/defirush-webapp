@@ -199,9 +199,7 @@ import dayjs from 'dayjs'
 import BankSelect from '@/components/BankSelect'
 import WithdrawDialog from '@/components/selects/WithdrawDialog'
 import RepayDialog from '@/components/selects/RepayDialog'
-
-import { createBankApp } from '@/utils/banks/factory'
-
+import { createBankItem } from '@/utils/banks/factory'
 import { getBankPortfolio } from './helper'
 
 export default {
@@ -217,7 +215,7 @@ export default {
   },
   data() {
     const bankName = this.$route.params.bankName
-    const bank = createBankApp(bankName, this.$wallet)
+    const bank = createBankItem(bankName, this.$wallet)
     return {
       bankName,
       bank,

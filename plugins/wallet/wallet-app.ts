@@ -59,8 +59,10 @@ export class WalletApp implements WalletInterface {
     } else {
       const { walletChainId } = this.$store.state.auth
       let url
-      if (+walletChainId === 1) {
+      if (walletChainId == 1) {
         url = 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'
+      } else if (walletChainId == 137) {
+        url = 'https://rpc-mainnet.maticvigil.com'
       } else {
         // url = 'http://localhost:8545'
         url = 'https://hardhat-dev.defirush.io'

@@ -27,17 +27,17 @@ const bankConfigs: any = {
   },
 }
 
-export function createBankApp(bankName:string, $wallet: WalletInterface) {
+export function createBankItem(bankName:string, $wallet: WalletInterface) {
   const { BankAppClass, logo, title } = bankConfigs[bankName]
   const app = new BankAppClass($wallet)
   return { name: bankName, logo, title, app }
 }
 
-export function createBankApps($wallet: WalletInterface) {
+export function createBanks($wallet: WalletInterface) {
   return [
-    createBankApp('aave', $wallet),
-    createBankApp('compound', $wallet),
-    createBankApp('cream', $wallet),
-    createBankApp('fortube', $wallet),
+    createBankItem('aave', $wallet),
+    createBankItem('compound', $wallet),
+    createBankItem('cream', $wallet),
+    createBankItem('fortube', $wallet),
   ]
 }

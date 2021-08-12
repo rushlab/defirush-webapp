@@ -65,7 +65,7 @@ import dayjs from 'dayjs'
 import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
 import DepositBankItem from '@/components/banks/DepositBankItem'
 import ChainSelect from '@/components/ChainSelect'
-import { createBankApps } from '@/utils/banks/factory'
+import { createBanks } from '@/utils/banks/factory'
 
 export default {
   components: {
@@ -103,7 +103,7 @@ export default {
     }
   },
   mounted() {
-    this.banksList = createBankApps(this.$wallet)
+    this.banksList = createBanks(this.$wallet)
     this.getUnderlyingAssetPriceUSD()
     this.getBalanceDisplay()
   },
@@ -113,7 +113,7 @@ export default {
       this.getUnderlyingAssetPriceUSD()
       this.getBalanceDisplay()
       // 换 token 以后需要重置 table
-      this.banksList = createBankApps(this.$wallet)
+      this.banksList = createBanks(this.$wallet)
     },
     async getBalanceDisplay() {
       this.balanceDisplay = await this.$wallet.getBalance(this.underlyingToken.address)

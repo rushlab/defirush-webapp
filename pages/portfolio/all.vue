@@ -170,7 +170,7 @@
 import _ from 'lodash'
 import dayjs from 'dayjs'
 import BankSelect from '@/components/BankSelect'
-import { createBankApps } from '@/utils/banks/factory'
+import { createBanks } from '@/utils/banks/factory'
 import { getBankPortfolio } from './helper'
 
 export default {
@@ -276,7 +276,7 @@ export default {
     },
   },
   mounted() {
-    this.banks = createBankApps(this.$wallet)
+    this.banks = createBanks(this.$wallet)
     this.fetchData()
   },
   methods: {

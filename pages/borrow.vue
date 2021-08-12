@@ -76,7 +76,7 @@ import dayjs from 'dayjs'
 import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
 import ChainSelect from '@/components/ChainSelect'
 import BorrowBankItem from '@/components/banks/BorrowBankItem'
-import { createBankApps } from '@/utils/banks/factory'
+import { createBanks } from '@/utils/banks/factory'
 
 export default {
   components: {
@@ -115,7 +115,7 @@ export default {
     }
   },
   mounted() {
-    this.banksList = createBankApps(this.$wallet)
+    this.banksList = createBanks(this.$wallet)
     this.getUnderlyingAssetPriceUSD()
     this.getBalanceDisplay()
   },
@@ -127,7 +127,7 @@ export default {
       this.underlyingToken = token
       this.getUnderlyingAssetPriceUSD()
       this.getBalanceDisplay()
-      this.banksList = createBankApps(this.$wallet)
+      this.banksList = createBanks(this.$wallet)
     },
     async getUnderlyingAssetPriceUSD() {
       const underlyingAssetAddress = this.underlyingToken.address
