@@ -1,23 +1,39 @@
 <template>
   <div class="page">
     <el-card shadow="never" :body-style="{'padding':0}" v-loading="pending" element-loading-spinner="el-icon-loading">
-      <el-descriptions class="telegram-info" title="Telegram" :column="1">
-        <template slot="extra">
-          <el-button type="text" @click="fetchProfile" style="padding:2px;">Refresh</el-button>
-        </template>
-        <el-descriptions-item label="Telegram Key">{{ profile.telegramKey }}</el-descriptions-item>
-        <el-descriptions-item label="Telegram Chat ID">
-          <el-button
-            v-if="!profile.telegramChatId"
-            type="text" style="padding:2px;"
-            @click="bindTelegram"
-          >Bind Telegram</el-button>
-          <div v-else>{{ profile.telegramChatId }}</div>
-        </el-descriptions-item>
-        <el-descriptions-item
-          v-if="profile.telegramChatId"
-          label="Telegram Username">{{ profile.telegramUsername }}</el-descriptions-item>
-      </el-descriptions>
+      <div class="card__row">
+        <div class="card__left">
+          <el-descriptions class="telegram-info" title="Telegram" :column="1">
+            <template slot="extra">
+              <el-button class="extra-btn" type="primary" plain size="small" @click="fetchProfile">Refresh</el-button>
+            </template>
+            <el-descriptions-item label="Telegram Key">{{ profile.telegramKey }}</el-descriptions-item>
+            <el-descriptions-item label="Telegram Chat ID">
+              <el-button
+                v-if="!profile.telegramChatId"
+                type="primary"
+                plain
+                class="extra-btn"
+                size="small"
+                @click="bindTelegram"
+              >Bind Telegram</el-button>
+              <div v-else>{{ profile.telegramChatId }} <el-tag type="success" size="mini">Success</el-tag></div>
+            </el-descriptions-item>
+            <el-descriptions-item
+              v-if="profile.telegramChatId"
+              label="Telegram Username">{{ profile.telegramUsername }}</el-descriptions-item>
+          </el-descriptions>
+        </div>
+        <div class="card__right">
+          <div style="height: 200px;">
+            <el-steps direction="vertical" :active="activeStep">
+              <el-step title="Step1" description="Click “Bind Telegram” button, it will automatically pop up Telegram app"></el-step>
+              <el-step title="Step2" description="Click the “Start” button in Telegram app chat view."></el-step>
+              <el-step title="Step3" description="Click the “Refresh ”button, if the page shows your telegram ID, means you already subscribe successfully"></el-step>
+            </el-steps>
+          </div>
+        </div>
+      </div>
     </el-card>
   </div>
 </template>
@@ -31,6 +47,7 @@ export default {
     return {
       profile: {},
       pending: false,
+      activeStep: 1,
     }
   },
   mounted() {
@@ -42,6 +59,9 @@ export default {
       try {
         const res = await this.$axios.get('/api/account/profile/')
         this.profile = res.data
+        if (this.profile.telegramChatId) {
+          this.activeStep = 3
+        }
       } catch(err) {
         console.log(err)
       }
@@ -53,6 +73,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then((res) => {
+        this.activeStep = 2
         window.open(`https://t.me/defirush_bot?start=${this.profile.telegramKey}`)
       }).catch(() => {})
     }
@@ -67,5 +88,24 @@ export default {
 }
 .telegram-info {
   padding: 20px;
+}
+.card__row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.card__left {
+  flex: 1;
+}
+.card__right {
+  border-left: 1px solid $--border-color-base;
+  flex: 1;
+  padding: 30px;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+.extra-btn {
+  // background-color: transparent;
 }
 </style>
