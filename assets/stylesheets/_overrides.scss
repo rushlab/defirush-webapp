@@ -127,15 +127,11 @@
 }
 .el-notification__title {
   font-size: 18px;
-  font-weight: normal;
   color: $--color-text-primary;
 }
 .el-notification__content {
   color: $--color-text-secondary;
   text-align: left;
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 200;
   a {
     text-decoration: underline;
   }

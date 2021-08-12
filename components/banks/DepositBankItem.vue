@@ -88,10 +88,7 @@ export default {
   computed: {
     ...mapState('auth', ['walletChainId', 'walletAddress', 'isAuthenticated', 'isSignerAlive']),
     disabledDeposit() {
-      return _.isEmpty(this.underlyingTokenData) || this.disabled
-    },
-    underlyingTokenAddress() {
-      return _.get(this.underlyingTokenData, 'address')
+      return this.disabled
     },
     totalDepositsInUSD() {
       const { totalDeposits, priceUSD } = this.assetData
@@ -122,20 +119,21 @@ export default {
       this.pending = false
     },
     async getAssetData() {
-      /**
-       * trycatch 包一下，这样对于当前bankApp不支持的 underlyingAsset，可以直接将状态置为 disabled
-       */
+      /* trycatch 包一下，这样对于当前bankApp不支持的 underlyingAsset，可以直接将状态置为 disabled */
       try {
-        this.assetData = await this.bankApp.getAssetData(this.underlyingTokenAddress)
+        this.assetData = await this.bankApp.getAssetData(this.underlyingTokenData.address)
         this.disabled = false
       } catch (error) {
+        console.log(error)
         this.disabled = true
       }
     },
     async getAccountAssetData() {
       try {
-        this.accountAssetData = await this.bankApp.getAccountAssetData(this.underlyingTokenAddress)
-      } catch (error) {}
+        this.accountAssetData = await this.bankApp.getAccountAssetData(this.underlyingTokenData.address)
+      } catch (error) {
+        console.log(error)
+      }
     },
     onDepositSuccess(amountDisplay) {
       this.getAllData()

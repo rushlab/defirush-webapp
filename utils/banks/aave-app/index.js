@@ -22,6 +22,7 @@ class AaveApp extends BankApp {
       'function getReservesList() view returns (address[])',
     ], this.$wallet.getProvider());
     this.wETHGateway = new ethers.Contract(this.addresses['WETHGateway'], [
+      'function getWETHAddress() view returns (address)',
       'function depositETH(address lendingPool, address onBehalfOf, uint16 referralCode) payable',
       'function withdrawETH(address lendingPool, uint256 amount, address to)',
       'function repayETH(address lendingPool, uint256 amount, uint256 rateMode, address onBehalfOf) payable',
@@ -61,6 +62,9 @@ class AaveApp extends BankApp {
   }
 
   async getAssetData(underlyingToken) {
+    if (this._isETH(underlyingToken)) {
+      underlyingToken = await this.wETHGateway.getWETHAddress()
+    }
     const [decimals, priceAssetMantissa, priceEtherUsdMantissa] = await Promise.all([
       this._decimals(underlyingToken),
       this._getAssetPriceMantissa(underlyingToken),
@@ -131,6 +135,9 @@ class AaveApp extends BankApp {
   }
 
   async getAccountAssetData(underlyingToken) {
+    if (this._isETH(underlyingToken)) {
+      underlyingToken = await this.wETHGateway.getWETHAddress()
+    }
     // aToken 和 debtToken 的 decimals 是和 underlyingToken 一样的
     const decimals = await this._decimals(underlyingToken);
     const [
