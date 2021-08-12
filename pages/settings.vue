@@ -27,9 +27,9 @@
         <div class="card__right">
           <div style="height: 200px;">
             <el-steps direction="vertical" :active="activeStep">
-              <el-step title="Step1" description="Click “Bind Telegram” button, it will automatically pop up Telegram app"></el-step>
-              <el-step title="Step2" description="Click the “Start” button in Telegram app chat view."></el-step>
-              <el-step title="Step3" description="Click the “Refresh ”button, if the page shows your telegram ID, means you already subscribe successfully"></el-step>
+              <el-step title="Step1" description='Click "Bind Telegram" button, it will automatically pop up Telegram app'></el-step>
+              <el-step title="Step2" description='Click the "Start" button in Telegram app chat view.'></el-step>
+              <el-step title="Step3" description='Click the "Refresh" button, if the page shows your telegram ID, means you already subscribe successfully'></el-step>
             </el-steps>
           </div>
         </div>

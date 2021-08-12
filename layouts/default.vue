@@ -4,7 +4,7 @@
       <sidebar :isCollasped.sync="isCollasped"/>
     </el-aside>
     <el-container style="height: 100vh; overflow: auto;">
-      <el-header class="app__header">
+      <el-header class="app__header" height="75px">
         <site-header />
       </el-header>
       <el-main class="app__main">
@@ -32,8 +32,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.app {
+  min-height: 100vh;
+  min-width: 1200px;
+}
 .app__header {
-  height: 75px !important;
   box-shadow: 0 1px 0 0px #E6E6E6;
   z-index: 1;
 }

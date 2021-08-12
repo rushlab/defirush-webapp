@@ -22,7 +22,7 @@
           <el-col :span="6">
             <div class="data-item">
               <div class="data-item__label">APY</div>
-              <price class="data-item__value" :value="averageDepositAPY"></price>
+              <div class="data-item__value">{{ formatPercentage(averageDepositAPY) }}</div>
             </div>
           </el-col>
           <el-col :span="6">
