@@ -10,7 +10,7 @@ export class WalletApp implements WalletInterface {
     this.$store = store
   }
 
-  getChainId(): Number {
+  getChainId(): number {
     const chainId = this.$store.state.auth.walletChainId
     return chainId
   }

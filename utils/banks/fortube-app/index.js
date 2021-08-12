@@ -8,7 +8,6 @@ class ForTubeApp extends BankApp {
     /* 都放到 this 下面, 代码里就不需要使用全局变量了, 避免和局部变量命名冲突 */
     this.addresses = addresses;
     this.markets = markets;
-    this.fETH = (this.markets.find((item) => item.symbol === 'fETH')).address;
     this.bankcontroller = new ethers.Contract(this.addresses['BankController'], [
       'function deposit(address token, uint256 amount)',
       'function tokenDecimals(address token) view returns (uint256)',

@@ -21,7 +21,7 @@ declare type AmountDisplay = string;
 declare type AmountMantissa = typeof BigNumberish;
 
 declare interface WalletInterface {
-  getChainId(): Number;
+  getChainId(): number;
   getAddress(): Address;
   getSigner(): Signer;
   getProvider(): Provider;

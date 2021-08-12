@@ -1,12 +1,17 @@
 const { ethers } = require('ethers');
 const { BankApp } = require('../bank-app');
-const { addresses } = require('./constants');
+const CONSTANTS = require('./constants');
 
 
 class AaveApp extends BankApp {
   constructor($wallet) {
     super($wallet);
-    this.addresses = addresses;
+    const chainId = this.$wallet.getChainId()
+    this.addresses = {}
+    for (const name in CONSTANTS.addresses) {
+      const item = CONSTANTS.addresses[name]
+      this.addresses[name] = item[chainId] || item['default'];
+    }
     this.lendingPool = new ethers.Contract(this.addresses['LendingPool'], [
       'function deposit(address asset, uint256 amount, address onBehalfOf, uint16 referralCode)',
       'function withdraw(address asset, uint256 amount, address to)',
@@ -56,9 +61,6 @@ class AaveApp extends BankApp {
   }
 
   async getAssetData(underlyingToken) {
-    if (this._isETH(underlyingToken)) {
-      underlyingToken = this.addresses['WETH'];
-    }
     const [decimals, priceAssetMantissa, priceEtherUsdMantissa] = await Promise.all([
       this._decimals(underlyingToken),
       this._getAssetPriceMantissa(underlyingToken),
@@ -129,9 +131,6 @@ class AaveApp extends BankApp {
   }
 
   async getAccountAssetData(underlyingToken) {
-    if (this._isETH(underlyingToken)) {
-      underlyingToken = this.addresses['WETH'];
-    }
     // aToken 和 debtToken 的 decimals 是和 underlyingToken 一样的
     const decimals = await this._decimals(underlyingToken);
     const [
@@ -195,10 +194,10 @@ class AaveApp extends BankApp {
        * 目前暂不支持直接借 ETH, 直接 borrow WETH 就行了, 然后自己兑换成 ETH
        */
       throw new Error('Borrow ETH is not supported for the moment');
-      const amountMantissa = this._displayToMantissa(amountDisplay, 18);
-      // borrowETH(lendingPool, amount, interestRateMode, referralCode)
-      const payload = [this.lendingPool.address, amountMantissa, rateMode, 0];
-      await this.wETHGateway.connect(signer).borrowETH(...payload).then(this.$wallet.waitForTx);
+      // const amountMantissa = this._displayToMantissa(amountDisplay, 18);
+      // // borrowETH(lendingPool, amount, interestRateMode, referralCode)
+      // const payload = [this.lendingPool.address, amountMantissa, rateMode, 0];
+      // await this.wETHGateway.connect(signer).borrowETH(...payload).then(this.$wallet.waitForTx);
     } else {
       const decimals = await this._decimals(underlyingToken);
       const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
@@ -246,10 +245,10 @@ class AaveApp extends BankApp {
        * 目前暂不支持直接 withdraw ETH, 直接 withdraw WETH 就行了, 然后兑换成 ETH
        */
       throw new Error('Withdraw ETH is not supported for the moment');
-      const amountMantissa = this._displayToMantissa(amountDisplay, 18);
-      // withdrawETH(lendingPool, amount, to)
-      const payload = [this.lendingPool.address, amountMantissa, to];
-      await this.wETHGateway.connect(signer).withdrawETH(...payload).then(this.$wallet.waitForTx);
+      // const amountMantissa = this._displayToMantissa(amountDisplay, 18);
+      // // withdrawETH(lendingPool, amount, to)
+      // const payload = [this.lendingPool.address, amountMantissa, to];
+      // await this.wETHGateway.connect(signer).withdrawETH(...payload).then(this.$wallet.waitForTx);
     } else {
       const decimals = await this._decimals(underlyingToken);
       const amountMantissa = this._displayToMantissa(amountDisplay, decimals);

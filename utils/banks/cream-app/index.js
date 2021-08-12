@@ -1,6 +1,6 @@
 const { ethers } = require('ethers');
 const { BankApp } = require('../bank-app');
-const { addresses, markets } = require('./constants');
+const CONSTANTS = require('./constants');
 
 const _rateToApyDisplay = (rateMantissa) => {
   // APY = ((((Rate / ETH Mantissa * Blocks Per Day + 1) ^ Days Per Year)) - 1) * 100
@@ -16,10 +16,14 @@ const _rateToApyDisplay = (rateMantissa) => {
 class CreamApp extends BankApp {
   constructor($wallet) {
     super($wallet);
+    const chainId = this.$wallet.getChainId()
     /* 都放到 this 下面, 代码里就不需要使用全局变量了, 避免和局部变量命名冲突 */
-    this.addresses = addresses;
-    this.markets = markets;
-    this.crETH = (this.markets.find((item) => item.symbol === 'crETH')).address;
+    this.addresses = {}
+    for (const name in CONSTANTS.addresses) {
+      const item = CONSTANTS.addresses[name]
+      this.addresses[name] = item[chainId] || item['default'];
+    }
+    this.markets = CONSTANTS.markets[chainId] || CONSTANTS.markets['default'];
     this.comptroller = new ethers.Contract(this.addresses['Comptroller'], [
       'function enterMarkets(address[] calldata crTokens) returns (uint[] memory)',
       'function getAssetsIn(address account) view returns (address[] memory)',
@@ -29,8 +33,8 @@ class CreamApp extends BankApp {
     ], this.$wallet.getProvider());
   }
 
-  _isCrETH(crToken) {
-    return crToken.toLowerCase() === this.crETH.toLowerCase();
+  _isPolygon() {
+    return this.$wallet.getChainId() === 137
   }
 
   _getMarketOfUnderlying(underlyingToken) {
@@ -70,15 +74,22 @@ class CreamApp extends BankApp {
    * 返回 underlyingToken 的价格 in usd, 保留 getUnderlyingPrice 的 decimals
    */
   async _getUnderlyingPriceMantissa(crTokenAddr) {
-    const priceOracle = new ethers.Contract(this.addresses['PriceOracleProxy'], [
-      'function getUnderlyingPrice(address crToken) view returns (uint)',
-    ], this.$wallet.getProvider());
-    const [priceMantissa, priceEtherUsdMantissa] = await Promise.all([
-      priceOracle.getUnderlyingPrice(crTokenAddr),
-      this._getEtherUsdPriceMantissa(),
-    ]);
-    const _1e8 = ethers.utils.parseUnits('1', 8);
-    return priceMantissa.mul(priceEtherUsdMantissa).div(_1e8);
+    if (this._isPolygon()) {
+      const priceOracleUSD = new ethers.Contract(this.addresses['PriceOracleProxyUSD'], [
+        'function getUnderlyingPrice(address crToken) view returns (uint)',
+      ], this.$wallet.getProvider());
+      return await priceOracleUSD.getUnderlyingPrice(crTokenAddr);
+    } else {
+      const priceOracle = new ethers.Contract(this.addresses['PriceOracleProxy'], [
+        'function getUnderlyingPrice(address crToken) view returns (uint)',
+      ], this.$wallet.getProvider());
+      const [priceMantissa, priceEtherUsdMantissa] = await Promise.all([
+        priceOracle.getUnderlyingPrice(crTokenAddr),
+        this._getEtherUsdPriceMantissa(),
+      ]);
+      const _1e8 = ethers.utils.parseUnits('1', 8);
+      return priceMantissa.mul(priceEtherUsdMantissa).div(_1e8);
+    }
   }
 
   async getAssetData(underlyingToken) {
@@ -120,9 +131,14 @@ class CreamApp extends BankApp {
       this.comptroller.getAccountLiquidity(_userAddress),
       this._getEtherUsdPriceMantissa(),
     ])
-    const _1e8 = ethers.utils.parseUnits('1', 8);  // chain link eth price 的 decimals 是 8
-    const liquidityUSD = liquidity.mul(priceEtherUsdMantissa).div(_1e8);
-    // cream 的 liquidity 是 eth 计价的, 和 _getUnderlyingPriceMantissa 一样, 但 compounud 全都是 usd 计价的
+    let liquidityUSD;
+    if (this._isPolygon()) {
+      liquidityUSD = liquidity
+    } else {
+      const _1e8 = ethers.utils.parseUnits('1', 8);  // chain link eth price 的 decimals 是 8
+      liquidityUSD = liquidity.mul(priceEtherUsdMantissa).div(_1e8);
+      // cream 的 liquidity 是 eth 计价的, 和 _getUnderlyingPriceMantissa 一样, 但 compounud 全都是 usd 计价的
+    }
     const crTokens = await this.comptroller.getAssetsIn(_userAddress);
     const _promises = crTokens.map(async (crTokenAddr) => {
       const {
@@ -220,9 +236,14 @@ class CreamApp extends BankApp {
     const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
     const crTokenAddr = this._getMarketOfUnderlying(underlyingToken);
     // 这里最好检查 this.underlyingEnabled, 建议用户存款的同时也 enterMarket, 不然也没啥意义, 但先不这么做
-    if (this._isCrETH(crTokenAddr)) {
-      const crToken = new ethers.Contract(crTokenAddr, ['function mint() payable'], this.$wallet.getSigner());
-      await crToken.mint({ value: amountMantissa }).then(this.$wallet.waitForTx);
+    if (this._isETH(underlyingToken)) {
+      if (this._isPolygon()) {
+        const crToken = new ethers.Contract(crTokenAddr, ['function mintNative() payable'], this.$wallet.getSigner());
+        await crToken.mintNative({ value: amountMantissa }).then(this.$wallet.waitForTx);
+      } else {
+        const crToken = new ethers.Contract(crTokenAddr, ['function mint() payable'], this.$wallet.getSigner());
+        await crToken.mint({ value: amountMantissa }).then(this.$wallet.waitForTx);
+      }
     } else {
       // const allowanceDisplay = await this.underlyingAllowance(underlyingToken);
       const allowanceMantissa = await super._allowance(underlyingToken, crTokenAddr);
@@ -248,7 +269,7 @@ class CreamApp extends BankApp {
     const decimals = await this._decimals(underlyingToken);
     const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
     const crTokenAddr = this._getMarketOfUnderlying(underlyingToken);
-    if (this._isCrETH(crTokenAddr)) {
+    if (this._isETH(underlyingToken)) {
       const crToken = new ethers.Contract(crTokenAddr, [
         'function repayBorrow() payable',
       ], this.$wallet.getSigner());

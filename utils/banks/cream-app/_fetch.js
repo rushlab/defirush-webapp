@@ -3,6 +3,7 @@ const path = require('path');
 const { ethers } = require('hardhat');
 
 const fetchCrTokens = async () => {
+  // polygon comptroller 0x20CA53E2395FA571798623F1cFBD11Fe2C114c24
   const comptroller = new ethers.Contract('0x3d5BC3c8d13dcB8bF317092d84783c2697AE9258', [
     'function getAllMarkets() view returns (address[])'
   ], ethers.provider);
@@ -25,6 +26,7 @@ const fetchCrTokens = async () => {
       ], ethers.provider);
       result.underlyingSymbol = await erc20Token.symbol();
     }
+    console.log(result);
     results.push(result);
   }
   const content = JSON.stringify(results, null, 2);

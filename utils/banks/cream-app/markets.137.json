@@ -1,0 +1,62 @@
+[
+  {
+    "symbol": "crMATIC",
+    "address": "0x3FaE5e5722C51cdb5B0afD8c7082e8a6AF336Ee8",
+    "underlyingAddress": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    "underlyingSymbol": "MATIC"
+  },
+  {
+    "symbol": "crUSDC",
+    "address": "0x73CF8c5D14Aa0EbC89f18272A568319F5BAB6cBD",
+    "underlyingAddress": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+    "underlyingSymbol": "USDC"
+  },
+  {
+    "symbol": "crUSDT",
+    "address": "0xf976C9bc0E16B250E0B1523CffAa9E4c07Bc5C8a",
+    "underlyingAddress": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+    "underlyingSymbol": "USDT"
+  },
+  {
+    "symbol": "crDAI",
+    "address": "0x4eCEDdF62277eD78623f9A94995c680f8fd6C00e",
+    "underlyingAddress": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+    "underlyingSymbol": "DAI"
+  },
+  {
+    "symbol": "crWETH",
+    "address": "0x7ef18d0a9C3Fb1A716FF6c3ED0Edf52a2427F716",
+    "underlyingAddress": "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
+    "underlyingSymbol": "WETH"
+  },
+  {
+    "symbol": "crWBTC",
+    "address": "0x5Dc3A30d8c5937f1529C3c93507C16d86A17072A",
+    "underlyingAddress": "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6",
+    "underlyingSymbol": "WBTC"
+  },
+  {
+    "symbol": "crLINK",
+    "address": "0x20d5d319C2964ecb52e1B006a4C059b7f6d6ad0a",
+    "underlyingAddress": "0x53E0bca35eC356BD5ddDFebbD1Fc0fD03FaBad39",
+    "underlyingSymbol": "LINK"
+  },
+  {
+    "symbol": "crSUSHI",
+    "address": "0x468a7BF78f11Da82c90b17a93adb7B14999aF5AB",
+    "underlyingAddress": "0x0b3F868E0BE5597D5DB7fEB59E1CADBb0fdDa50a",
+    "underlyingSymbol": "SUSHI"
+  },
+  {
+    "symbol": "crCRV",
+    "address": "0xE82225bA6BeD28406912522F01C7102DD9f07e78",
+    "underlyingAddress": "0x172370d5Cd63279eFa6d502DAB29171933a610AF",
+    "underlyingSymbol": "CRV"
+  },
+  {
+    "symbol": "crQUICK",
+    "address": "0x2eE80614Ccbc5e28654324a66A396458Fa5cD7Cc",
+    "underlyingAddress": "0x831753DD7087CaC61aB5644b308642cc1c33Dc13",
+    "underlyingSymbol": "QUICK"
+  }
+]

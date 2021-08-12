@@ -19,7 +19,6 @@ class CompoundApp extends BankApp {
     /* 都放到 this 下面, 代码里就不需要使用全局变量了, 避免和局部变量命名冲突 */
     this.addresses = addresses;
     this.markets = markets;
-    this.cETH = (this.markets.find((item) => item.symbol === 'cETH')).address;
     this.comptroller = new ethers.Contract(this.addresses['Comptroller'], [
       'function enterMarkets(address[] calldata cTokens) returns (uint[] memory)',
       'function getAssetsIn(address account) view returns (address[] memory)',
@@ -27,10 +26,6 @@ class CompoundApp extends BankApp {
       'function markets(address cTokenAddress) view returns (bool, uint, bool)',
       'function oracle() view returns (address)',
     ], this.$wallet.getProvider());
-  }
-
-  _isCETH(cToken) {
-    return cToken.toLowerCase() === this.cETH.toLowerCase();
   }
 
   _getMarketOfUnderlying(underlyingToken) {
@@ -203,7 +198,7 @@ class CompoundApp extends BankApp {
     const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
     const cTokenAddr = this._getMarketOfUnderlying(underlyingToken);
     // 这里最好检查 this.underlyingEnabled, 建议用户存款的同时也 enterMarket, 不然也没啥意义, 但先不这么做
-    if (this._isCETH(cTokenAddr)) {
+    if (this._isETH(underlyingToken)) {
       const cToken = new ethers.Contract(cTokenAddr, ['function mint() payable'], this.$wallet.getSigner());
       await cToken.mint({ value: amountMantissa }).then(this.$wallet.waitForTx);
     } else {
@@ -231,7 +226,7 @@ class CompoundApp extends BankApp {
     const decimals = await this._decimals(underlyingToken);
     const amountMantissa = this._displayToMantissa(amountDisplay, decimals);
     const cTokenAddr = this._getMarketOfUnderlying(underlyingToken);
-    if (this._isCETH(cTokenAddr)) {
+    if (this._isETH(underlyingToken)) {
       const cToken = new ethers.Contract(cTokenAddr, [
         'function repayBorrow() payable',
       ], this.$wallet.getSigner());
