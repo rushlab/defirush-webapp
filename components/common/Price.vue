@@ -68,8 +68,8 @@ export default {
 .g {
   letter-spacing: 0.5px;
 }
-.s {
-  font-size: 0.8em;
-  line-height: 1;
-}
+// .s {
+//   font-size: 0.8em;
+//   line-height: 1;
+// }
 </style>

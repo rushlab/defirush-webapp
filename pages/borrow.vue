@@ -6,12 +6,8 @@
       </el-form-item>
       <el-form-item class="token-amount">
         <div class="token-balance-display">
-          <template v-if="balanceDisplay > 0">
-            <span>Max: {{ balanceDisplay }}</span>
-          </template>
-          <template v-else>
-            <span class="text-danger">Not enough balance </span> <span>Max: {{ balanceDisplay }}</span>
-          </template>
+          <span class="text-danger" v-if="+amountDisplay > +balanceDisplay">Not enough balance </span>
+          <span>Wallet balance: {{ balanceDisplay }} {{ underlyingToken.symbol }}</span>
         </div>
         <el-input v-model="amountDisplay" placeholder="Input token amount..." class="input-amount">
           <el-button class="select-token-btn" slot="prepend" @click="tokenSelectDialogVisible = !tokenSelectDialogVisible">
@@ -22,8 +18,7 @@
             </div>
           </el-button>
         </el-input>
-        <div v-if="+underlyingTokenPriceUSD" class="token-value-to-usd">&asymp;${{ amountToUSD }}</div>
-        <div v-else class="token-value-to-usd">-</div>
+        <div class="token-value-to-usd">&asymp; <price :value="amountToUSD"></price></div>
       </el-form-item>
     </el-form>
     <el-card class="bank-list" :body-style="{'padding':0}" shadow="never">
@@ -289,7 +284,7 @@ export default {
     line-height: 56px;
     color: $--color-text-primary;
     font-size: 18px;
-    font-weight: 400;
+    font-weight: bold;
     border: none;
   }
 }
