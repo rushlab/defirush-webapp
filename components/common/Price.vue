@@ -52,7 +52,11 @@ export default {
       }
       // 价格无论如何都只保留两位小数
       value = (+value).toFixed(2)
-      return ethers.utils.commify(value) + suffix
+      try {
+        value = ethers.utils.commify(value)
+        // value 超级大比如 1e100, 这样 toFixed(2) 了以后还是 1e100, 但 commify 只接受纯数字
+      } catch(err) {}
+      return value + suffix
     },
     negative() {
       return +this.value < 0
