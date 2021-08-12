@@ -59,10 +59,12 @@ export default {
     networkName() {
       if (this.walletChainId == 1) {
         return 'Ethereum Mainnet'
+      } else if (this.walletChainId == 137) {
+        return 'Polygon Mainnet'
       } else if (this.walletChainId === 31337 || this.walletChainId === 71337 ) {
         return 'Hardhat Forking'
       } else {
-        return 'Unknown Network'
+        return `Unknown Network (${this.walletChainId})`
       }
     },
     maskedWalletAddress() {

@@ -66,8 +66,8 @@ export default {
     background-color: $--input-background-color;
   }
   &.active {
-    background-color: $btn-dark-bg;
-    color: $btn-dark-text;
+    background-color: $--color-black;
+    color: $--color-white;
   }
   &.disabled {
     opacity: 0.5;

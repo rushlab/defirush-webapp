@@ -62,9 +62,11 @@ function listenToMetaMask(store) {
       store.commit('auth/setSignerStatus', true)
     } else {
       await store.dispatch('auth/logout')
-      MessageBox.confirm('Current page will be reloaded by changing network or account?', 'Notice', {
-        confirmButtonText: 'Yes',
-        cancelButtonText: 'Cancel',
+      MessageBox.confirm(
+        'Page will be reloaded because the network or your wallet account is changed',
+        'Network/Account Changed', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'DO NOT REFRESH',
         type: 'warning'
       }).then(() => global.location.reload()).catch(() => {})
     }
@@ -95,8 +97,12 @@ export default async ({ store }) => {
   listenToMetaMask(store)
 
   /**
+   * 需要 auth store 初始化好了再 getTokens, 但是要再 $wallet 初始化之前
+   */
+  await store.dispatch('tokens/getTokens')
+
+  /**
    * 需要访问 store, 所以这个全局变量在这里定义
    */
   Vue.prototype.$wallet = new WalletApp(store)
-
 }

@@ -289,11 +289,15 @@ export default {
     async fetchData() {
       this.pending = true
       const promises = _.map(this.banks, async (bank) => {
-        const portfolio = await getBankPortfolio(bank)
-        // 这样强制触发更新
-        this.bankPortfolioDict = {
-          ...this.bankPortfolioDict,
-          [bank.name]: portfolio,
+        try {
+          const portfolio = await getBankPortfolio(bank)
+          // 这样强制触发更新
+          this.bankPortfolioDict = {
+            ...this.bankPortfolioDict,
+            [bank.name]: portfolio,
+          }
+        } catch(err) {
+          console.error(`${bank} fetchData`, err)
         }
       })
       await Promise.all(promises)

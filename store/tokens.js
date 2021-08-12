@@ -51,9 +51,11 @@ export const mutations = {
 }
 
 export const actions = {
-  getTokens({ commit }) {
+  getTokens({ commit, rootState }) {
     commit('START_REQUEST')
-    return this.$axios.get('/api/tokens').then(({ data }) => {
+    return this.$axios.get('/api/tokens', {
+      params: { 'chain_id': rootState.auth.walletChainId }
+    }).then(({ data }) => {
       commit('COMPLETE_REQUEST')
       commit('SET_TOKENS', data)
     }).catch(err => {

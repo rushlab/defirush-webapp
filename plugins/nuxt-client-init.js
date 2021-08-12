@@ -16,5 +16,5 @@ dayjs.extend(relativeTime)
 
 /* initialize basic state in store */
 export default async ({ store }) => {
-  store.dispatch('tokens/getTokens')
+  // store.dispatch('tokens/getTokens') 应该在确认了 chainId 以后再获取
 }
