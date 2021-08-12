@@ -15,7 +15,8 @@ export class BankApp implements BankAppInterface {
   }
 
   _isETH(asset: Address) {
-    return asset.toLowerCase() === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase();
+    // 只在 bank app 内部使用, 其他地方直接用 $wallet.isETH
+    return this.$wallet.isETH(asset)
   }
 
   _displayToMantissa(amountDisplay: AmountDisplay, decimals: number) {

@@ -13,10 +13,10 @@
             class="dialog-input"
             v-model="form.amountDisplay"
             @input="onInputAmountDisplay"
-            :disabled="pending || !+amountMaxDisplay || !underlyingAssetDecimals">
-            <div slot="append" v-if="underlyingAssetSymbol">{{ underlyingAssetSymbol }}</div>
+            :disabled="pending || !+amountMaxDisplay">
+            <div slot="append">{{ underlyingTokenData.symbol }}</div>
           </el-input>
-          <div class="balance-hint">Deposits: <strong>{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div>
+          <div class="balance-hint">Deposits: <strong>{{ amountMaxDisplay }} {{ underlyingTokenData.symbol }}</strong></div>
         </el-form-item>
         <el-form-item class="form__slider">
           <el-slider
@@ -24,13 +24,13 @@
             :show-tooltip="false"
             v-model="form.amountSlideValue"
             @change="onChangeSlideValue"
-            :disabled="pending || !+amountMaxDisplay || !underlyingAssetDecimals"></el-slider>
+            :disabled="pending || !+amountMaxDisplay"></el-slider>
         </el-form-item>
       </el-form>
       <div class="dialog__hints">
         <p class="hints-title">You Will</p>
         <ul>
-          <li>Withdraw {{ form.amountDisplay }} {{ underlyingAssetSymbol }}(≈ {{ formatCurrency(amountToUSD) }})</li>
+          <li>Withdraw {{ form.amountDisplay }} {{ underlyingTokenData.symbol }}(≈ {{ formatCurrency(amountToUSD) }})</li>
           <li>Lock - ETH for liquidation reserve</li>
           <li>Pay - ETH for borrow fee</li>
         </ul>
@@ -110,14 +110,8 @@ export default {
     }
   },
   computed: {
-    underlyingAssetSymbol() {
-      return this.underlyingTokenData ? this.underlyingTokenData.symbol : ''
-    },
-    underlyingAssetDecimals() {
-      return _.get(this.underlyingTokenData, 'decimals')
-    },
     isETH() {
-      return _.get(this.underlyingTokenData, 'address', '').toLowerCase() === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase()
+      return this.$wallet.isETH(this.underlyingTokenData.address)
     },
     amountPrecentage() {
       return toNumberOrZero(this.amountMaxDisplay) > 0 ? (toNumberOrZero(this.form.amountDisplay) / toNumberOrZero(this.amountMaxDisplay)) * 100 : 0
@@ -179,7 +173,7 @@ export default {
       this.$emit('update:visible', false)
     },
     onInputAmountDisplay(val) {
-      const re = new RegExp(`(\\d+\\.\\d{${this.underlyingAssetDecimals}})(\\d+)`)
+      const re = new RegExp(`(\\d+\\.\\d{${this.underlyingTokenData.decimals}})(\\d+)`)
       const amountDisplay = val.replace(re, '$1')
       this.form.amountDisplay = amountDisplay
       this._updatePrecentageFromAmount()
@@ -192,7 +186,7 @@ export default {
     },
     _updateAmountFromPrecentage() {
       const res = (toNumberOrZero(this.amountMaxDisplay)) * parseInt(this.form.amountSlideValue) / 100
-      this.form.amountDisplay = safeToFixed(res, this.underlyingAssetDecimals)
+      this.form.amountDisplay = safeToFixed(res, this.underlyingTokenData.decimals)
     },
     async handleWithdraw() {
       try {

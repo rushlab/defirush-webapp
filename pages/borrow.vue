@@ -121,12 +121,7 @@ export default {
   },
   methods: {
     async getBalanceDisplay() {
-      if (this.isETH) {
-        this.balanceDisplay = await this.$wallet.getBalance()
-      } else {
-        const { address } = this.underlyingToken
-        this.balanceDisplay = await this.$wallet.getBalance(address)
-      }
+      this.balanceDisplay = await this.$wallet.getBalance(this.underlyingToken.address)
     },
     onSelectToken(token) {
       this.underlyingToken = token

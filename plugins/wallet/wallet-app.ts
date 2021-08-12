@@ -10,6 +10,10 @@ export class WalletApp implements WalletInterface {
     this.$store = store
   }
 
+  isETH(asset: Address): boolean {
+    return asset.toLowerCase() === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase();
+  }
+
   getChainId(): number {
     const chainId = this.$store.state.auth.walletChainId
     return chainId
@@ -65,10 +69,6 @@ export class WalletApp implements WalletInterface {
     }
   }
 
-  _isETH(asset: Address): Boolean {
-    return asset.toLowerCase() === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase();
-  }
-
   /**
    * 管理全局的 transaction 状态, 比如
    *  await contract.method(args).then(this.$waitForTx)
@@ -105,7 +105,7 @@ export class WalletApp implements WalletInterface {
   async getBalance(asset: Address): Promise<AmountDisplay> {
     const provider = this.getProvider();
     const address = this.getAddress();
-    if (!asset || this._isETH(asset)) {
+    if (!asset || this.isETH(asset)) {
       const balance = await provider.getBalance(address);
       return ethers.utils.formatEther(balance);
     } else {

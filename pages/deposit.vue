@@ -98,9 +98,6 @@ export default {
     amountToUSD() {
       return (+this.amountDisplay * +this.underlyingTokenPriceUSD).toFixed(2)
     },
-    isETH() {
-      return _.get(this.underlyingToken, 'address', '').toLowerCase() === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase()
-    },
     lastUpdatedAtDisplay() {
       return this.lastUpdatedAt ? this.lastUpdatedAt.from(this.currentTime, true) : '-'
     }
@@ -119,12 +116,7 @@ export default {
       this.banksList = createBankApps(this.$wallet)
     },
     async getBalanceDisplay() {
-      if (this.isETH) {
-        this.balanceDisplay = await this.$wallet.getBalance()
-      } else {
-        const { address } = this.underlyingToken
-        this.balanceDisplay = await this.$wallet.getBalance(address)
-      }
+      this.balanceDisplay = await this.$wallet.getBalance(this.underlyingToken.address)
     },
     async getUnderlyingAssetPriceUSD() {
       const underlyingAssetAddress = this.underlyingToken.address

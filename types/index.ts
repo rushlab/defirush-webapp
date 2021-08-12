@@ -21,6 +21,7 @@ declare type AmountDisplay = string;
 declare type AmountMantissa = typeof BigNumberish;
 
 declare interface WalletInterface {
+  isETH(asset: Address): boolean;
   getChainId(): number;
   getAddress(): Address;
   getSigner(): Signer;

@@ -9,21 +9,20 @@
       <el-form :model="form">
         <el-form-item>
           <div class="collateral-info">
-            <span class="collateral-label">Current Debt:&nbsp;</span><span class="collateral-value">{{ accountAssetData.userBorrows }} {{ underlyingAssetSymbol }}</span>
+            <span class="collateral-label">Current Debt:&nbsp;</span><span class="collateral-value">{{ accountAssetData.userBorrows }} {{ underlyingTokenData.symbol }}</span>
           </div>
           <div class="collateral-info">
             <span class="collateral-label">Borrow APY:&nbsp;</span><span class="collateral-value">{{ formatPercentage(assetData.borrowAPY) }}</span>
           </div>
-
           <div class="input-hint">How much collateral do you want to borrow?</div>
           <el-input
             class="dialog-input"
             v-model="form.amountDisplay"
             @input="onInputAmountDisplay"
-            :disabled="pending || !+amountMaxDisplay || !underlyingAssetDecimals">
-            <div slot="append">{{ underlyingAssetSymbol }}</div>
+            :disabled="pending || !+amountMaxDisplay">
+            <div slot="append">{{ underlyingTokenData.symbol }}</div>
           </el-input>
-          <div class="balance-hint">Available to borrow: <strong>{{ amountMaxDisplay }} {{ underlyingAssetSymbol }}</strong></div>
+          <div class="balance-hint">Available to borrow: <strong>{{ amountMaxDisplay }} {{ underlyingTokenData.symbol }}</strong></div>
         </el-form-item>
         <el-form-item>
           <el-slider
@@ -31,13 +30,13 @@
             :show-tooltip="false"
             v-model="form.amountSlideValue"
             @change="onChangeSlideValue"
-            :disabled="pending || !+amountMaxDisplay || !underlyingAssetDecimals"></el-slider>
+            :disabled="pending || !+amountMaxDisplay"></el-slider>
         </el-form-item>
       </el-form>
       <div class="dialog__hints">
         <h3>You Will</h3>
         <ul>
-          <li>Borrow {{ form.amountDisplay }} {{ underlyingAssetSymbol }} (≈ {{ formatCurrency(amountToUSD) }})</li>
+          <li>Borrow {{ form.amountDisplay }} {{ underlyingTokenData.symbol }} (≈ {{ formatCurrency(amountToUSD) }})</li>
           <li>Increate current debt to {{ formatCurrency(increasedTotalDebetUSD) }} USD</li>
           <li>Decrease collateral ratio to {{ updatedCollateralRatio }}</li>
         </ul>
@@ -110,7 +109,6 @@ export default {
       accountData: {},
       assetData: {},
       accountAssetData: {},
-
       userBorrowsDisplay: 0,
       priceUSD: 0,
       allowanceMantissa: ethers.constants.Zero,
@@ -119,14 +117,8 @@ export default {
     }
   },
   computed: {
-    underlyingAssetSymbol() {
-      return this.underlyingTokenData ? this.underlyingTokenData.symbol : ''
-    },
-    underlyingAssetDecimals() {
-      return _.get(this.underlyingTokenData, 'decimals')
-    },
     isETH() {
-      return _.get(this.underlyingTokenData, 'address', '').toLowerCase() === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'.toLowerCase()
+      return this.$wallet.isETH(this.underlyingTokenData.address)
     },
     availableBorrowsDisplay() {
       const { availableBorrowsUSD = 0 } = this.accountData
@@ -205,8 +197,9 @@ export default {
       this.accountAssetData = accountAssetData
     },
     async updateAllowanceMantissa() {
-      if (this.isETH) return
-      this.allowanceMantissa = await this.bankApp.underlyingAllowance(this.underlyingTokenData.address)
+      if (!this.isETH) {
+        this.allowanceMantissa = await this.bankApp.underlyingAllowance(this.underlyingTokenData.address)
+      }
     },
     onDialogClose() {
       this.form.amountDisplay = ''
@@ -214,7 +207,7 @@ export default {
       this.$emit('update:visible', false)
     },
     onInputAmountDisplay(val) {
-      const re = new RegExp(`(\\d+\\.\\d{${this.underlyingAssetDecimals}})(\\d+)`)
+      const re = new RegExp(`(\\d+\\.\\d{${this.underlyingTokenData.decimals}})(\\d+)`)
       const amountDisplay = val.replace(re, '$1')
       this.form.amountDisplay = amountDisplay
       this._updatePrecentageFromAmount()
@@ -227,7 +220,7 @@ export default {
     },
     _updateAmountFromPrecentage() {
       const res = (toNumberOrZero(this.amountMaxDisplay)) * parseInt(this.form.amountSlideValue) / 100
-      this.form.amountDisplay = safeToFixed(res, this.underlyingAssetDecimals)
+      this.form.amountDisplay = safeToFixed(res, this.underlyingTokenData.decimals)
     },
     async handleBorrow() {
       try {
