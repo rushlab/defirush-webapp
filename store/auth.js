@@ -48,9 +48,9 @@ export const actions = {
     commit('setWallet', { walletChainId: chainId, walletAddress: address })
     commit('setSignerStatus', true)
   },
-  async logout({ dispatch, commit }) {
+  async logout({ dispatch, commit, state }) {
     commit('_setApiToken', '')
-    commit('setWallet', { walletChainId: 1, walletAddress: '' })
+    commit('setWallet', { walletChainId: state.walletChainId, walletAddress: '' })
     commit('setSignerStatus', false)
     global.localStorage.removeItem(AUTH_STORAGE_KEY)
   },
