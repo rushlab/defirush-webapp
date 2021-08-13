@@ -1,9 +1,6 @@
 <template>
   <div class="page--deposit">
     <el-form @submit.native.prevent>
-      <el-form-item>
-        <chain-select :value.sync="currentChain"/>
-      </el-form-item>
       <el-form-item class="token-amount">
         <div class="token-balance-display">
           <span>Wallet balance: {{ balanceDisplay }} {{ underlyingToken.symbol }}</span>
@@ -59,18 +56,15 @@ import _ from 'lodash'
 import dayjs from 'dayjs'
 import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
 import DepositBankItem from '@/components/banks/DepositBankItem'
-import ChainSelect from '@/components/ChainSelect'
 import { createBanks } from '@/utils/banks/factory'
 
 export default {
   components: {
     DepositBankItem,
     TokenSelectDialog,
-    ChainSelect
   },
   data() {
     return {
-      currentChain: "Ethereum",
       banksList: [],
       tokenSelectDialogVisible: false,
       underlyingToken: {

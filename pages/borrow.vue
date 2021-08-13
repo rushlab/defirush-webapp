@@ -1,9 +1,6 @@
 <template>
   <div class="page--borrow">
     <el-form @submit.native.prevent>
-      <el-form-item>
-        <chain-select :value.sync="currentChain"/>
-      </el-form-item>
       <el-form-item class="token-amount">
         <div class="token-balance-display">
           <span class="text-danger" v-if="+amountDisplay > +balanceDisplay">Not enough balance </span>
@@ -69,7 +66,6 @@
 import _ from 'lodash'
 import dayjs from 'dayjs'
 import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
-import ChainSelect from '@/components/ChainSelect'
 import BorrowBankItem from '@/components/banks/BorrowBankItem'
 import { createBanks } from '@/utils/banks/factory'
 
@@ -77,11 +73,9 @@ export default {
   components: {
     BorrowBankItem,
     TokenSelectDialog,
-    ChainSelect
   },
   data() {
     return {
-      currentChain: "Ethereum",
       banksList: [],
       tokenSelectDialogVisible: false,
       underlyingToken: {
