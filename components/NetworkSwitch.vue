@@ -1,10 +1,12 @@
 <template>
-  <div class="network-status" :class="{ 'signer-alive': isSignerAlive }">
+  <div class="network-switch" :class="{ 'signer-alive': isSignerAlive }">
     <el-dropdown @command="handleChainCommand" placement="bottom-start">
-      <span class="el-dropdown-link">
+      <div class="el-dropdown-link">
+        <!-- <el-image v-if="selectedChainIcon" :src="selectedChainIcon" fit="contain"></el-image>
+        <i v-else class="el-icon-warning-outline"></i> -->
         <span>{{ selectedChainName }}</span>
         <i class="el-icon-arrow-down el-icon--right"></i>
-      </span>
+      </div>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item
           v-for="item in chainOptions" :key="item.chainId"
@@ -43,8 +45,12 @@ export default {
   computed: {
     ...mapState('auth', ['chainId', 'isSignerAlive']),
     selectedChainName() {
-      const chain = _.find(this.chains, (chain) => +chain.chainId === +this.chainId)
+      const chain = _.find(this.chains, { chainId: this.chainId })
       return chain ? chain.chainName : `Unknown Network (${this.chainId})`
+    },
+    selectedChainIcon() {
+      const chain = _.find(this.chains, { chainId: this.chainId })
+      return chain ? chain.icon : null
     }
   },
   mounted() {},
@@ -62,7 +68,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/assets/stylesheets/variables.scss";
-.network-status {
+.network-switch {
   position: relative;
   padding-left: 20px;
   &::before {
@@ -81,6 +87,14 @@ export default {
   }
   /deep/ .el-dropdown-link {
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    .el-image {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+    }
   }
 }
 </style>
