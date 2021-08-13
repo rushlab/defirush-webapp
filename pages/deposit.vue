@@ -152,6 +152,9 @@ export default {
 
 <style lang="scss" scoped>
 @import '@/assets/stylesheets/variables.scss';
+.page--deposit {
+  padding-top: 20px;
+}
 .table--headers-only {
   /deep/ > .el-table__body-wrapper > .el-table__empty-block {
     display: none;

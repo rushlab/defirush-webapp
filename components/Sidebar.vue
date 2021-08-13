@@ -18,7 +18,7 @@
         :collapse="isCollasped"
         :collapse-transition="false"
       >
-        <el-menu-item index="/">
+        <el-menu-item @click="goToHome">
           <i class="rush-icon-home"></i>
           <strong slot="title">Home</strong>
         </el-menu-item>
@@ -119,6 +119,9 @@ export default {
   methods: {
     toggleCollasped() {
       this.$emit('update:isCollasped', !this.isCollasped)
+    },
+    goToHome() {
+      window.open('https://www.defirush.io')
     },
     toggleSimulationMode(val) {
       if (val) {

@@ -163,6 +163,9 @@ export default {
 
 <style lang="scss" scoped>
 @import '@/assets/stylesheets/variables.scss';
+.page--borrow {
+  padding-top: 20px;
+}
 /deep/ {
   .el-input-group__prepend {
     background-color: #ffffff;
