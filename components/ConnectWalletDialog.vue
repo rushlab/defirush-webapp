@@ -6,16 +6,16 @@
     :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose"
   >
-    <div>
+    <div v-loading="isConnecting">
       <template v-if="!address">
         <!-- 选择钱包，点击链接 -->
         <div class="dialog__notice">Please select a wallet to connect:</div>
         <div class="wallet-items">
-          <button class="wallet-btn" :disabled="isConnecting" @click="connectBrowserWallet">
+          <button class="wallet-btn" @click="connectBrowserWallet">
             <img class="wallet-icon" src="~/assets/icons/metamask-fox.svg" alt="">
             <span> MetaMask</span>
           </button>
-          <button class="wallet-btn" :disabled="isConnecting" @click="connectBrowserWallet">
+          <button class="wallet-btn" @click="connectBrowserWallet">
             <img class="wallet-icon" src="~/assets/icons/wallet-connect.png" alt="">
             <span> WalletConnect</span>
           </button>
@@ -41,6 +41,7 @@
 import _ from 'lodash'
 import { ethers } from 'ethers'
 import { mapState, mapGetters, mapActions } from 'vuex'
+import { chains } from '@/utils/chains'
 
 export default {
   name: 'ConnectWalletDialog',
@@ -53,6 +54,7 @@ export default {
   },
   data() {
     return {
+      chains,
       isVisible: this.visible,
       address: '',
       signer: null,
@@ -90,10 +92,14 @@ export default {
       if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
         this.isConnecting = true
         try {
+          await this.switchToCurrentChain()
           await global.ethereum.request({ method: 'eth_requestAccounts' })
         } catch(error) {
           console.log(error)
           this.isVisible = false
+          this.isConnecting = false
+          this.$message.error(JSON.stringify(error))
+          return
         }
         const provider = new ethers.providers.Web3Provider(global.ethereum)
         const signer = provider.getSigner()
@@ -138,63 +144,26 @@ export default {
         this.$message.error('Wrong signature ...... ')
       }
     },
-    /* below to do */
-    toggleSimulationModeLegacy(val) {
-      if (val) {
-        // 切换到模拟网络
-        this.checkSimulationNetwork()
-      } else {
-        this.execSwitchChainId(int2hex(1))
-      }
-    },
-    async checkSimulationNetwork() {
+    async switchToCurrentChain() {
+      const chainId = this.$store.state.auth.chainId
+      const chainIdHex = '0x' + chainId.toString(16)
+      const { chainName, nativeCurrency, rpcUrls } = _.find(this.chains, { chainId })  // 一定存在
       try {
-        await this.execSwitchChainId(this.simulationChainId)
+        await global.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: chainIdHex }],
+        });
       } catch (error) {
-        console.log('@@@ checkSimulationNetwork', error)
+        // This error code indicates that the chain has not been added to MetaMask.
         if (error.code === 4902) {
-          this.$confirm('An ethereum hain will be add to metamask?', 'Notice', {
-            confirmButtonText: 'Continue',
-            cancelButtonText: 'Cancel',
-            type: 'warning'
-          }).then(() => {
-            this.addSimulationNetwork()
-          }).catch(() => {
+          await global.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{ chainId: chainIdHex, chainName, nativeCurrency, rpcUrls }],
           })
+        } else {
+          throw error
         }
       }
-    },
-    async addSimulationNetwork() {
-
-      const int2hex = (num) => ('0x' + num.toString(16))
-      const chainId = 71337
-      const simulationChainId = int2hex(chainId)
-      const simulationNetWorkParams = {
-        chainId: simulationChainId,
-        chainName: 'hardhat-dev.defirush.io',
-        nativeCurrency: {
-          name: 'Ethereum',
-          symbol: 'ETH',
-          decimals: 18
-        },
-        rpcUrls: ['https://hardhat-dev.defirush.io']
-      }
-
-      try {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [this.simulationNetWorkParams],
-        })
-        await this.execSwitchChainId(this.simulationChainId)
-      } catch (error) {
-        this.$message.error('Failed to wallet_addEthereumChain', JSON.stringify(error))
-      }
-    },
-    async execSwitchChainId(chainId) {
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId }],
-      })
     }
   },
   watch: {

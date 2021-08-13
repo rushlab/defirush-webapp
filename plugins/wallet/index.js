@@ -43,8 +43,31 @@ async function verifyLoginData({ chainId, address, message, signature }) {
 
 
 function listenToMetaMask(store) {
-  const handler = async () => {
-    const { walletChainId, walletAddress } = store.state.auth
+  const logoutAndReload = async () => {
+    if (store.state.auth.isAuthenticated) {
+      await store.dispatch('auth/logout')
+      MessageBox.confirm(
+        'Page will be reloaded because the network or your wallet account is changed',
+        'Network/Account Changed', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'DO NOT REFRESH',
+        type: 'warning'
+      }).then(() => global.location.reload()).catch(() => {})
+    }
+  }
+  const chainChanged = async () => {
+    const provider = new ethers.providers.Web3Provider(global.ethereum)
+    let selectedChainId = 0
+    try {
+      selectedChainId = +((await provider.getNetwork()).chainId)
+    } catch(error) {}  // 无法获取就直接忽略, 然后更新 signer 状态
+    if (!selectedChainId || store.state.auth.chainId !== selectedChainId) {
+      store.commit('auth/setSignerStatus', false)
+      await logoutAndReload()
+    }
+  }
+  const accountsChanged = async () => {
+    const { chainId, walletAddress } = store.state.auth
     // if (!walletAddress) {
     //   return
     // }
@@ -58,40 +81,33 @@ function listenToMetaMask(store) {
     } catch(error) {}  // 无法获取就直接忽略, 然后更新 signer 状态
     if (!selectedChainId || !selectedAddress) {
       store.commit('auth/setSignerStatus', false)
-    } else if (+walletChainId === selectedChainId && walletAddress.toLowerCase() === selectedAddress.toLowerCase()) {
+    } else if (+chainId === selectedChainId && walletAddress.toLowerCase() === selectedAddress.toLowerCase()) {
       store.commit('auth/setSignerStatus', true)
     } else {
-      await store.dispatch('auth/logout')
-      MessageBox.confirm(
-        'Page will be reloaded because the network or your wallet account is changed',
-        'Network/Account Changed', {
-        confirmButtonText: 'OK',
-        cancelButtonText: 'DO NOT REFRESH',
-        type: 'warning'
-      }).then(() => global.location.reload()).catch(() => {})
+      await logoutAndReload()
     }
   }
   if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
-    global.ethereum.on('chainChanged', handler)
-    global.ethereum.on('accountsChanged', handler)
+    global.ethereum.on('chainChanged', chainChanged)
+    global.ethereum.on('accountsChanged', accountsChanged)
   }
 }
 
 
 export default async ({ store }) => {
 
-  // const loginData = await store.dispatch('auth/getLoginData')
-  // if (loginData) {
-  //   try {
-  //     const { connected } = await verifyLoginData(loginData)
-  //     const { address } = loginData
-  //     store.commit('auth/setWallet', address)
-  //     store.commit('auth/setSignerStatus', connected)
-  //   } catch(error) {
-  //     console.log(error)
-  //     await store.dispatch('auth/logout')
-  //   }
-  // }
+  const loginData = await store.dispatch('auth/getLoginData')
+  if (loginData) {
+    try {
+      const { connected } = await verifyLoginData(loginData)
+      const { address } = loginData
+      store.commit('auth/setWallet', address)
+      store.commit('auth/setSignerStatus', connected)
+    } catch(error) {
+      console.log(error)
+      await store.dispatch('auth/logout')
+    }
+  }
 
   // 现在只支持 metamask, 回头再添加其他的
   listenToMetaMask(store)
