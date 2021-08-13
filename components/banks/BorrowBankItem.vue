@@ -92,7 +92,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('auth', ['walletChainId', 'walletAddress', 'isAuthenticated', 'isSignerAlive']),
+    ...mapState('auth', ['isSignerAlive']),
     disabledBorrow() {
       return _.isEmpty(this.underlyingTokenData) || this.disabled
     },

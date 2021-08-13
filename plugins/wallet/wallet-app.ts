@@ -15,7 +15,7 @@ export class WalletApp implements WalletInterface {
   }
 
   getChainId(): number {
-    const chainId = this.$store.state.auth.walletChainId
+    const chainId = this.$store.state.auth.chainId
     return chainId
   }
 
@@ -57,11 +57,11 @@ export class WalletApp implements WalletInterface {
         throw new Error('Requires MetaMask') // 目前只支持 metamask
       }
     } else {
-      const { walletChainId } = this.$store.state.auth
+      const { chainId } = this.$store.state.auth
       let url
-      if (walletChainId == 1) {
+      if (chainId == 1) {
         url = 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'
-      } else if (walletChainId == 137) {
+      } else if (chainId == 137) {
         url = 'https://rpc-mainnet.maticvigil.com'
       } else {
         // url = 'http://localhost:8545'

@@ -54,7 +54,7 @@ export const actions = {
   getTokens({ commit, rootState }) {
     commit('START_REQUEST')
     return this.$axios.get('/api/tokens', {
-      params: { 'chain_id': rootState.auth.walletChainId }
+      params: { 'chain_id': rootState.auth.chainId }
     }).then(({ data }) => {
       commit('COMPLETE_REQUEST')
       commit('SET_TOKENS', data)

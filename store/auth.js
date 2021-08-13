@@ -1,3 +1,4 @@
+const CHAIN_STORAGE_KEY = 'web3-chain-id'
 const AUTH_STORAGE_KEY = 'web3-wallet-auth'
 
 /**
@@ -9,12 +10,9 @@ const AUTH_STORAGE_KEY = 'web3-wallet-auth'
  * isSignerAlive: 浏览器钱包可用, 可以发送交易, 并且和 walletAddress 对应
  */
 export const state = () => {
-  let walletChainId = 1
-  if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
-    walletChainId = +global.ethereum.chainId || 1
-  }
+  const chainId = (+global.localStorage.getItem(CHAIN_STORAGE_KEY)) || 1
   return {
-    walletChainId,
+    chainId,
     walletAddress: '',
     isAuthenticated: false,
     isSignerAlive: false,
@@ -26,8 +24,11 @@ export const mutations = {
   _setApiToken(state, token) {
     state._apiToken = token
   },
-  setWallet(state, { walletChainId, walletAddress }) {
-    state.walletChainId = +walletChainId
+  setChainId(state, chainId) {
+    state.chainId = +chainId
+    global.localStorage.setItem(CHAIN_STORAGE_KEY, state.chainId)
+  },
+  setWallet(state, walletAddress) {
     state.walletAddress = walletAddress
     state.isAuthenticated = !!walletAddress
   },
@@ -41,16 +42,19 @@ export const mutations = {
  * 所以先都用 actions 不用 mutations, 而 actions 一定要 async
  */
 export const actions = {
-  async login({ dispatch, commit }, { chainId, address, message, signature }) {
+  async login({ dispatch, commit, state }, { chainId, address, message, signature }) {
+    if (state.chainId !== chainId) {
+      throw new Error('chain id doesn\'t match')
+    }
     const content = JSON.stringify({ chainId, address, message, signature })
     global.localStorage.setItem(AUTH_STORAGE_KEY, content)
     commit('_setApiToken', btoa(content))
-    commit('setWallet', { walletChainId: chainId, walletAddress: address })
+    commit('setWallet', address)
     commit('setSignerStatus', true)
   },
   async logout({ dispatch, commit, state }) {
     commit('_setApiToken', '')
-    commit('setWallet', { walletChainId: state.walletChainId, walletAddress: '' })
+    commit('setWallet', '')
     commit('setSignerStatus', false)
     global.localStorage.removeItem(AUTH_STORAGE_KEY)
   },

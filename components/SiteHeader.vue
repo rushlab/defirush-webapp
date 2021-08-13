@@ -83,13 +83,13 @@ export default {
     }
   },
   computed: {
-    ...mapState('auth', ['walletChainId', 'walletAddress', 'isAuthenticated', 'isSignerAlive']),
+    ...mapState('auth', ['chainId', 'walletAddress', 'isAuthenticated', 'isSignerAlive']),
     networkName() {
-      if (this.walletChainId === 31337 || this.walletChainId === 71337) {
-        return `Hardhat Forking (${this.walletChainId})`
+      if (this.chainId === 31337 || this.chainId === 71337) {
+        return `Hardhat Forking (${this.chainId})`
       }
-      const option = _.find(this.chainOptions, { chainId: this.walletChainId })
-      return option ? option.title : `Unknown Network (${this.walletChainId})`
+      const option = _.find(this.chainOptions, { chainId: this.chainId })
+      return option ? option.title : `Unknown Network (${this.chainId})`
     },
     maskedWalletAddress() {
       const walletAddress = this.walletAddress || ''

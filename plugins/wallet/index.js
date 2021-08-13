@@ -84,8 +84,8 @@ export default async ({ store }) => {
   if (loginData) {
     try {
       const { connected } = await verifyLoginData(loginData)
-      const { chainId, address } = loginData
-      store.commit('auth/setWallet', { walletChainId: chainId, walletAddress: address })
+      const { address } = loginData
+      store.commit('auth/setWallet', address)
       store.commit('auth/setSignerStatus', connected)
     } catch(error) {
       console.log(error)

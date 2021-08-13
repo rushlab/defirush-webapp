@@ -86,7 +86,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('auth', ['walletChainId', 'walletAddress', 'isAuthenticated', 'isSignerAlive']),
+    ...mapState('auth', ['isSignerAlive']),
     disabledDeposit() {
       return this.disabled
     },

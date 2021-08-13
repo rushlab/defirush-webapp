@@ -103,7 +103,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('auth', ['walletChainId']),
+    ...mapState('auth', ['chainId']),
     defaultActive() {
       const fullPath = this.$route.fullPath
       if (/\/portfolio\/\w+/.test(fullPath)) {
@@ -113,7 +113,7 @@ export default {
       }
     },
     isSimulationMode() {
-      return this.walletChainId === 71337
+      return this.chainId === 71337
     }
   },
   methods: {
