@@ -64,7 +64,7 @@
 import _ from 'lodash'
 import { mapState } from 'vuex'
 import { ethers } from 'ethers'
-import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
+import TokenSelectDialog from '@/components/dialogs/TokenSelectDialog'
 
 import OneSplitAuditABI from './oneSplitAudit.json'
 const OneSplitAuditContractAddress = '0xC586BeF4a0992C495Cf22e1aeEE4E446CECDee0E'

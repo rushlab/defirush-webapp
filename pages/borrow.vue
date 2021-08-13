@@ -64,7 +64,7 @@
 <script>
 import _ from 'lodash'
 import dayjs from 'dayjs'
-import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
+import TokenSelectDialog from '@/components/dialogs/TokenSelectDialog'
 import BorrowBankItem from '@/components/banks/BorrowBankItem'
 import { createBanks } from '@/utils/banks/factory'
 

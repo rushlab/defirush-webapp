@@ -55,7 +55,7 @@
 <script>
 import _ from 'lodash'
 import dayjs from 'dayjs'
-import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
+import TokenSelectDialog from '@/components/dialogs/TokenSelectDialog'
 import DepositBankItem from '@/components/banks/DepositBankItem'
 import { createBanks } from '@/utils/banks/factory'
 

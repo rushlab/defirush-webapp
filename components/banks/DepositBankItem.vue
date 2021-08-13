@@ -55,7 +55,7 @@
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import { ethers } from 'ethers'
-import DepositDialog from '@/components/selects/DepositDialog'
+import DepositDialog from '@/components/dialogs/DepositDialog'
 
 export default {
   name: 'DepositBankItem',
@@ -124,7 +124,7 @@ export default {
         this.assetData = await this.bankApp.getAssetData(this.underlyingTokenData.address)
         this.disabled = false
       } catch (error) {
-        console.log(error)
+        console.error(error)
         this.disabled = true
       }
     },
@@ -132,7 +132,7 @@ export default {
       try {
         this.accountAssetData = await this.bankApp.getAccountAssetData(this.underlyingTokenData.address)
       } catch (error) {
-        console.log(error)
+        console.error(error)
       }
     },
     onDepositSuccess(amountDisplay) {

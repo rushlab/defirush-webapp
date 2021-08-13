@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
+import TokenSelectDialog from '@/components/dialogs/TokenSelectDialog'
 
 export default {
   components: {

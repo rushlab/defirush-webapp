@@ -58,7 +58,7 @@
 import _ from 'lodash'
 import { ethers } from 'ethers'
 import { mapState, mapGetters } from 'vuex'
-import ConnectWalletDialog from '@/components/ConnectWalletDialog'
+import ConnectWalletDialog from '@/components/dialogs/ConnectWalletDialog'
 import GasFeeGauge from '@/components/GasFeeGauge'
 import { copyToClipboard } from '@/utils/copy'
 import { chains } from '@/utils/chains'

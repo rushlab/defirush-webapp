@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { ethers } from 'ethers'
 import { chains as ALL_CHAINS_LIST } from '@/utils/chains'
 const CHAIN_STORAGE_KEY = 'web3-chain-id'
 const AUTH_STORAGE_KEY = 'web3-wallet-auth'
@@ -17,23 +18,19 @@ const getStateFromStorage = () => {
   /* decode login data */
   try {
     const content = global.localStorage.getItem(AUTH_STORAGE_KEY)
+    if (!content) { throw new Error('no auth storage') }
     const { chainId, address, message, signature } = JSON.parse(content)
+    if (chainId !== state.chainId) { throw new Error('wrong chain') }
     const [_tip, _address, _timestamp] = message.split('\n')
-    if ((new Date()).valueOf() - (+_timestamp) > 86400 * 7 * 1000) {
-      throw new Error('expired')
-    }
-    if (_address.toLowerCase() !== address.toLowerCase()) {
-      throw new Error('invalid address')
-    }
+    if ((new Date()).valueOf() - (+_timestamp) > 86400 * 7 * 1000) { throw new Error('expired') }
+    if (_address.toLowerCase() !== address.toLowerCase()) { throw new Error('invalid address') }
     const signerAddress = ethers.utils.verifyMessage(message, signature)
-    if (signerAddress.toLowerCase() !== address.toLowerCase()) {
-      throw new Error('invalid signature')
-    }
+    if (signerAddress.toLowerCase() !== address.toLowerCase()) { throw new Error('invalid signature') }
     // 执行到这里 content 就没问题, 然后再 _setApiToken
     state._apiToken = btoa(content)
     state.walletAddress = address
   } catch(error) {
-    console.error(error)
+    console.debug('getStateFromStorage', error.message)
     global.localStorage.removeItem(AUTH_STORAGE_KEY)
   }
   /**/
@@ -104,14 +101,5 @@ export const actions = {
     commit('setWallet', '')
     commit('setSignerStatus', false)
     global.localStorage.removeItem(AUTH_STORAGE_KEY)
-  },
-  async getLoginData({ dispatch, commit }) {
-    const content = global.localStorage.getItem(AUTH_STORAGE_KEY)
-    try {
-      const { chainId, address, message, signature } = JSON.parse(content)
-      // 执行到这里 content 就没问题, 然后再 _setApiToken
-      commit('_setApiToken', btoa(content))
-      return { chainId, address, message, signature }
-    } catch(error) {}
   }
 }

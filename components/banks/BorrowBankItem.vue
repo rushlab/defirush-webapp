@@ -59,7 +59,7 @@
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import { ethers } from 'ethers'
-import BorrowDialog from '@/components/selects/BorrowDialog'
+import BorrowDialog from '@/components/dialogs/BorrowDialog'
 
 export default {
   name: 'BorrowBankItem',
@@ -96,9 +96,6 @@ export default {
     disabledBorrow() {
       return _.isEmpty(this.underlyingTokenData) || this.disabled
     },
-    underlyingTokenAddress() {
-      return _.get(this.underlyingTokenData, 'address')
-    },
     availableBorrows() {
       const { availableBorrowsUSD } = this.accountData
       const { priceUSD } = this.assetData
@@ -134,25 +131,28 @@ export default {
       this.pending = false
     },
     async getAssetData() {
-      /**
-       * trycatch 包一下，这样对于当前bankApp不支持的 underlyingAsset，可以直接将状态置为 disabled
-       */
+      /* trycatch 包一下，这样对于当前bankApp不支持的 underlyingAsset，可以直接将状态置为 disabled */
       try {
-        this.assetData = await this.bankApp.getAssetData(this.underlyingTokenAddress)
+        this.assetData = await this.bankApp.getAssetData(this.underlyingTokenData.address)
         this.disabled = false
       } catch (error) {
+        console.error(error)
         this.disabled = true
       }
     },
     async getAccountAssetData() {
       try {
-        this.accountAssetData = await this.bankApp.getAccountAssetData(this.underlyingTokenAddress)
-      } catch (error) {}
+        this.accountAssetData = await this.bankApp.getAccountAssetData(this.underlyingTokenData.address)
+      } catch (error) {
+        console.error(error)
+      }
     },
     async getAccountData() {
       try {
         this.accountData = await this.bankApp.getAccountData()
-      } catch (error) {}
+      } catch (error) {
+        console.error(error)
+      }
     },
     onBorrowSuccess() {
       this.getAllData()

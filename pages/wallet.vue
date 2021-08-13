@@ -12,7 +12,7 @@
 
 <script>
 import _ from 'lodash'
-import TokenSelectDialog from '@/components/selects/TokenSelectDialog'
+import TokenSelectDialog from '@/components/dialogs/TokenSelectDialog'
 
 export default {
   data() {
