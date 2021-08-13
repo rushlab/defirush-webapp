@@ -10,7 +10,15 @@
           <el-dropdown-item
             v-for="item in chainOptions" :key="item.chainId"
             :disabled="item.disabled" :command="`chain--${item.chainId}`"
-          >{{ item.chainName }}</el-dropdown-item>
+            style="display: flex; align-items: center; justify-content: flex-start; padding: 5px 20px;"
+          >
+            <el-image
+              v-if="item.icon" :src="item.icon" fit="contain"
+              style="width: 25px; height: 25px; margin-right: 10px;"
+            ></el-image>
+            <i v-else class="el-icon-warning-outline"></i>
+            <span>{{ item.chainName }}</span>
+          </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>

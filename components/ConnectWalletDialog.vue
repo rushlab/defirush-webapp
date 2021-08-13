@@ -20,12 +20,12 @@
             <span> WalletConnect</span>
           </button>
         </div>
-        <a href="javascript:void(0);" class="help-hint">What is a wallet?</a>
+        <el-link href="/" target="_blank">What is a wallet?</el-link>
       </template>
       <template v-if="address && !verified">
         <!-- 没有验证过，点击进行验证 -->
-        <div class="input-hint">Please sign to let us verify that you are the owner of this address</div>
-        <div class="dialog-verify__address">{{ address }}</div>
+        <div class="dialog__notice">Please sign to let us verify that you are the owner of this address</div>
+        <div class="address-to-verify">{{ address }}</div>
       </template>
     </div>
     <div v-if="address && !verified" slot="footer" class="call-to-action">
@@ -147,7 +147,7 @@ export default {
     async switchToCurrentChain() {
       const chainId = this.$store.state.auth.chainId
       const chainIdHex = '0x' + chainId.toString(16)
-      const { chainName, nativeCurrency, rpcUrls } = _.find(this.chains, { chainId })  // 一定存在
+      const { chainName, nativeCurrency, rpcUrl } = _.find(this.chains, { chainId })  // 一定存在
       try {
         await global.ethereum.request({
           method: 'wallet_switchEthereumChain',
@@ -158,7 +158,7 @@ export default {
         if (error.code === 4902) {
           await global.ethereum.request({
             method: 'wallet_addEthereumChain',
-            params: [{ chainId: chainIdHex, chainName, nativeCurrency, rpcUrls }],
+            params: [{ chainId: chainIdHex, chainName, nativeCurrency, rpcUrls: [ rpcUrl ] }],
           })
         } else {
           throw error
@@ -181,7 +181,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 50px;
+  margin-top: 40px;
   margin-bottom: 50px;
 }
 .wallet-btn {
@@ -212,46 +212,12 @@ export default {
   }
 }
 .dialog__notice {
-  font-size: 16px;
-  line-height: 1;
   margin-bottom: 10px;
-  color: $--color-text-secondary;
-}
-.balance-hint {
-  display: block;
-  text-align: right;
-  line-height: 20px;
-  margin: 5px 0 10px;
-  color: #858E99;
-}
-.dialog__hints {
-  padding: 0;
-  margin-top: 60px;
   color: $--color-text-regular;
-  .hints-title {
-    font-size: 18px;
-    color: $--color-text-primary;
-  }
-  ul {
-    padding-left: 20px;
-    margin-top: 10px;
-  }
-  li {
-    line-height: 1.7;
-  }
 }
-.dialog-footer {
-  height: 80px;
-}
-
-.help-hint {
-  font-size: 16px;
-  color: #033FFF;
-  cursor: pointer;
-}
-.dialog-verify__address {
-  margin-top: 50px;
-  margin-bottom: 20px;
+.address-to-verify {
+  margin-top: 40px;
+  margin-bottom: 30px;
   color: $--color-text-primary;
   background-color: #E6E8EC;
   font-size: 16px;

@@ -6,7 +6,8 @@ const chains = [{
     symbol: 'ETH',
     decimals: 18
   },
-  rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161']
+  rpcUrl: 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+  icon: require('~/assets/icons/chains/icon-ethereum.svg'),
 }, {
   chainId: 137,
   chainName: 'Polygon POS',
@@ -15,7 +16,8 @@ const chains = [{
     symbol: 'MATIC',
     decimals: 18
   },
-  rpcUrls: ['https://rpc-mainnet.maticvigil.com']
+  rpcUrl: 'https://rpc-mainnet.maticvigil.com',
+  icon: require('~/assets/icons/chains/icon-polygon.svg'),
 }, {
   chainId: 56,
   chainName: 'Binance Smart Chain',
@@ -24,7 +26,8 @@ const chains = [{
     symbol: 'BNB',
     decimals: 18
   },
-  rpcUrls: ['https://bsc-dataseed.binance.org']
+  rpcUrl: 'https://bsc-dataseed.binance.org',
+  icon: require('~/assets/icons/chains/icon-bsc.svg'),
 }, {
   chainId: 128,
   chainName: 'Huobi ECO Chain',
@@ -33,7 +36,8 @@ const chains = [{
     symbol: 'HT',
     decimals: 18
   },
-  rpcUrls: ['https://http-mainnet-node.huobichain.com']
+  rpcUrl: 'https://http-mainnet-node.huobichain.com',
+  icon: require('~/assets/icons/chains/icon-heco.svg'),
 }, {
   forking: true,
   chainId: 71337,
@@ -43,7 +47,7 @@ const chains = [{
     symbol: 'ETH',
     decimals: 18
   },
-  rpcUrls: ['https://hardhat-dev.defirush.io']
+  rpcUrl: 'https://hardhat-dev.defirush.io',
 }, {
   forking: true,
   chainId: 31337,
@@ -53,7 +57,7 @@ const chains = [{
     symbol: 'ETH',
     decimals: 18
   },
-  rpcUrls: ['http://localhost:8545']
+  rpcUrl: 'http://localhost:8545',
 }]
 
 

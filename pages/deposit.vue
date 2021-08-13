@@ -1,8 +1,9 @@
 <template>
   <div class="page--deposit">
-    <el-form @submit.native.prevent>
-      <el-form-item class="token-amount">
-        <div class="token-balance-display">
+    <el-form @submit.native.prevent class="form--amount">
+      <el-form-item>
+        <div class="amount-tip">
+          <span class="text-danger" v-if="+amountDisplay > +balanceDisplay">Not enough balance </span>
           <span>Wallet balance: {{ balanceDisplay }} {{ underlyingToken.symbol }}</span>
         </div>
         <el-input v-model="amountDisplay" placeholder="Input token amount..." class="input-amount">
@@ -14,7 +15,7 @@
             </div>
           </el-button>
         </el-input>
-        <div class="token-value-to-usd">&asymp; <price :value="amountToUSD"></price></div>
+        <div class="amount-tip">&asymp; <price :value="amountToUSD"></price></div>
       </el-form-item>
     </el-form>
     <el-card class="bank-list" :body-style="{'padding':0}" shadow="never">
@@ -153,40 +154,27 @@ export default {
 <style lang="scss" scoped>
 @import '@/assets/stylesheets/variables.scss';
 .page--deposit {
-  padding-top: 20px;
+  padding-top: 10px;
 }
 .table--headers-only {
   /deep/ > .el-table__body-wrapper > .el-table__empty-block {
     display: none;
   }
 }
-.token-amount /deep/ .el-form-item__content {
-  position: relative;
-  padding: 20px 0;
-
-  // TODO override styles
+.form--amount {
+  display: block;
   max-width: 700px;
   margin-left: auto;
   margin-right: auto;
-}
-.token-balance-display,
-.token-value-to-usd {
-  position: absolute;
-  right: 0;
-  height: 16px;
-  z-index: 1;
-  line-height: 1;
-  color: $--color-text-regular;
-}
-.token-balance-display {
-  top: 0;
+  .amount-tip {
+    color: $--color-text-regular;
+    margin-right: 0.2em;
+    text-align: right;
+    line-height: 2;
+  }
 }
 .text-danger {
   color: $--color-danger;
-}
-.token-value-to-usd {
-  bottom: 0;
-  margin-top: 8px;
 }
 .select-token-btn {
   width: 350px;

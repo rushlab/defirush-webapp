@@ -61,8 +61,8 @@ export class WalletApp implements WalletInterface {
     } else {
       const chainId = this.getChainId()
       const chain = _.find(ALL_CHAINS_LIST, { chainId })
-      const url = chain!.rpcUrls[0]  // chain 一定存在
-      return new ethers.providers.JsonRpcProvider(url)
+      // chain 一定存在, 用 chain!.
+      return new ethers.providers.JsonRpcProvider(chain!.rpcUrl)
     }
   }
 
