@@ -1,6 +1,8 @@
+import _ from 'lodash'
 import axios from 'axios'
 import { ethers } from 'ethers'
 import { MessageBox, Notification } from 'element-ui'
+import { chains as ALL_CHAINS_LIST } from '@/utils/chains'
 
 
 export class WalletApp implements WalletInterface {
@@ -57,16 +59,9 @@ export class WalletApp implements WalletInterface {
         throw new Error('Requires MetaMask') // 目前只支持 metamask
       }
     } else {
-      const { chainId } = this.$store.state.auth
-      let url
-      if (chainId == 1) {
-        url = 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'
-      } else if (chainId == 137) {
-        url = 'https://rpc-mainnet.maticvigil.com'
-      } else {
-        // url = 'http://localhost:8545'
-        url = 'https://hardhat-dev.defirush.io'
-      }
+      const chainId = this.getChainId()
+      const chain = _.find(ALL_CHAINS_LIST, { chainId })
+      const url = chain!.rpcUrls[0]  // chain 一定存在
       return new ethers.providers.JsonRpcProvider(url)
     }
   }

@@ -1,16 +1,16 @@
 <template>
   <div class="site-header">
     <div class="network-status" :class="{ 'signer-alive': isSignerAlive }">
-      <el-dropdown @command="handleChainCommand">
+      <el-dropdown @command="handleChainCommand" placement="bottom-start">
         <span class="el-dropdown-link">
-          <span>{{ networkName }}</span>
+          <span>{{ selectedChainName }}</span>
           <i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item
             v-for="item in chainOptions" :key="item.chainId"
             :disabled="item.disabled" :command="`chain--${item.chainId}`"
-          >{{ item.title }}</el-dropdown-item>
+          >{{ item.chainName }}</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
@@ -53,6 +53,7 @@ import { mapState, mapGetters } from 'vuex'
 import ConnectWalletDialog from '@/components/ConnectWalletDialog'
 import GasFeeGauge from '@/components/GasFeeGauge'
 import { copyToClipboard } from '@/utils/copy'
+import { chains } from '@/utils/chains'
 
 export default {
   name: 'SiteHeader',
@@ -62,34 +63,18 @@ export default {
   },
   data() {
     return {
+      // [ { chainId, chainName }, ... ]
+      chains,
+      chainOptions: chains,
+      // chainOptions: _.filter(chains, (chain) => !chain.forking),
       connectDialogVisible: false,
-      chainOptions: [{
-        chainId: 1,
-        title: 'Ethereum Mainnet',
-        disabled: false,
-      }, {
-        chainId: 137,
-        title: 'Polygon Mainnet',
-        disabled: false,
-      }, {
-        chainId: 56,
-        title: 'BSC Mainnet',
-        disabled: true,
-      }, {
-        chainId: 128,
-        title: 'HECO Mainnet',
-        disabled: true,
-      }]
     }
   },
   computed: {
     ...mapState('auth', ['chainId', 'walletAddress', 'isAuthenticated', 'isSignerAlive']),
-    networkName() {
-      if (this.chainId === 31337 || this.chainId === 71337) {
-        return `Hardhat Forking (${this.chainId})`
-      }
-      const option = _.find(this.chainOptions, { chainId: this.chainId })
-      return option ? option.title : `Unknown Network (${this.chainId})`
+    selectedChainName() {
+      const chain = _.find(this.chains, (chain) => +chain.chainId === +this.chainId)
+      return chain ? chain.chainName : `Unknown Network (${this.chainId})`
     },
     maskedWalletAddress() {
       const walletAddress = this.walletAddress || ''
@@ -103,7 +88,10 @@ export default {
   methods: {
     async handleChainCommand(command) {
       const chainId = +(command.split('--')[1])
-      console.log(chainId)
+      if (chainId !== this.chainId) {
+        this.$store.commit('auth/setChainId', chainId)
+        global.location.reload()
+      }
     },
     async handleAccountCommand(command) {
       if (command === 'copyWalletAddress') {

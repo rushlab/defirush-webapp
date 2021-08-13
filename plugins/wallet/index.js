@@ -80,18 +80,18 @@ function listenToMetaMask(store) {
 
 export default async ({ store }) => {
 
-  const loginData = await store.dispatch('auth/getLoginData')
-  if (loginData) {
-    try {
-      const { connected } = await verifyLoginData(loginData)
-      const { address } = loginData
-      store.commit('auth/setWallet', address)
-      store.commit('auth/setSignerStatus', connected)
-    } catch(error) {
-      console.log(error)
-      await store.dispatch('auth/logout')
-    }
-  }
+  // const loginData = await store.dispatch('auth/getLoginData')
+  // if (loginData) {
+  //   try {
+  //     const { connected } = await verifyLoginData(loginData)
+  //     const { address } = loginData
+  //     store.commit('auth/setWallet', address)
+  //     store.commit('auth/setSignerStatus', connected)
+  //   } catch(error) {
+  //     console.log(error)
+  //     await store.dispatch('auth/logout')
+  //   }
+  // }
 
   // 现在只支持 metamask, 回头再添加其他的
   listenToMetaMask(store)

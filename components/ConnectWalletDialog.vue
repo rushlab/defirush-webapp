@@ -138,6 +138,64 @@ export default {
         this.$message.error('Wrong signature ...... ')
       }
     },
+    /* below to do */
+    toggleSimulationModeLegacy(val) {
+      if (val) {
+        // 切换到模拟网络
+        this.checkSimulationNetwork()
+      } else {
+        this.execSwitchChainId(int2hex(1))
+      }
+    },
+    async checkSimulationNetwork() {
+      try {
+        await this.execSwitchChainId(this.simulationChainId)
+      } catch (error) {
+        console.log('@@@ checkSimulationNetwork', error)
+        if (error.code === 4902) {
+          this.$confirm('An ethereum hain will be add to metamask?', 'Notice', {
+            confirmButtonText: 'Continue',
+            cancelButtonText: 'Cancel',
+            type: 'warning'
+          }).then(() => {
+            this.addSimulationNetwork()
+          }).catch(() => {
+          })
+        }
+      }
+    },
+    async addSimulationNetwork() {
+
+      const int2hex = (num) => ('0x' + num.toString(16))
+      const chainId = 71337
+      const simulationChainId = int2hex(chainId)
+      const simulationNetWorkParams = {
+        chainId: simulationChainId,
+        chainName: 'hardhat-dev.defirush.io',
+        nativeCurrency: {
+          name: 'Ethereum',
+          symbol: 'ETH',
+          decimals: 18
+        },
+        rpcUrls: ['https://hardhat-dev.defirush.io']
+      }
+
+      try {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [this.simulationNetWorkParams],
+        })
+        await this.execSwitchChainId(this.simulationChainId)
+      } catch (error) {
+        this.$message.error('Failed to wallet_addEthereumChain', JSON.stringify(error))
+      }
+    },
+    async execSwitchChainId(chainId) {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId }],
+      })
+    }
   },
   watch: {
     visible(newVal) {

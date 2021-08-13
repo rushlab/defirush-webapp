@@ -1,3 +1,5 @@
+import _ from 'lodash'
+import { chains as ALL_CHAINS_LIST } from '@/utils/chains'
 const CHAIN_STORAGE_KEY = 'web3-chain-id'
 const AUTH_STORAGE_KEY = 'web3-wallet-auth'
 
@@ -10,9 +12,12 @@ const AUTH_STORAGE_KEY = 'web3-wallet-auth'
  * isSignerAlive: 浏览器钱包可用, 可以发送交易, 并且和 walletAddress 对应
  */
 export const state = () => {
-  const chainId = (+global.localStorage.getItem(CHAIN_STORAGE_KEY)) || 1
+  let chainId = +global.localStorage.getItem(CHAIN_STORAGE_KEY)
+  if (!_.find(ALL_CHAINS_LIST, { chainId })) {
+    chainId = 1
+  }
   return {
-    chainId,
+    chainId,  // chainId 一定存在于 ALL_CHAINS_LIST, 其他地方可以放心使用
     walletAddress: '',
     isAuthenticated: false,
     isSignerAlive: false,
@@ -25,8 +30,16 @@ export const mutations = {
     state._apiToken = token
   },
   setChainId(state, chainId) {
-    state.chainId = +chainId
-    global.localStorage.setItem(CHAIN_STORAGE_KEY, state.chainId)
+    chainId = +chainId
+    if (chainId !== state.chainId && _.find(ALL_CHAINS_LIST, { chainId })) {
+      // 改变 chainId 以后所有信息重置
+      state.chainId = chainId
+      state.setWallet = ''
+      state.setSignerStatus = false
+      state._setApiToken = ''
+      global.localStorage.removeItem(AUTH_STORAGE_KEY)
+      global.localStorage.setItem(CHAIN_STORAGE_KEY, chainId)
+    }
   },
   setWallet(state, walletAddress) {
     state.walletAddress = walletAddress
