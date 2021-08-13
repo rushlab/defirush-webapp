@@ -1,13 +1,24 @@
 <template>
   <div class="site-header">
     <div class="network-status" :class="{ 'signer-alive': isSignerAlive }">
-      <span>{{ networkName }}</span>
+      <el-dropdown @command="handleChainCommand">
+        <span class="el-dropdown-link">
+          <span>{{ networkName }}</span>
+          <i class="el-icon-arrow-down el-icon--right"></i>
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item
+            v-for="item in chainOptions" :key="item.chainId"
+            :disabled="item.disabled" :command="`chain--${item.chainId}`"
+          >{{ item.title }}</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
     </div>
     <div style="margin-left: auto;"></div>
     <gas-fee-gauge></gas-fee-gauge>
     <template v-if="isAuthenticated">
       <div class="wallet-status">
-        <el-dropdown @command="handleDropdownCommand">
+        <el-dropdown @command="handleAccountCommand">
           <div class="el-dropdown-link wallet-address-btn">
             <img class="icon-metamask" src="~/assets/icons/metamask-fox.svg" alt="">
             <span class="wallet-address">{{ maskedWalletAddress }}</span> <i class="el-icon-arrow-down el-icon--right"></i>
@@ -51,21 +62,34 @@ export default {
   },
   data() {
     return {
-      connectDialogVisible: false
+      connectDialogVisible: false,
+      chainOptions: [{
+        chainId: 1,
+        title: 'Ethereum Mainnet',
+        disabled: false,
+      }, {
+        chainId: 137,
+        title: 'Polygon Mainnet',
+        disabled: false,
+      }, {
+        chainId: 56,
+        title: 'BSC Mainnet',
+        disabled: true,
+      }, {
+        chainId: 128,
+        title: 'HECO Mainnet',
+        disabled: true,
+      }]
     }
   },
   computed: {
     ...mapState('auth', ['walletChainId', 'walletAddress', 'isAuthenticated', 'isSignerAlive']),
     networkName() {
-      if (this.walletChainId == 1) {
-        return 'Ethereum Mainnet'
-      } else if (this.walletChainId == 137) {
-        return 'Polygon Mainnet'
-      } else if (this.walletChainId === 31337 || this.walletChainId === 71337 ) {
-        return 'Hardhat Forking'
-      } else {
-        return `Unknown Network (${this.walletChainId})`
+      if (this.walletChainId === 31337 || this.walletChainId === 71337) {
+        return `Hardhat Forking (${this.walletChainId})`
       }
+      const option = _.find(this.chainOptions, { chainId: this.walletChainId })
+      return option ? option.title : `Unknown Network (${this.walletChainId})`
     },
     maskedWalletAddress() {
       const walletAddress = this.walletAddress || ''
@@ -77,7 +101,11 @@ export default {
   },
   mounted() {},
   methods: {
-    async handleDropdownCommand(command) {
+    async handleChainCommand(command) {
+      const chainId = +(command.split('--')[1])
+      console.log(chainId)
+    },
+    async handleAccountCommand(command) {
       if (command === 'copyWalletAddress') {
         await this.copyWalletAddress()
       } else if (command === 'logout') {
@@ -112,9 +140,6 @@ export default {
 .network-status {
   position: relative;
   padding-left: 20px;
-  font-size: 16px;
-  line-height: 1;
-  color: $--color-text-regular;
   &::before {
     content: "";
     position: absolute;
@@ -128,6 +153,9 @@ export default {
   }
   &.signer-alive::before {
     background-color: $--color-success;
+  }
+  /deep/ .el-dropdown-link {
+    cursor: pointer;
   }
 }
 .wallet-address-btn {
