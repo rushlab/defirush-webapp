@@ -137,7 +137,10 @@ export default {
       if (signerAddress.toLowerCase() === address.toLowerCase()) {
         this.isVisible = false
         this.verified = true
-        await this.$store.dispatch('auth/login', { chainId, address, message, signature })
+        await this.$store.dispatch('auth/login', {
+          chainId, address, message, signature,
+          protocol: 'MetaMask', connection: {}
+        })
         this.$message.success('Connected')
         global.location.reload()
       } else {

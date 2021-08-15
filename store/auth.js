@@ -1,36 +1,66 @@
 import _ from 'lodash'
 import { ethers } from 'ethers'
 import { chains as ALL_CHAINS_LIST } from '@/utils/chains'
+const SIGNER_SESSION_STORAGE_KEY = 'web3-signer-session'
 const CHAIN_STORAGE_KEY = 'web3-chain-id'
 const AUTH_STORAGE_KEY = 'web3-wallet-auth'
 
-const getStateFromStorage = () => {
-  const state = {
-    chainId: 1,
-    walletAddress: '',
-    web3ApiToken: '',
+const _require = (condition, errMsg) => {
+  if (!condition) {
+    throw new Error(errMsg)
   }
-  /* determine chainId */
+}
+
+const getChainIdFromStorage = () => {
   const chainId = +global.localStorage.getItem(CHAIN_STORAGE_KEY)
   if (_.find(ALL_CHAINS_LIST, { chainId })) {
-    state.chainId = chainId
+    return chainId
+  } else {
+    return 1
   }
-  /* decode login data */
+}
+
+const getSignerSessionFromStorage = (expectChainId) => {
+  try {
+    const content = global.localStorage.getItem(SIGNER_SESSION_STORAGE_KEY)
+    const { protocol, connection } = JSON.parse(content)
+    _require(['MetaMask', 'WalletConnect'].includes(protocol), `signer protocol ${protocol} not supported`)
+    _require(_.isPlainObject(connection), 'malformed signer connection')
+    return {
+      signerProtocol: protocol,
+      signerConnection: connection,
+    }
+  } catch(error) {
+    console.debug('getStateFromStorage', error.message)
+    return {
+      signerProtocol: null,
+      signerConnection: {}
+    }
+  }
+}
+
+const getAuthFromStorage = (expectChainId) => {
   try {
     const content = global.localStorage.getItem(AUTH_STORAGE_KEY)
     if (!content) { throw new Error('no auth storage') }
     const { chainId, address, message, signature } = JSON.parse(content)
-    if (chainId !== state.chainId) { throw new Error('wrong chain') }
+    _require(chainId === expectChainId, 'wrong chain')
     const [_tip, _address, _timestamp] = message.split('\n')
-    if ((new Date()).valueOf() - (+_timestamp) > 86400 * 7 * 1000) { throw new Error('expired') }
-    if (_address.toLowerCase() !== address.toLowerCase()) { throw new Error('invalid address') }
+    _require((new Date()).valueOf() - (+_timestamp) < 86400 * 7 * 1000, 'expired')
+    _require(_address.toLowerCase() === address.toLowerCase(), 'invalid address')
     const signerAddress = ethers.utils.verifyMessage(message, signature)
-    if (signerAddress.toLowerCase() !== address.toLowerCase()) { throw new Error('invalid signature') }
-    state.web3ApiToken = btoa(content)
-    state.walletAddress = address
+    _require(signerAddress.toLowerCase() === address.toLowerCase(), 'invalid signature')
+    return {
+      web3ApiToken: btoa(content),
+      walletAddress: address,
+    }
   } catch(error) {
     console.debug('getStateFromStorage', error.message)
     global.localStorage.removeItem(AUTH_STORAGE_KEY)
+    return {
+      web3ApiToken: '',
+      walletAddress: '',
+    }
   }
   /**/
   return state
@@ -45,40 +75,63 @@ const getStateFromStorage = () => {
  * isSignerAlive: 浏览器钱包可用, 可以发送交易, 并且和 walletAddress 对应
  */
 export const state = () => {
-  const { chainId, walletAddress, web3ApiToken } = getStateFromStorage()
+  const chainId = getChainIdFromStorage()
+  const { walletAddress, web3ApiToken } = getAuthFromStorage(chainId)
+  const { signerProtocol, signerConnection } = getSignerSessionFromStorage(chainId)
   const isAuthenticated = !!walletAddress
   return {
-    chainId,  // chainId 一定存在于 ALL_CHAINS_LIST, 其他地方可以放心使用
+    /* 1. store 里存着的 chainId 一定存在于 ALL_CHAINS_LIST, 其他地方可以放心使用 */
+    chainId,
+    /* 2. web3ApiToken 只给 axios 用 */
     walletAddress,
-    isAuthenticated,
-    /* web3ApiToken 只给 axios 用 */
     web3ApiToken,
-    /* isSignerAlive 信息要 await 验证, 这个单独在 plugin 和 登录 的时候指定 */
+    isAuthenticated,
+    /* 3. isSignerAlive 信息要 await 验证, 一开始的时候先设置成 false */
+    signerProtocol,
+    signerConnection,
     isSignerAlive: false,
   }
 }
 
 export const mutations = {
   _setApiToken(state, token) {
-    // 私有 mutation, 只在 login/logout 里使用
+    // 私有 mutation, 只在 actions 里使用
     state.web3ApiToken = token
   },
-  setChainId(state, chainId) {
-    chainId = +chainId
-    if (chainId !== state.chainId && _.find(ALL_CHAINS_LIST, { chainId })) {
-      // 改变 chainId 以后所有信息重置
-      state.chainId = chainId
+  _setChainId(state, chainId) {
+    // 私有 mutation, 只在 actions 里使用
+    state.chainId = chainId
+    global.localStorage.setItem(CHAIN_STORAGE_KEY, chainId)
+  },
+  _setAuth(state, payload) {
+    // 私有 mutation, 只在 actions 里使用
+    if (payload) {
+      const { chainId, address, message, signature } = payload
+      const _data = JSON.stringify({ chainId, address, message, signature })
+      state.walletAddress = address
+      state.isAuthenticated = true
+      state.web3ApiToken = btoa(_data)
+      global.localStorage.setItem(AUTH_STORAGE_KEY, _data)
+    } else {
       state.walletAddress = ''
       state.isAuthenticated = false
       state.web3ApiToken = ''
-      state.isSignerAlive = false
       global.localStorage.removeItem(AUTH_STORAGE_KEY)
-      global.localStorage.setItem(CHAIN_STORAGE_KEY, chainId)
     }
   },
-  setWallet(state, walletAddress) {
-    state.walletAddress = walletAddress
-    state.isAuthenticated = !!walletAddress
+  _setSignerSession(state, payload) {
+    // 私有 mutation, 只在 actions 里使用
+    if (payload) {
+      const { protocol, connection = {} } = payload
+      const _data = JSON.stringify({ protocol, connection })
+      state.signerProtocol = protocol
+      state.signerConnection = connection
+      global.localStorage.setItem(SIGNER_SESSION_STORAGE_KEY, _data)
+    } else {
+      state.signerProtocol = null
+      state.signerConnection = {}
+      global.localStorage.removeItem(SIGNER_SESSION_STORAGE_KEY)
+    }
   },
   setSignerStatus(state, isSignerAlive) {
     state.isSignerAlive = !!isSignerAlive
@@ -90,20 +143,30 @@ export const mutations = {
  * 所以先都用 actions 不用 mutations, 而 actions 一定要 async
  */
 export const actions = {
-  async login({ dispatch, commit, state }, { chainId, address, message, signature }) {
+  async login({ dispatch, commit, state }, {
+    chainId, address, message, signature,
+    protocol, connection,
+  }) {
     if (state.chainId !== chainId) {
       throw new Error('chain id doesn\'t match')
     }
-    const content = JSON.stringify({ chainId, address, message, signature })
-    global.localStorage.setItem(AUTH_STORAGE_KEY, content)
-    commit('_setApiToken', btoa(content))
-    commit('setWallet', address)
+    commit('_setAuth', { chainId, address, message, signature })
+    commit('_setSignerSession', { protocol, connection })
     commit('setSignerStatus', true)
   },
   async logout({ dispatch, commit, state }) {
-    commit('_setApiToken', '')
-    commit('setWallet', '')
+    commit('_setAuth', null)
+    commit('_setSignerSession', null)
     commit('setSignerStatus', false)
-    global.localStorage.removeItem(AUTH_STORAGE_KEY)
+  },
+  async switchChain({ dispatch, commit, state }, { chainId }) {
+    chainId = +chainId
+    if (chainId !== state.chainId && _.find(ALL_CHAINS_LIST, { chainId })) {
+      // 改变 chainId 以后所有信息重置
+      commit('_setChainId', chainId)
+      commit('_setAuth', null)
+      commit('_setSignerSession', null)
+      commit('setSignerStatus', false)
+    }
   }
 }

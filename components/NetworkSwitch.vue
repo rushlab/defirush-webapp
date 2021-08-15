@@ -58,7 +58,7 @@ export default {
     async handleChainCommand(command) {
       const chainId = +(command.split('--')[1])
       if (chainId !== this.chainId) {
-        this.$store.commit('auth/setChainId', chainId)
+        this.$store.dispatch('auth/switchChain', { chainId })
         global.location.reload()
       }
     }

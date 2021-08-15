@@ -49,7 +49,7 @@ export class WalletApp implements WalletInterface {
    */
   getProvider(): Provider {
     if (this.$store.state.auth.isSignerAlive) {
-      if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
+      if (this.$store.state.auth.signerProtocol === 'MetaMask') {
         return new ethers.providers.Web3Provider(global.ethereum)
       } else {
         throw new Error('Requires MetaMask') // 目前只支持 metamask

@@ -115,7 +115,7 @@ export default {
         const chain = _.find(this.chains, { forking: true })
         chainId = chain.chainId
       }
-      this.$store.commit('auth/setChainId', chainId)
+      this.$store.dispatch('auth/switchChain', { chainId })
       global.location.reload()
     },
   },

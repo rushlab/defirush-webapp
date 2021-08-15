@@ -5,19 +5,17 @@ import { MessageBox } from 'element-ui'
 import { WalletApp } from './wallet-app'
 
 
-async function checkSignerStatus(store) {
-  const { chainId, walletAddress } = store.state.auth
+async function checkMetaMaskSignerStatus(store) {
+  const { chainId, walletAddress, signerProtocol } = store.state.auth
   let selectedChainId = 0
   let selectedAddress = ''
-  if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
+  try {
     const provider = new ethers.providers.Web3Provider(global.ethereum)
     const signer = provider.getSigner()
-    try {
-      const [ network, address ] = await Promise.all([provider.getNetwork(), signer.getAddress()])
-      selectedChainId = +network.chainId
-      selectedAddress = address
-    } catch(err) {}
-  }
+    const [ network, address ] = await Promise.all([provider.getNetwork(), signer.getAddress()])
+    selectedChainId = +network.chainId
+    selectedAddress = address
+  } catch(error) {}
   if (chainId === selectedChainId && walletAddress.toLowerCase() === selectedAddress.toLowerCase()) {
     store.commit('auth/setSignerStatus', true)
   } else {
@@ -35,18 +33,16 @@ async function checkSignerStatus(store) {
 
 
 export default async ({ store }) => {
-  /**
-   * 只处理 signer status, 这里不需要处理登录状态, store 里都处理好了
-   */
-  await checkSignerStatus(store)
 
-  /**
-   * 现在只支持 metamask, 回头再添加其他的
-   */
-  if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
-    const handler = () => checkSignerStatus(store)
+  // TODO: 这一段可以移到 $wallet 里面
+  if (store.state.auth.signerProtocol === 'MetaMask') {
+    /* 只处理 signer status, 这里不需要处理登录状态, store 里都处理好了 */
+    await checkMetaMaskSignerStatus(store)
+    const handler = () => checkMetaMaskSignerStatus(store)
     global.ethereum.on('chainChanged', handler)
     global.ethereum.on('accountsChanged', handler)
+  } else {
+    // TODO... walletconnect etc.
   }
 
   /**
