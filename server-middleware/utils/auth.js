@@ -30,7 +30,7 @@ const getOrCreateUserProfile = async (walletChainId, walletAddress) => {
   return profile
 }
 
-const validateSignature = async ({ chainId, address, message, signature }) => {
+const validateSignature = ({ chainId, address, message, signature }) => {
   const [_tip, _address, _timestamp] = message.split('\n')
   if ((new Date()).valueOf() - _timestamp > 86400 * 7 * 1000) {
     throw new Error('expired')
@@ -38,7 +38,7 @@ const validateSignature = async ({ chainId, address, message, signature }) => {
   if (_address.toLowerCase() !== address.toLowerCase()) {
     throw new Error('invalid address')
   }
-  const signerAddress = await ethers.utils.verifyMessage(message, signature)
+  const signerAddress = ethers.utils.verifyMessage(message, signature)
   if (signerAddress.toLowerCase() !== address.toLowerCase()) {
     throw new Error('invalid signature')
   }
@@ -53,7 +53,7 @@ const authenticate = async (req) => {
     try {
       const content = Buffer.from(authToken, 'base64').toString()
       const { chainId, address, message, signature } = JSON.parse(content)
-      await validateSignature({ chainId, address, message, signature })
+      validateSignature({ chainId, address, message, signature })
       const [walletChainId, walletAddress] = [chainId, address]
       const userProfile = await getOrCreateUserProfile(walletChainId, walletAddress)
       customer = {

@@ -6,8 +6,8 @@
     :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose"
   >
-    <div v-loading="isConnecting">
-      <template v-if="!address">
+    <div v-loading="pending">
+      <template v-if="step === 'connect'">
         <!-- 选择钱包，点击链接 -->
         <div class="dialog__notice">Please select a wallet to connect:</div>
         <div class="wallet-items">
@@ -22,16 +22,16 @@
         </div>
         <el-link href="/" target="_blank">What is a wallet?</el-link>
       </template>
-      <template v-if="address && !verified">
+      <template v-if="step === 'verify'">
         <!-- 没有验证过，点击进行验证 -->
         <div class="dialog__notice">Please sign to let us verify that you are the owner of this address</div>
         <div class="address-to-verify">{{ address }}</div>
       </template>
     </div>
-    <div v-if="address && !verified" slot="footer" class="call-to-action">
+    <div v-if="step === 'verify'" slot="footer" class="call-to-action">
       <el-button
         type="dark" @click="verifyUserWallet"
-        :disabled="isVerifying" :loading="isVerifying"
+        :disabled="pending" :loading="pending"
       >Verify</el-button>
     </div>
   </el-dialog>
@@ -59,16 +59,26 @@ export default {
       address: '',
       signer: null,
       verified: false,
-      isConnecting: false,
-      isVerifying: false,
+      pending: false,
     }
   },
   computed: {
     dialogTitle() {
-      if (!this.address) return 'Select a wallet'
-      if (this.address && !this.verified) return 'Verify'
-      return ''
+      return {
+        'connect': 'Select a wallet',
+        'verify': 'Verify',
+        'done': 'Connected',
+      }[this.step]
     },
+    step() {
+      if (!this.address) {
+        return 'connect'
+      } else if (this.address && !this.verified) {
+        return 'verify'
+      } else if (this.address && this.verified) {
+        return 'done'
+      }
+    }
   },
   mounted() {},
   methods: {
@@ -76,8 +86,7 @@ export default {
       this.address = ''
       this.signer = null
       this.verified = false
-      this.isConnecting = false
-      this.isVerifying = false
+      this.pending = false
     },
     onDialogOpen() {
       this.resetStatus()
@@ -90,15 +99,15 @@ export default {
     },
     async connectBrowserWallet() {
       if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
-        this.isConnecting = true
+        this.pending = true
         try {
           await this.switchToCurrentChain()
           await global.ethereum.request({ method: 'eth_requestAccounts' })
         } catch(error) {
           console.log(error)
+          this.$message.error(error.message || error.toString())
           this.isVisible = false
-          this.isConnecting = false
-          this.$message.error(JSON.stringify(error))
+          this.pending = false
           return
         }
         const provider = new ethers.providers.Web3Provider(global.ethereum)
@@ -106,7 +115,7 @@ export default {
         const address = await signer.getAddress()
         this.signer = signer
         this.address = address
-        this.isConnecting = false
+        this.pending = false
       } else {
         this.$confirm('请先安装 MetaMask 扩展应用', '提示', {
           confirmButtonText: '确定',
@@ -122,26 +131,28 @@ export default {
       const tip = 'Please sign to let us verify that you are the owner of this address'
       const timestamp = (new Date()).valueOf()
       const message = `${tip}\n${address}\n${timestamp}`
-      let signature, signerAddress, chainId
-      this.isVerifying = true
+      let signature, chainId
+      this.pending = true
       try {
         chainId = (await signer.provider.getNetwork()).chainId
         signature = await signer.signMessage(message)
-        signerAddress = await ethers.utils.verifyMessage(message, signature)
-        this.isVerifying = false
       } catch(error) {
-        this.isVerifying = false
+        console.log(error)
         this.$message.error(error.message || error.toString())
+        this.isVisible = false
+        this.pending = false
         return
       }
+      const signerAddress = ethers.utils.verifyMessage(message, signature)
       if (signerAddress.toLowerCase() === address.toLowerCase()) {
-        this.isVisible = false
-        this.verified = true
+        this.$message.success('Connected')
         await this.$store.dispatch('auth/login', {
           chainId, address, message, signature,
           protocol: 'MetaMask', connection: {}
         })
-        this.$message.success('Connected')
+        this.verified = true
+        this.isVisible = false
+        this.pending = false
         // global.location.reload()
         this.$store.dispatch('_refreshApp')
       } else {
