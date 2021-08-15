@@ -4,7 +4,10 @@ import { ethers } from 'ethers'
 import { MessageBox, Notification } from 'element-ui'
 import { chains as ALL_CHAINS_LIST } from '@/utils/chains'
 
-
+/**
+ * wallet 里面的信息都是从 store 里取的, 是一个 utilities 合集, 不要存储额外信息
+ * 登录信息和 wallet connect 等连接信息在 store 里面处理好
+ */
 export class WalletApp implements WalletInterface {
   $store: any
 
@@ -37,11 +40,6 @@ export class WalletApp implements WalletInterface {
     if (this.$store.state.auth.isSignerAlive) {
       return provider.getSigner(address)
     } else {
-      // MessageBox.confirm('Current page will be reloaded by changing network or account?', 'Notice', {
-      //   confirmButtonText: 'Yes',
-      //   cancelButtonText: 'Cancel',
-      //   type: 'warning'
-      // }).then(() => global.location.reload()).catch(() => {})
       return new ethers.VoidSigner(address, provider)
     }
   }
@@ -51,8 +49,6 @@ export class WalletApp implements WalletInterface {
    */
   getProvider(): Provider {
     if (this.$store.state.auth.isSignerAlive) {
-      // const signer = this.getSigner()
-      // return signer.provider
       if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
         return new ethers.providers.Web3Provider(global.ethereum)
       } else {

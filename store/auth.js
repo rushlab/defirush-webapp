@@ -8,7 +8,7 @@ const getStateFromStorage = () => {
   const state = {
     chainId: 1,
     walletAddress: '',
-    _apiToken: '',
+    web3ApiToken: '',
   }
   /* determine chainId */
   const chainId = +global.localStorage.getItem(CHAIN_STORAGE_KEY)
@@ -26,8 +26,7 @@ const getStateFromStorage = () => {
     if (_address.toLowerCase() !== address.toLowerCase()) { throw new Error('invalid address') }
     const signerAddress = ethers.utils.verifyMessage(message, signature)
     if (signerAddress.toLowerCase() !== address.toLowerCase()) { throw new Error('invalid signature') }
-    // 执行到这里 content 就没问题, 然后再 _setApiToken
-    state._apiToken = btoa(content)
+    state.web3ApiToken = btoa(content)
     state.walletAddress = address
   } catch(error) {
     console.debug('getStateFromStorage', error.message)
@@ -46,28 +45,33 @@ const getStateFromStorage = () => {
  * isSignerAlive: 浏览器钱包可用, 可以发送交易, 并且和 walletAddress 对应
  */
 export const state = () => {
-  const { chainId, walletAddress, _apiToken } = getStateFromStorage()
+  const { chainId, walletAddress, web3ApiToken } = getStateFromStorage()
+  const isAuthenticated = !!walletAddress
   return {
     chainId,  // chainId 一定存在于 ALL_CHAINS_LIST, 其他地方可以放心使用
     walletAddress,
-    _apiToken,  // 只给 axios 用
-    isAuthenticated: !!walletAddress,
+    isAuthenticated,
+    /* web3ApiToken 只给 axios 用 */
+    web3ApiToken,
+    /* isSignerAlive 信息要 await 验证, 这个单独在 plugin 和 登录 的时候指定 */
     isSignerAlive: false,
   }
 }
 
 export const mutations = {
   _setApiToken(state, token) {
-    state._apiToken = token
+    // 私有 mutation, 只在 login/logout 里使用
+    state.web3ApiToken = token
   },
   setChainId(state, chainId) {
     chainId = +chainId
     if (chainId !== state.chainId && _.find(ALL_CHAINS_LIST, { chainId })) {
       // 改变 chainId 以后所有信息重置
       state.chainId = chainId
-      state.setWallet = ''
-      state.setSignerStatus = false
-      state._setApiToken = ''
+      state.walletAddress = ''
+      state.isAuthenticated = false
+      state.web3ApiToken = ''
+      state.isSignerAlive = false
       global.localStorage.removeItem(AUTH_STORAGE_KEY)
       global.localStorage.setItem(CHAIN_STORAGE_KEY, chainId)
     }
