@@ -116,7 +116,8 @@ export default {
         chainId = chain.chainId
       }
       this.$store.dispatch('auth/switchChain', { chainId })
-      global.location.reload()
+      // global.location.reload()
+      this.$store.dispatch('_refreshApp')
     },
   },
 }

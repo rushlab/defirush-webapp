@@ -142,7 +142,8 @@ export default {
           protocol: 'MetaMask', connection: {}
         })
         this.$message.success('Connected')
-        global.location.reload()
+        // global.location.reload()
+        this.$store.dispatch('_refreshApp')
       } else {
         this.$message.error('Wrong signature ...... ')
       }

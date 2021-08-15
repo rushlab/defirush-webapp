@@ -81,7 +81,8 @@ export default {
     },
     async handleLogout() {
       await this.$store.dispatch('auth/logout')
-      global.location.reload()
+      // global.location.reload()
+      this.$store.dispatch('_refreshApp')
     }
   },
 }

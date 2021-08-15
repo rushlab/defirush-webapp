@@ -1,5 +1,5 @@
 <template>
-  <el-container class="app">
+  <el-container class="app" v-loading="$store.state._appRefreshTimestamp < 0">
     <el-aside class="app__aside" :width="!!isCollasped ? '64px' : '240px'">
       <sidebar :isCollasped.sync="isCollasped"/>
     </el-aside>
@@ -7,7 +7,7 @@
       <el-header class="app__header" height="75px">
         <site-header />
       </el-header>
-      <el-main class="app__main">
+      <el-main class="app__main" v-if="$store.state._appRefreshTimestamp >= 0">
         <nuxt />
       </el-main>
       <!-- <el-footer>Footer</el-footer> -->

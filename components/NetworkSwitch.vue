@@ -59,7 +59,8 @@ export default {
       const chainId = +(command.split('--')[1])
       if (chainId !== this.chainId) {
         this.$store.dispatch('auth/switchChain', { chainId })
-        global.location.reload()
+        // global.location.reload()
+        this.$store.dispatch('_refreshApp')
       }
     }
   },
