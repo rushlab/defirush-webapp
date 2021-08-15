@@ -35,14 +35,32 @@ export class WalletApp implements WalletInterface {
   /**
    * 所有地方的 signer 都要通过这个方法来获得, 不要自己构造 signer
    */
+  // getSigner(): Signer {
+  //   const provider = this.getProvider()
+  //   const address = this.getAddress()
+  //   if (this.$store.state.auth.isSignerAlive) {
+  //     return provider.getSigner(address)
+  //   } else {
+  //     return new ethers.VoidSigner(address, provider)
+  //   }
+  // }
   getSigner(): Signer {
-    const provider = this.getProvider()
     const address = this.getAddress()
     if (this.$store.state.auth.isSignerAlive) {
-      return provider.getSigner(address)
-    } else {
-      return new ethers.VoidSigner(address, provider)
+      const signerProtocol =  this.$store.state.auth.signerProtocol
+      if (signerProtocol === 'MetaMask') {
+        const provider = new ethers.providers.Web3Provider(global.ethereum)
+        return provider.getSigner(address)
+      } else if (signerProtocol === 'WalletConnect') {
+        const wcProvider = new WalletConnectProvider({
+          rpc: _.fromPairs(ALL_CHAINS_LIST.map(({ chainId, rpcUrl }) => [ chainId, rpcUrl ]))
+        })
+        const provider = new ethers.providers.Web3Provider(wcProvider)
+        return provider.getSigner(address)
+      }
     }
+    const provider = this.getProvider()
+    return new ethers.VoidSigner(address, provider)
   }
 
   /**
@@ -52,21 +70,22 @@ export class WalletApp implements WalletInterface {
     const chainId = this.getChainId()
     const chain = _.find(ALL_CHAINS_LIST, { chainId })
     // chain 一定存在, 用 chain!.xxx 访问其属性
-    if (this.$store.state.auth.isSignerAlive) {
-      const signerProtocol =  this.$store.state.auth.signerProtocol
-      if (signerProtocol === 'MetaMask') {
-        return new ethers.providers.Web3Provider(global.ethereum)
-      } else if (signerProtocol === 'WalletConnect') {
-        const wcProvider = new WalletConnectProvider({
-          rpc: { [chainId]: chain!.rpcUrl },
-        })
-        return new ethers.providers.Web3Provider(wcProvider)
-      } else {
-        throw new Error('Requires MetaMask or Wallet Connect')
-      }
-    } else {
-      return new ethers.providers.JsonRpcProvider(chain!.rpcUrl)
-    }
+    return new ethers.providers.JsonRpcProvider(chain!.rpcUrl)
+    // if (this.$store.state.auth.isSignerAlive) {
+    //   const signerProtocol =  this.$store.state.auth.signerProtocol
+    //   if (signerProtocol === 'MetaMask') {
+    //     return new ethers.providers.Web3Provider(global.ethereum)
+    //   } else if (signerProtocol === 'WalletConnect') {
+    //     const wcProvider = new WalletConnectProvider({
+    //       rpc: _.fromPairs(ALL_CHAINS_LIST.map(({ chainId, rpcUrl }) => [ chainId, rpcUrl ]))
+    //     })
+    //     return new ethers.providers.Web3Provider(wcProvider)
+    //   } else {
+    //     throw new Error('Requires MetaMask or Wallet Connect')
+    //   }
+    // } else {
+    //   return new ethers.providers.JsonRpcProvider(chain!.rpcUrl)
+    // }
   }
 
   /**

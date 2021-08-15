@@ -1,16 +1,21 @@
 import Vue from 'vue'
 import _ from 'lodash'
 import { ethers } from 'ethers'
+import WalletConnectProvider from '@walletconnect/web3-provider'
 import { MessageBox } from 'element-ui'
+import { chains as ALL_CHAINS_LIST } from '@/utils/chains'
 import { WalletApp } from './wallet-app'
 
 
-async function checkMetaMaskSignerStatus(store) {
+async function checkSignerStatus(store, walletConnector) {
   const { chainId, walletAddress, signerProtocol } = store.state.auth
   let selectedChainId = 0
   let selectedAddress = ''
   try {
-    const provider = new ethers.providers.Web3Provider(global.ethereum)
+    await walletConnector.enable()
+    // metamask 其实不需要, 但是 walletConnect 需要,
+    // 但是如果 app 上断开连接会导致下一次刷新网页的时候先弹出一个二维码, 不大好
+    const provider = new ethers.providers.Web3Provider(walletConnector)
     const signer = provider.getSigner()
     const [ network, address ] = await Promise.all([provider.getNetwork(), signer.getAddress()])
     selectedChainId = +network.chainId
@@ -35,14 +40,21 @@ async function checkMetaMaskSignerStatus(store) {
 export default async ({ store }) => {
 
   // TODO: 这一段可以移到 $wallet 里面
-  if (store.state.auth.signerProtocol === 'MetaMask') {
-    /* 只处理 signer status, 这里不需要处理登录状态, store 里都处理好了 */
-    await checkMetaMaskSignerStatus(store)
-    const handler = () => checkMetaMaskSignerStatus(store)
-    global.ethereum.on('chainChanged', handler)
-    global.ethereum.on('accountsChanged', handler)
-  } else {
-    // TODO... walletconnect etc.
+  // 只处理 signer status, 这里不需要处理登录状态, store 里都处理好了
+  const signerProtocol = store.state.auth.signerProtocol
+  let walletConnector = null
+  if (signerProtocol === 'MetaMask') {
+    walletConnector = global.ethereum
+  } else if (signerProtocol === 'WalletConnect') {
+    walletConnector = new WalletConnectProvider({
+      rpc: _.fromPairs(ALL_CHAINS_LIST.map(({ chainId, rpcUrl }) => [ chainId, rpcUrl ]))
+    })
+  }
+  if (walletConnector) {
+    await checkSignerStatus(store, walletConnector)
+    const handler = () => checkSignerStatus(store, walletConnector)
+    walletConnector.on('chainChanged', handler)
+    walletConnector.on('accountsChanged', handler)
   }
 
   /**

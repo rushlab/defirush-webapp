@@ -135,11 +135,9 @@ export default {
       this.protocol = 'WalletConnect'
       this.connection = {}
       this.pending = true
-      const chainId = this.$wallet.getChainId()
-      const { rpcUrl } = _.find(this.chains, { chainId })  // 一定存在
       //  Create WalletConnect Provider
       const wcProvider = new WalletConnectProvider({
-        rpc: { [chainId]: rpcUrl },
+        rpc: _.fromPairs(ALL_CHAINS_LIST.map(({ chainId, rpcUrl }) => [ chainId, rpcUrl ]))
       })
       try {
         await wcProvider.enable()
