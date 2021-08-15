@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import axios from 'axios'
 import { ethers } from 'ethers'
+import WalletConnectProvider from '@walletconnect/web3-provider'
 import { MessageBox, Notification } from 'element-ui'
 import { chains as ALL_CHAINS_LIST } from '@/utils/chains'
 
@@ -48,16 +49,22 @@ export class WalletApp implements WalletInterface {
    * 所有地方的 provider 都要通过这个方法来获得, 不要自己构造 provider
    */
   getProvider(): Provider {
+    const chainId = this.getChainId()
+    const chain = _.find(ALL_CHAINS_LIST, { chainId })
+    // chain 一定存在, 用 chain!.xxx 访问其属性
     if (this.$store.state.auth.isSignerAlive) {
-      if (this.$store.state.auth.signerProtocol === 'MetaMask') {
+      const signerProtocol =  this.$store.state.auth.signerProtocol
+      if (signerProtocol === 'MetaMask') {
         return new ethers.providers.Web3Provider(global.ethereum)
+      } else if (signerProtocol === 'WalletConnect') {
+        const wcProvider = new WalletConnectProvider({
+          rpc: { [chainId]: chain!.rpcUrl },
+        })
+        return new ethers.providers.Web3Provider(wcProvider)
       } else {
-        throw new Error('Requires MetaMask') // 目前只支持 metamask
+        throw new Error('Requires MetaMask or Wallet Connect')
       }
     } else {
-      const chainId = this.getChainId()
-      const chain = _.find(ALL_CHAINS_LIST, { chainId })
-      // chain 一定存在, 用 chain!.
       return new ethers.providers.JsonRpcProvider(chain!.rpcUrl)
     }
   }

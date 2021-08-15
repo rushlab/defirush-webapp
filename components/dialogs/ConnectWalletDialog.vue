@@ -11,11 +11,11 @@
         <!-- 选择钱包，点击链接 -->
         <div class="dialog__notice">Please select a wallet to connect:</div>
         <div class="wallet-items">
-          <button class="wallet-btn" @click="connectBrowserWallet">
+          <button class="wallet-btn" @click="connectMetaMask">
             <img class="wallet-icon" src="~/assets/icons/metamask-fox.svg" alt="">
             <span> MetaMask</span>
           </button>
-          <button class="wallet-btn" @click="connectBrowserWallet">
+          <button class="wallet-btn" @click="connectWalletConnect">
             <img class="wallet-icon" src="~/assets/icons/wallet-connect.png" alt="">
             <span> WalletConnect</span>
           </button>
@@ -41,6 +41,7 @@
 import _ from 'lodash'
 import { ethers } from 'ethers'
 import { mapState, mapGetters, mapActions } from 'vuex'
+import WalletConnectProvider from '@walletconnect/web3-provider'
 import { chains } from '@/utils/chains'
 
 export default {
@@ -56,6 +57,8 @@ export default {
     return {
       chains,
       isVisible: this.visible,
+      protocol: '',
+      connection: {},
       address: '',
       signer: null,
       verified: false,
@@ -83,6 +86,8 @@ export default {
   mounted() {},
   methods: {
     resetStatus() {
+      this.protocol = ''
+      this.connection = {}
       this.address = ''
       this.signer = null
       this.verified = false
@@ -97,26 +102,8 @@ export default {
       // this.$emit('close')
       this.$emit('update:visible', false)
     },
-    async connectBrowserWallet() {
-      if (typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask) {
-        this.pending = true
-        try {
-          await this.switchToCurrentChain()
-          await global.ethereum.request({ method: 'eth_requestAccounts' })
-        } catch(error) {
-          console.log(error)
-          this.$message.error(error.message || error.toString())
-          this.isVisible = false
-          this.pending = false
-          return
-        }
-        const provider = new ethers.providers.Web3Provider(global.ethereum)
-        const signer = provider.getSigner()
-        const address = await signer.getAddress()
-        this.signer = signer
-        this.address = address
-        this.pending = false
-      } else {
+    async connectMetaMask() {
+      if (!(typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask)) {
         this.$confirm('请先安装 MetaMask 扩展应用', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -124,7 +111,49 @@ export default {
         }).then(() => {
           window.open('https://metamask.io/download.html')
         }).catch(() => {})
+        return
       }
+      this.protocol = 'MetaMask'
+      this.connection = {}
+      this.pending = true
+      try {
+        await this.switchToCurrentChain()
+        await global.ethereum.request({ method: 'eth_requestAccounts' })
+      } catch(error) {
+        console.log(error)
+        this.$message.error(error.message || error.toString())
+        this.isVisible = false
+        this.pending = false
+        return
+      }
+      const provider = new ethers.providers.Web3Provider(global.ethereum)
+      this.signer = provider.getSigner()
+      this.address = await this.signer.getAddress()
+      this.pending = false
+    },
+    async connectWalletConnect() {
+      this.protocol = 'WalletConnect'
+      this.connection = {}
+      this.pending = true
+      const chainId = this.$wallet.getChainId()
+      const { rpcUrl } = _.find(this.chains, { chainId })  // 一定存在
+      //  Create WalletConnect Provider
+      const wcProvider = new WalletConnectProvider({
+        rpc: { [chainId]: rpcUrl },
+      })
+      try {
+        await wcProvider.enable()
+      } catch(error) {
+        console.log(error)
+        this.$message.error(error.message || error.toString())
+        this.isVisible = false
+        this.pending = false
+        return
+      }
+      const provider = new ethers.providers.Web3Provider(wcProvider)
+      this.signer = provider.getSigner()
+      this.address = await this.signer.getAddress()
+      this.pending = false
     },
     async verifyUserWallet() {
       const { signer, address } = this
@@ -148,7 +177,7 @@ export default {
         this.$message.success('Connected')
         await this.$store.dispatch('auth/login', {
           chainId, address, message, signature,
-          protocol: 'MetaMask', connection: {}
+          protocol: this.protocol, connection: this.connection,
         })
         this.verified = true
         this.isVisible = false
