@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 
 const { authenticate } = require('../utils/auth')
-const error = (status, message) => {
+const createError = (status, message) => {
   const error = new Error(message)
   error.status = status
   return error
@@ -21,7 +21,7 @@ router.get('/profile', (req, res, next) => {
   if (req.customer.isAuthenticated) {
     res.json(req.customer.profile)
   } else {
-    throw error(403, 'Not authenticated')
+    next(createError(403, 'Not authenticated'))
   }
 })
 

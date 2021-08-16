@@ -38,6 +38,8 @@ const tokensRoutes = require('./routes/tokens')
 app.use('/api/tokens', tokensRoutes)
 const accountRoutes = require('./routes/account')
 app.use('/api/account', accountRoutes)
+const adminRoutes = require('./routes/admin')
+app.use('/api/admin', adminRoutes)
 
 
 /*

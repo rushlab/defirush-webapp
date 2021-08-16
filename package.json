@@ -26,6 +26,7 @@
     "element-ui": "^2.15.5",
     "ethers": "^5.3.1",
     "express": "^4.16.4",
+    "jsonwebtoken": "^8.5.1",
     "leancloud-storage": "^4.11.1",
     "lodash": "^4.17.21",
     "morgan": "^1.10.0",
