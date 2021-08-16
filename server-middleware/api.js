@@ -59,10 +59,15 @@ app.use('/api', function(err, req, res, next) {
 
 module.exports = app
 
+if (process.env.TELEGRAM_BOT === '1') {
+  const { run: runTelegramBot } = require('./tasks/telegram-listener')
+  runTelegramBot()
+}
+
 if (require.main === module) {
   const consola = require('consola')
   const port = process.env.PORT || 3001
-  const host = process.env.HOSTNAME || '127.0.0.1'
+  const host = process.env.HOST || '127.0.0.1'
   app.listen(port, host, () => {
     consola.ready({
       message: `Standalone API server listening on http://${host}:${port}`,

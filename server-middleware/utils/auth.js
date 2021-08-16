@@ -1,11 +1,5 @@
 const { ethers } = require('ethers')
-const LeanCloudStorage = require('leancloud-storage')
-
-// -MdYXbMMI 结尾的就不是 CN region, 不需要提供 serverURL
-const LEANCLOUD_APPID = process.env.LEANCLOUD_APPID || '000-MdYXbMMI'
-const LEANCLOUD_APPKEY = process.env.LEANCLOUD_APPKEY || '0'
-
-LeanCloudStorage.init({ appId: LEANCLOUD_APPID, appKey: LEANCLOUD_APPKEY })
+import { LeanCloudStorage } from '../leancloud'
 
 const getOrCreateUserProfile = async (walletChainId, walletAddress) => {
   const telegramKey = 'T' + ethers.utils.id(`${(new Date().valueOf())}${walletAddress}`).substr(2, 16).toUpperCase()
