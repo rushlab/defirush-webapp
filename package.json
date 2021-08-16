@@ -41,17 +41,17 @@
     "@types/lodash": "^4.14.171",
     "@vue/test-utils": "^1.0.0-beta.27",
     "babel-eslint": "^10.0.1",
-    "babel-jest": "^24.1.0",
+    "babel-jest": "^26.0.0",
     "eslint": "^6.1.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-nuxt": ">=0.4.2",
     "eslint-plugin-prettier": "^3.1.2",
-    "jest": "^24.1.0",
+    "jest": "^26.0.0",
     "node-sass": "^6.0.0",
     "nodemon": "^1.18.9",
     "prettier": "^1.19.1",
     "sass-loader": "^10",
     "stylelint": "^10.1.0",
-    "vue-jest": "^4.0.0-0"
+    "vue-jest": "^4.0.0"
   }
 }
