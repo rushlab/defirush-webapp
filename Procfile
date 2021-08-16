@@ -1,1 +1,1 @@
-web-and-bot: TELEGRAM_BOT=1 npm start
+web: TELEGRAM_BOT=1 npm start
