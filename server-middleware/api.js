@@ -7,6 +7,8 @@ const cookieParser = require('cookie-parser')
 
 dotenv.config()
 const app = express()
+module.exports = app
+
 
 app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'])  // app.enable('trust proxy')
 // app.use(logger('combined'))  // logger('dev')
@@ -57,8 +59,9 @@ app.use('/api', function(err, req, res, next) {
   })
 })
 
-module.exports = app
-
+/**
+ * Telegram bot
+ */
 if (process.env.TELEGRAM_BOT === '1') {
   const { run: runTelegramBot } = require('./tasks/telegram-listener')
   runTelegramBot()
