@@ -11,9 +11,13 @@ import { chains as ALL_CHAINS_LIST } from '@/utils/chains'
  */
 export class WalletApp implements WalletInterface {
   $store: any
+  _walletConnector: any
+  _rpcUrls: any  // { [chainId]: rpcUrl, ... }
 
   constructor(store: any) {
     this.$store = store
+    this._walletConnector = null
+    this._rpcUrls = _.fromPairs(ALL_CHAINS_LIST.map(({ chainId, rpcUrl }) => [ chainId, rpcUrl ]))
   }
 
   isETH(asset: Address): boolean {
@@ -32,35 +36,39 @@ export class WalletApp implements WalletInterface {
     return address || '0x0000000000000000000000000000000000000000'
   }
 
+  setWalletConnector(walletConnector: any) {
+    this._walletConnector = walletConnector
+  }
+
   /**
    * 所有地方的 signer 都要通过这个方法来获得, 不要自己构造 signer
    */
-  // getSigner(): Signer {
-  //   const provider = this.getProvider()
-  //   const address = this.getAddress()
-  //   if (this.$store.state.auth.isSignerAlive) {
-  //     return provider.getSigner(address)
-  //   } else {
-  //     return new ethers.VoidSigner(address, provider)
-  //   }
-  // }
   getSigner(): Signer {
     const address = this.getAddress()
-    if (this.$store.state.auth.isSignerAlive) {
-      const signerProtocol =  this.$store.state.auth.signerProtocol
-      if (signerProtocol === 'MetaMask') {
-        const provider = new ethers.providers.Web3Provider(global.ethereum)
-        return provider.getSigner(address)
-      } else if (signerProtocol === 'WalletConnect') {
-        const wcProvider = new WalletConnectProvider({
-          rpc: _.fromPairs(ALL_CHAINS_LIST.map(({ chainId, rpcUrl }) => [ chainId, rpcUrl ]))
-        })
-        const provider = new ethers.providers.Web3Provider(wcProvider)
-        return provider.getSigner(address)
-      }
+    if (this._walletConnector) {
+      const provider = new ethers.providers.Web3Provider(this._walletConnector)
+      return provider.getSigner(address)
+    } else {
+      const provider = this.getProvider()
+      return new ethers.VoidSigner(address, provider)
     }
-    const provider = this.getProvider()
-    return new ethers.VoidSigner(address, provider)
+    // if (this.$store.state.auth.isSignerAlive) {
+    //   const signerProtocol = this.$store.state.auth.signerProtocol
+    //   if (signerProtocol === 'MetaMask') {
+    //     const provider = new ethers.providers.Web3Provider(global.ethereum)
+    //     return provider.getSigner(address)
+    //   } else if (signerProtocol === 'WalletConnect') {
+    //     // TODO 这样好像会导致很多 session
+    //     const walletConnector = new WalletConnectProvider({
+    //       rpc: { ...this._rpcUrls }
+    //     })
+    //     // walletConnector.enable()
+    //     // https://github.com/WalletConnect/walletconnect-monorepo/blob/v1.0/packages/providers/web3-provider/src/index.ts
+    //     walletConnector.start()
+    //     const provider = new ethers.providers.Web3Provider(walletConnector)
+    //     return provider.getSigner(address)
+    //   }
+    // }
   }
 
   /**
@@ -68,24 +76,8 @@ export class WalletApp implements WalletInterface {
    */
   getProvider(): Provider {
     const chainId = this.getChainId()
-    const chain = _.find(ALL_CHAINS_LIST, { chainId })
-    // chain 一定存在, 用 chain!.xxx 访问其属性
-    return new ethers.providers.JsonRpcProvider(chain!.rpcUrl)
-    // if (this.$store.state.auth.isSignerAlive) {
-    //   const signerProtocol =  this.$store.state.auth.signerProtocol
-    //   if (signerProtocol === 'MetaMask') {
-    //     return new ethers.providers.Web3Provider(global.ethereum)
-    //   } else if (signerProtocol === 'WalletConnect') {
-    //     const wcProvider = new WalletConnectProvider({
-    //       rpc: _.fromPairs(ALL_CHAINS_LIST.map(({ chainId, rpcUrl }) => [ chainId, rpcUrl ]))
-    //     })
-    //     return new ethers.providers.Web3Provider(wcProvider)
-    //   } else {
-    //     throw new Error('Requires MetaMask or Wallet Connect')
-    //   }
-    // } else {
-    //   return new ethers.providers.JsonRpcProvider(chain!.rpcUrl)
-    // }
+    const rpcUrl = this._rpcUrls[chainId]
+    return new ethers.providers.JsonRpcProvider(rpcUrl)
   }
 
   /**

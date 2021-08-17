@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { ethers } from 'ethers'
 import { chains as ALL_CHAINS_LIST } from '@/utils/chains'
-const SIGNER_SESSION_STORAGE_KEY = 'web3-signer-session'
+const SIGNER_PROTOCOL_STORAGE_KEY = 'web3-signer-protocol'
 const CHAIN_STORAGE_KEY = 'web3-chain-id'
 const AUTH_STORAGE_KEY = 'web3-wallet-auth'
 
@@ -20,22 +20,17 @@ const getChainIdFromStorage = () => {
   }
 }
 
-const getSignerSessionFromStorage = (expectChainId) => {
+const getSignerProtocolFromStorage = (expectChainId) => {
   try {
-    const content = global.localStorage.getItem(SIGNER_SESSION_STORAGE_KEY)
-    const { protocol, connection } = JSON.parse(content)
-    _require(['MetaMask', 'WalletConnect'].includes(protocol), `signer protocol ${protocol} not supported`)
-    _require(_.isPlainObject(connection), 'malformed signer connection')
-    return {
-      signerProtocol: protocol,
-      signerConnection: connection,
-    }
+    const signerProtocol = global.localStorage.getItem(SIGNER_PROTOCOL_STORAGE_KEY)
+    _require(
+      ['MetaMask', 'WalletConnect', null].includes(signerProtocol),
+      `signer protocol ${signerProtocol} not supported`
+    )
+    return signerProtocol
   } catch(error) {
     console.debug('getStateFromStorage', error.message)
-    return {
-      signerProtocol: null,
-      signerConnection: {}
-    }
+    return null
   }
 }
 
@@ -77,7 +72,7 @@ const getAuthFromStorage = (expectChainId) => {
 export const state = () => {
   const chainId = getChainIdFromStorage()
   const { walletAddress, web3ApiToken } = getAuthFromStorage(chainId)
-  const { signerProtocol, signerConnection } = getSignerSessionFromStorage(chainId)
+  const signerProtocol = getSignerProtocolFromStorage(chainId)
   const isAuthenticated = !!walletAddress
   return {
     /* 1. store 里存着的 chainId 一定存在于 ALL_CHAINS_LIST, 其他地方可以放心使用 */
@@ -88,7 +83,6 @@ export const state = () => {
     isAuthenticated,
     /* 3. isSignerAlive 信息要 await 验证, 一开始的时候先设置成 false */
     signerProtocol,
-    signerConnection,
     isSignerAlive: false,
   }
 }
@@ -119,18 +113,14 @@ export const mutations = {
       global.localStorage.removeItem(AUTH_STORAGE_KEY)
     }
   },
-  _setSignerSession(state, payload) {
+  _setSignerProtocol(state, signerProtocol) {
     // 私有 mutation, 只在 actions 里使用
-    if (payload) {
-      const { protocol, connection = {} } = payload
-      const _data = JSON.stringify({ protocol, connection })
-      state.signerProtocol = protocol
-      state.signerConnection = connection
-      global.localStorage.setItem(SIGNER_SESSION_STORAGE_KEY, _data)
+    if (signerProtocol) {
+      state.signerProtocol = signerProtocol
+      global.localStorage.setItem(SIGNER_PROTOCOL_STORAGE_KEY, signerProtocol)
     } else {
-      state.signerProtocol = null
-      state.signerConnection = {}
-      global.localStorage.removeItem(SIGNER_SESSION_STORAGE_KEY)
+      state.signerProtocol = ''
+      global.localStorage.removeItem(SIGNER_PROTOCOL_STORAGE_KEY)
     }
   },
   setSignerStatus(state, isSignerAlive) {
@@ -145,18 +135,18 @@ export const mutations = {
 export const actions = {
   async login({ dispatch, commit, state }, {
     chainId, address, message, signature,
-    protocol, connection,
+    protocol,
   }) {
     if (state.chainId !== chainId) {
       throw new Error('chain id doesn\'t match')
     }
     commit('_setAuth', { chainId, address, message, signature })
-    commit('_setSignerSession', { protocol, connection })
+    commit('_setSignerProtocol', protocol)
     commit('setSignerStatus', true)
   },
   async logout({ dispatch, commit, state }) {
     commit('_setAuth', null)
-    commit('_setSignerSession', null)
+    commit('_setSignerProtocol', null)
     commit('setSignerStatus', false)
   },
   async switchChain({ dispatch, commit, state }, { chainId }) {
@@ -165,7 +155,7 @@ export const actions = {
       // 改变 chainId 以后所有信息重置
       commit('_setChainId', chainId)
       commit('_setAuth', null)
-      commit('_setSignerSession', null)
+      commit('_setSignerProtocol', null)
       commit('setSignerStatus', false)
     }
   }

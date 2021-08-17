@@ -57,7 +57,6 @@ export default {
     return {
       isVisible: this.visible,
       protocol: '',
-      connection: {},
       address: '',
       signer: null,
       verified: false,
@@ -86,7 +85,6 @@ export default {
   methods: {
     resetStatus() {
       this.protocol = ''
-      this.connection = {}
       this.address = ''
       this.signer = null
       this.verified = false
@@ -112,8 +110,6 @@ export default {
         }).catch(() => {})
         return
       }
-      this.protocol = 'MetaMask'
-      this.connection = {}
       this.pending = true
       try {
         await this.switchToCurrentChain()
@@ -128,18 +124,18 @@ export default {
       const provider = new ethers.providers.Web3Provider(global.ethereum)
       this.signer = provider.getSigner()
       this.address = await this.signer.getAddress()
+      this.protocol = 'MetaMask'
+      this.$wallet.setWalletConnector(global.ethereum)
       this.pending = false
     },
     async connectWalletConnect() {
-      this.protocol = 'WalletConnect'
-      this.connection = {}
       this.pending = true
       //  Create WalletConnect Provider
-      const wcProvider = new WalletConnectProvider({
+      const walletConnector = new WalletConnectProvider({
         rpc: _.fromPairs(ALL_CHAINS_LIST.map(({ chainId, rpcUrl }) => [ chainId, rpcUrl ]))
       })
       try {
-        await wcProvider.enable()
+        await walletConnector.enable()
       } catch(error) {
         console.log(error)
         this.$message.error(error.message || error.toString())
@@ -147,9 +143,11 @@ export default {
         this.pending = false
         return
       }
-      const provider = new ethers.providers.Web3Provider(wcProvider)
+      const provider = new ethers.providers.Web3Provider(walletConnector)
       this.signer = provider.getSigner()
       this.address = await this.signer.getAddress()
+      this.protocol = 'WalletConnect'
+      this.$wallet.setWalletConnector(walletConnector)
       this.pending = false
     },
     async verifyUserWallet() {
@@ -174,7 +172,7 @@ export default {
         this.$message.success('Connected')
         await this.$store.dispatch('auth/login', {
           chainId, address, message, signature,
-          protocol: this.protocol, connection: this.connection,
+          protocol: this.protocol
         })
         this.verified = true
         this.isVisible = false
