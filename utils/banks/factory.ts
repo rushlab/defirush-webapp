@@ -34,10 +34,18 @@ export function createBankItem(bankName:string, $wallet: WalletInterface) {
 }
 
 export function createBanks($wallet: WalletInterface) {
-  return [
-    createBankItem('aave', $wallet),
-    createBankItem('compound', $wallet),
-    createBankItem('cream', $wallet),
-    createBankItem('fortube', $wallet),
-  ]
+  const chainId = $wallet.getChainId()
+  if (chainId === 137) {
+    return [
+      createBankItem('aave', $wallet),
+      createBankItem('cream', $wallet),
+    ]
+  } else {
+    return [
+      createBankItem('aave', $wallet),
+      createBankItem('compound', $wallet),
+      createBankItem('cream', $wallet),
+      createBankItem('fortube', $wallet),
+    ]
+  }
 }

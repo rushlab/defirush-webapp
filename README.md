@@ -46,9 +46,3 @@ $ npm run generate
 ```
 
 For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
-
-## 注意点
-nuxtjs 版本目前固定在 2.14.4, 似乎新版有个问题, layout 切换的时候页面会 created/mounted 两次
-这个问题在 https://github.com/nuxt/nuxt.js/issues/3496 里被修复了
-重新产生这个问题的原因看起来是希望在 layout 切换的时候, 旧的 layout 出现新的 page 的动画, 于是新的 page 就被 mount 了两次
-另外 2.14.4 还需要把 @babel/preset-env 的版本固定在 "~7.12"
