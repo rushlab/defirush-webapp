@@ -170,7 +170,7 @@ export default {
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  background-image: url('~/assets/icons/logo-white.png');
+  background-image: url('~assets/icons/logo-white.png');
 }
 .sidebar__toggle {
   position: absolute;
@@ -184,7 +184,7 @@ export default {
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  background-image: url('~/assets/icons/icon-collaspe.png');
+  background-image: url('~assets/icons/icon-collaspe.png');
 }
 .sidebar__body {
   padding: 20px;

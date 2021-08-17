@@ -1,5 +1,5 @@
 const { ethers } = require('ethers')
-import { LeanCloudStorage } from '../leancloud'
+const { LeanCloudStorage } = require('../leancloud/index.ts')
 
 const getOrCreateUserProfile = async (walletChainId, walletAddress) => {
   const telegramKey = 'T' + ethers.utils.id(`${(new Date().valueOf())}${walletAddress}`).substr(2, 16).toUpperCase()
