@@ -146,7 +146,7 @@ export default {
           this.updateAllowanceDisplay()
         ])
       } catch (error) {
-        this.$message.error(JSON.stringify(error))
+        this.$message.error(error.message || error.toString())
       }
       this.pending = false
     },
@@ -196,7 +196,7 @@ export default {
         this.handleWithdrawSuccess()
       } catch (error) {
         console.log('handleWithdraw error: ', error)
-        this.$message.error(JSON.stringify(error))
+        this.$message.error(error.message || error.toString())
       }
       this.isWithdrawing = false
     },

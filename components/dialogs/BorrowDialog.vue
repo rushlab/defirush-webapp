@@ -179,7 +179,7 @@ export default {
         ])
       } catch (error) {
         console.log('getDialogData error', error)
-        this.$message.error(JSON.stringify(error))
+        this.$message.error(error.message || error.toString())
       }
       this.pending = false
     },
@@ -230,7 +230,7 @@ export default {
         this.handleBorrowSuccess()
       } catch (error) {
         console.log('handleBorrow error: ', error)
-        this.$message.error(JSON.stringify(error))
+        this.$message.error(error.message || error.toString())
       }
       this.isBorrowing   = false
     },

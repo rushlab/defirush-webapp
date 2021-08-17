@@ -165,7 +165,7 @@ export default {
         ])
       } catch (error) {
         console.log('getDialogData error', error)
-        this.$message.error(JSON.stringify(error))
+        this.$message.error(error.message || error.toString())
       }
       this.pending = false
     },
@@ -192,7 +192,7 @@ export default {
         this.checkUnderlyingEnabled()
       } catch (error) {
         console.log(error)
-        this.$message.error(JSON.stringify(error))
+        this.$message.error(error.message || error.toString())
       }
       this.isEnabling = false
     },
@@ -237,7 +237,7 @@ export default {
         await this.updateAllowanceDisplay()
       } catch (error) {
         console.log('handleApprove error: ', error)
-        this.$message.error(JSON.stringify(error))
+        this.$message.error(error.message || error.toString())
       }
       this.isApproving = false
     },
@@ -249,7 +249,7 @@ export default {
         this.handleDepositSuccess()
       } catch (error) {
         console.log('handleDeposit error: ', error)
-        this.$message.error(JSON.stringify(error))
+        this.$message.error(error.message || error.toString())
       }
       this.isDepositing = false
     },

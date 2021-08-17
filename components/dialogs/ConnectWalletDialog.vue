@@ -42,7 +42,7 @@ import _ from 'lodash'
 import { ethers } from 'ethers'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import { chains } from '@/utils/chains'
+import { chains as ALL_CHAINS_LIST } from '@/utils/chains'
 
 export default {
   name: 'ConnectWalletDialog',
@@ -55,7 +55,6 @@ export default {
   },
   data() {
     return {
-      chains,
       isVisible: this.visible,
       protocol: '',
       connection: {},
@@ -189,7 +188,7 @@ export default {
     async switchToCurrentChain() {
       const chainId = this.$store.state.auth.chainId
       const chainIdHex = '0x' + chainId.toString(16)
-      const { chainName, nativeCurrency, rpcUrl } = _.find(this.chains, { chainId })  // 一定存在
+      const { chainName, nativeCurrency, rpcUrl } = _.find(ALL_CHAINS_LIST, { chainId })  // 一定存在
       try {
         await global.ethereum.request({
           method: 'wallet_switchEthereumChain',

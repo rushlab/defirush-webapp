@@ -161,7 +161,7 @@ export default {
           this.getBalanceDisplay()
         ])
       } catch (error) {
-        this.$message.error(JSON.stringify(error))
+        this.$message.error(error.message || error.toString())
       }
       this.pending = false
     },
@@ -218,7 +218,7 @@ export default {
         await this.updateAllowanceDisplay()
       } catch (error) {
         console.log('handleApprove error: ', error)
-        this.$message.error(JSON.stringify(error))
+        this.$message.error(error.message || error.toString())
       }
       this.isApproving = false
     },
@@ -230,7 +230,7 @@ export default {
         this.handleRepaySuccess()
       } catch (error) {
         console.log('handleRepay error: ', error)
-        this.$message.error(JSON.stringify(error))
+        this.$message.error(error.message || error.toString())
       }
       this.isRepaying = false
     },
