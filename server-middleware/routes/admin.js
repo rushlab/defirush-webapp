@@ -1,5 +1,6 @@
 const express = require('express')
 const jwt = require('jsonwebtoken')
+const { sendMessageToAccount } = require('../telegram/bot')
 
 const router = express.Router()
 
@@ -47,6 +48,23 @@ router.get('/test', async (req, res, next) => {
   res.json({
     test: true
   })
+})
+
+router.post('/message', async (req, res, next) => {
+  const { chainId, address, message } = req.body || {}
+  try {
+    if (!chainId || !address || !message) {
+      throw createError(400, 'missing params')
+    }
+    const result = await sendMessageToAccount(chainId, address, message)
+    res.json({
+      success: true,
+      result,
+    })
+  } catch(err) {
+    next(err)
+    return
+  }
 })
 
 module.exports = router

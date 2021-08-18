@@ -36,6 +36,9 @@ export class WalletApp implements WalletInterface {
     return address || '0x0000000000000000000000000000000000000000'
   }
 
+  /**
+   * Wallet session connector
+   */
   setWalletConnector(walletConnector: any) {
     this._walletConnector = walletConnector
   }

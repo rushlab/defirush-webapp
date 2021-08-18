@@ -1,7 +1,7 @@
 import { Telegraf, Context, Markup, deunionize } from 'telegraf'
 
 import { LeanCloudStorage } from '../leancloud'
-import { bot, SessionContext } from './telegram/bot'
+import { bot, SessionContext } from '../telegram/bot'
 
 const doRegistration = async (ctx: SessionContext, telegramKey: string) => {
   const chat = deunionize(ctx.chat)
