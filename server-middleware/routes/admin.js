@@ -58,8 +58,8 @@ router.post('/message', async (req, res, next) => {
     }
     const result = await sendMessageToAccount(chainId, address, message)
     res.json({
-      success: true,
-      result,
+      success: !!result,
+      result: result,
     })
   } catch(err) {
     next(err)
