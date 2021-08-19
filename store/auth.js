@@ -129,6 +129,10 @@ export const mutations = {
  * 所以先都用 actions 不用 mutations, 而 actions 一定要 async
  */
 export const actions = {
+  async disconnectWallet({ dispatch, commit, state }) {
+    commit('_setSignerProtocol', null)
+    commit('setSignerStatus', false)
+  },
   async connectWallet({ dispatch, commit, state }, { address, protocol }) {
     // if (state.chainId !== chainId) {
     //   throw new Error('chain id doesn\'t match')

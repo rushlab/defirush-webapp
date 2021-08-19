@@ -45,18 +45,22 @@ export class WalletApp implements WalletInterface {
     if (this._connector === connector) {
       return
     }
-    const [ address ] = await connector.enable()
     if (this._connector) {
-      this._connector.off('chainChanged')
-      this._connector.off('accountsChanged')
+      this._connector.removeAllListeners()
     }
+    await this.$store.dispatch('auth/disconnectWallet')
+    // setWalletConnector 只会在登录或者打开页面时候执行, 无论如何先 disconnect, 是合理的
+    const [ address ] = await connector.enable()
     await this.$store.dispatch('auth/connectWallet', { address, protocol })
     // 只有 await connectWallet 成功了才会执行下面的
     this._connector = connector
     await this.checkSignerStatus()
     this._connector.on('chainChanged', () => this.checkSignerStatus())
     this._connector.on('accountsChanged', () => this.checkSignerStatus())
-    this._connector.on('disconnect', () => this.checkSignerStatus())
+    this._connector.on('disconnect', () => {
+      this._connector.removeAllListeners()
+      this.$store.dispatch('auth/disconnectWallet')
+    })
   }
 
   async checkSignerStatus() {

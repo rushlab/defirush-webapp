@@ -16,20 +16,18 @@ async function initWallet(store, $wallet) {
     walletConnector = new WalletConnectProvider({
       rpc: _.fromPairs(ALL_CHAINS_LIST.map(({ chainId, rpcUrl }) => [ chainId, rpcUrl ]))
     })
-    const wc = await walletConnector.getWalletConnector({ disableSessionCreation: true })
-    if (wc.connected) {
-      // subscribe 方法里面会调用 getWalletConnector, start 了以后 handleRequest 还是会调用 getWalletConnector
-      // 所以这里不能直接 start, 要先判断下 wc.connected
-      walletConnector.start()
-      walletConnector.subscribeWalletConnector()
-    } else {
-      walletConnector = null
-    }
-    // https://github.com/WalletConnect/walletconnect-monorepo/blob/v1.0/packages/providers/web3-provider/src/index.ts
-    // await walletConnector.enable()
+    // const wc = await walletConnector.getWalletConnector({ disableSessionCreation: true })
+    // if (wc.connected) {
+    //   // subscribe 方法里面会调用 getWalletConnector, start 了以后 handleRequest 还是会调用 getWalletConnector
+    //   // 所以这里不能直接 start, 要先判断下 wc.connected
+    //   walletConnector.start()
+    //   walletConnector.subscribeWalletConnector()
+    // } else {
+    //   walletConnector = null
+    // }
+    // // https://github.com/WalletConnect/walletconnect-monorepo/blob/v1.0/packages/providers/web3-provider/src/index.ts
   }
   if (walletConnector) {
-    // 没必要 await, 反而会导致页面打开的时候卡住
     await $wallet.setWalletConnector(signerProtocol, walletConnector)
   }
 }
@@ -43,7 +41,7 @@ export default async ({ store }) => {
   const $wallet = new WalletApp(store)
   Vue.prototype.$wallet = $wallet
 
-  // 没必要 await
+  // 没必要 await, 反而会导致页面打开的时候卡住
   initWallet(store, $wallet).then(() => {
     //
   }).catch((error) => {
