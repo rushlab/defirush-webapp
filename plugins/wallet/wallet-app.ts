@@ -11,12 +11,12 @@ import { chains as ALL_CHAINS_LIST } from '@/utils/chains'
  */
 export class WalletApp implements WalletInterface {
   $store: any
-  _walletConnector: any
+  _connector: any
   _rpcUrls: any  // { [chainId]: rpcUrl, ... }
 
   constructor(store: any) {
     this.$store = store
-    this._walletConnector = null
+    this._connector = null
     this._rpcUrls = _.fromPairs(ALL_CHAINS_LIST.map(({ chainId, rpcUrl }) => [ chainId, rpcUrl ]))
   }
 
@@ -38,9 +38,53 @@ export class WalletApp implements WalletInterface {
 
   /**
    * Wallet session connector
+   * metamask 建议用 await global.ethereum.request({ method: 'eth_requestAccounts' }) 代替 enable
+   * enable 方法会弹出二维码或者浏览器插件的 popup
    */
-  setWalletConnector(walletConnector: any) {
-    this._walletConnector = walletConnector
+  async setWalletConnector(protocol: any, connector: any) {
+    if (this._connector === connector) {
+      return
+    }
+    const [ address ] = await connector.enable()
+    if (this._connector) {
+      this._connector.off('chainChanged')
+      this._connector.off('accountsChanged')
+    }
+    await this.$store.dispatch('auth/connectWallet', { address, protocol })
+    // 只有 await connectWallet 成功了才会执行下面的
+    this._connector = connector
+    await this.checkSignerStatus()
+    this._connector.on('chainChanged', () => this.checkSignerStatus())
+    this._connector.on('accountsChanged', () => this.checkSignerStatus())
+    this._connector.on('disconnect', () => this.checkSignerStatus())
+  }
+
+  async checkSignerStatus() {
+    const { chainId, walletAddress, signerProtocol } = this.$store.state.auth
+    let selectedChainId = 0
+    let selectedAddress = ''
+    try {
+      const provider = new ethers.providers.Web3Provider(this._connector)
+      const signer = provider.getSigner()
+      const [ network, address ] = await Promise.all([provider.getNetwork(), signer.getAddress()])
+      selectedChainId = +network.chainId
+      selectedAddress = address
+    } catch(error) {
+      console.error(error)
+    }
+    if (chainId === selectedChainId && walletAddress.toLowerCase() === selectedAddress.toLowerCase()) {
+      this.$store.commit('auth/setSignerStatus', true)
+    } else {
+      // 如果 metamask 里的地址和登录着的不同没关系, 依然可以看数据只是不能发送交易, 这种情况就是 isSignerAlive 为 false
+      this.$store.commit('auth/setSignerStatus', false)
+    }
+    // MessageBox.confirm(
+    //   'Page will be reloaded because the network or your wallet account is changed',
+    //   'Network/Account Changed', {
+    //   confirmButtonText: 'OK',
+    //   cancelButtonText: 'DO NOT REFRESH',
+    //   type: 'warning'
+    // }).then(() => global.location.reload()).catch(() => {})
   }
 
   /**
@@ -48,30 +92,13 @@ export class WalletApp implements WalletInterface {
    */
   getSigner(): Signer {
     const address = this.getAddress()
-    if (this._walletConnector) {
-      const provider = new ethers.providers.Web3Provider(this._walletConnector)
+    if (this._connector) {
+      const provider = new ethers.providers.Web3Provider(this._connector)
       return provider.getSigner(address)
     } else {
       const provider = this.getProvider()
       return new ethers.VoidSigner(address, provider)
     }
-    // if (this.$store.state.auth.isSignerAlive) {
-    //   const signerProtocol = this.$store.state.auth.signerProtocol
-    //   if (signerProtocol === 'MetaMask') {
-    //     const provider = new ethers.providers.Web3Provider(global.ethereum)
-    //     return provider.getSigner(address)
-    //   } else if (signerProtocol === 'WalletConnect') {
-    //     // TODO 这样好像会导致很多 session
-    //     const walletConnector = new WalletConnectProvider({
-    //       rpc: { ...this._rpcUrls }
-    //     })
-    //     // walletConnector.enable()
-    //     // https://github.com/WalletConnect/walletconnect-monorepo/blob/v1.0/packages/providers/web3-provider/src/index.ts
-    //     walletConnector.start()
-    //     const provider = new ethers.providers.Web3Provider(walletConnector)
-    //     return provider.getSigner(address)
-    //   }
-    // }
   }
 
   /**

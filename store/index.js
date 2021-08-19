@@ -12,6 +12,7 @@ export const mutations = {
 
 export const actions = {
   _refreshApp({ commit }) {
+    // TODO: 还得刷新一下 tokens !
     commit('_setAppRefreshTimestamp', -1)
     setTimeout(() => {
       commit('_setAppRefreshTimestamp', (new Date()).valueOf())

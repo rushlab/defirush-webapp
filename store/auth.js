@@ -15,8 +15,6 @@ const getChainIdFromStorage = () => {
   const chainId = +global.localStorage.getItem(CHAIN_STORAGE_KEY)
   if (_.find(ALL_CHAINS_LIST, { chainId })) {
     return chainId
-  } else {
-    return 1
   }
 }
 
@@ -30,7 +28,6 @@ const getSignerProtocolFromStorage = (expectChainId) => {
     return signerProtocol
   } catch(error) {
     console.debug('getStateFromStorage', error.message)
-    return null
   }
 }
 
@@ -52,10 +49,7 @@ const getAuthFromStorage = (expectChainId) => {
   } catch(error) {
     console.debug('getStateFromStorage', error.message)
     global.localStorage.removeItem(AUTH_STORAGE_KEY)
-    return {
-      web3ApiToken: '',
-      walletAddress: '',
-    }
+    return {}
   }
   /**/
   return state
@@ -66,48 +60,50 @@ const getAuthFromStorage = (expectChainId) => {
  * 使用什么钱包接口在获取 signer 的时候判断, signer 软件的切换不影响用户本身的信息
  *
  * walletAddress: 用户钱包地址
- * isAuthenticated: 用户钱包地址已验证, 可以向 web 服务器请求个人信息, 现在这个值完全对应于有没有 walletAddress
+ * isAuthenticated: 用户钱包地址已验证, 可以向 web 服务器请求个人信息
  * isSignerAlive: 浏览器钱包可用, 可以发送交易, 并且和 walletAddress 对应
  */
 export const state = () => {
   const chainId = getChainIdFromStorage()
   const { walletAddress, web3ApiToken } = getAuthFromStorage(chainId)
   const signerProtocol = getSignerProtocolFromStorage(chainId)
-  const isAuthenticated = !!walletAddress
   return {
+    storageKeys: {
+      SIGNER_PROTOCOL_STORAGE_KEY,
+      CHAIN_STORAGE_KEY,
+      AUTH_STORAGE_KEY,
+    },
     /* 1. store 里存着的 chainId 一定存在于 ALL_CHAINS_LIST, 其他地方可以放心使用 */
-    chainId,
+    chainId: chainId || 1,
     /* 2. web3ApiToken 只给 axios 用 */
-    walletAddress,
-    web3ApiToken,
-    isAuthenticated,
+    walletAddress: walletAddress || '',
+    web3ApiToken: web3ApiToken || '',
+    isAuthenticated: !!walletAddress,
     /* 3. isSignerAlive 信息要 await 验证, 一开始的时候先设置成 false */
-    signerProtocol,
+    signerProtocol: signerProtocol || '',
     isSignerAlive: false,
   }
 }
 
 export const mutations = {
-  _setApiToken(state, token) {
-    // 私有 mutation, 只在 actions 里使用
-    state.web3ApiToken = token
-  },
   _setChainId(state, chainId) {
     // 私有 mutation, 只在 actions 里使用
-    state.chainId = chainId
+    state.chainId = chainId || 1
     global.localStorage.setItem(CHAIN_STORAGE_KEY, chainId)
+  },
+  _setAddress(state, address) {
+    state.walletAddress = address || ''
   },
   _setAuth(state, payload) {
     // 私有 mutation, 只在 actions 里使用
     if (payload) {
       const { chainId, address, message, signature } = payload
+      // TODO: 确认一下 chainId 和 address 与 store 对应
       const _data = JSON.stringify({ chainId, address, message, signature })
-      state.walletAddress = address
       state.isAuthenticated = true
       state.web3ApiToken = btoa(_data)
       global.localStorage.setItem(AUTH_STORAGE_KEY, _data)
     } else {
-      state.walletAddress = ''
       state.isAuthenticated = false
       state.web3ApiToken = ''
       global.localStorage.removeItem(AUTH_STORAGE_KEY)
@@ -116,7 +112,7 @@ export const mutations = {
   _setSignerProtocol(state, signerProtocol) {
     // 私有 mutation, 只在 actions 里使用
     if (signerProtocol) {
-      state.signerProtocol = signerProtocol
+      state.signerProtocol = signerProtocol || ''
       global.localStorage.setItem(SIGNER_PROTOCOL_STORAGE_KEY, signerProtocol)
     } else {
       state.signerProtocol = ''
@@ -133,18 +129,32 @@ export const mutations = {
  * 所以先都用 actions 不用 mutations, 而 actions 一定要 async
  */
 export const actions = {
-  async login({ dispatch, commit, state }, {
-    chainId, address, message, signature,
-    protocol,
-  }) {
-    if (state.chainId !== chainId) {
-      throw new Error('chain id doesn\'t match')
+  async connectWallet({ dispatch, commit, state }, { address, protocol }) {
+    // if (state.chainId !== chainId) {
+    //   throw new Error('chain id doesn\'t match')
+    // }
+    if (!['MetaMask', 'WalletConnect', null].includes(protocol)) {
+      throw new Error(`signer protocol ${protocol} not supported`)
     }
-    commit('_setAuth', { chainId, address, message, signature })
+    if (state.isAuthenticated && state.walletAddress !== address) {
+      throw new Error('connecting address is different with user authenticated address')
+    }
+    commit('_setAddress', address)
     commit('_setSignerProtocol', protocol)
     commit('setSignerStatus', true)
   },
+  async authenticate({ dispatch, commit, state }, { message, signature }) {
+    const chainId = state.chainId
+    const address = state.walletAddress
+    const signerAddress = ethers.utils.verifyMessage(message, signature)
+    if (signerAddress.toLowerCase() === address.toLowerCase()) {
+      commit('_setAuth', { chainId, address, message, signature })
+    } else {
+      throw new Error('invalid signature')
+    }
+  },
   async logout({ dispatch, commit, state }) {
+    commit('_setAddress', null)
     commit('_setAuth', null)
     commit('_setSignerProtocol', null)
     commit('setSignerStatus', false)

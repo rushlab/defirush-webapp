@@ -111,77 +111,52 @@ export default {
         return
       }
       this.pending = true
+      this.protocol = 'MetaMask'
       try {
         await this.switchToCurrentChain()
-        await global.ethereum.request({ method: 'eth_requestAccounts' })
+        await this.$wallet.setWalletConnector(this.protocol, global.ethereum)
+        this.address = this.$wallet.getAddress()
       } catch(error) {
         console.log(error)
         this.$message.error(error.message || error.toString())
         this.isVisible = false
-        this.pending = false
-        return
       }
-      const provider = new ethers.providers.Web3Provider(global.ethereum)
-      this.signer = provider.getSigner()
-      this.address = await this.signer.getAddress()
-      this.protocol = 'MetaMask'
-      this.$wallet.setWalletConnector(global.ethereum)
       this.pending = false
     },
     async connectWalletConnect() {
       this.pending = true
-      //  Create WalletConnect Provider
+      this.protocol = 'WalletConnect'
       const walletConnector = new WalletConnectProvider({
         rpc: _.fromPairs(ALL_CHAINS_LIST.map(({ chainId, rpcUrl }) => [ chainId, rpcUrl ]))
       })
       try {
-        await walletConnector.enable()
+        await this.$wallet.setWalletConnector(this.protocol, walletConnector)
+        this.address = this.$wallet.getAddress()
       } catch(error) {
         console.log(error)
         this.$message.error(error.message || error.toString())
         this.isVisible = false
-        this.pending = false
-        return
       }
-      const provider = new ethers.providers.Web3Provider(walletConnector)
-      this.signer = provider.getSigner()
-      this.address = await this.signer.getAddress()
-      this.protocol = 'WalletConnect'
-      this.$wallet.setWalletConnector(walletConnector)
       this.pending = false
     },
     async verifyUserWallet() {
-      const { signer, address } = this
+      const signer = this.$wallet.getSigner()
+      const address = this.$wallet.getAddress()
       const tip = 'Please sign to let us verify that you are the owner of this address'
       const timestamp = (new Date()).valueOf()
       const message = `${tip}\n${address}\n${timestamp}`
-      let signature, chainId
       this.pending = true
       try {
-        chainId = (await signer.provider.getNetwork()).chainId
-        signature = await signer.signMessage(message)
+        const signature = await signer.signMessage(message)
+        await this.$store.dispatch('auth/authenticate', { message, signature })
+        this.verified = true
       } catch(error) {
         console.log(error)
         this.$message.error(error.message || error.toString())
-        this.isVisible = false
-        this.pending = false
-        return
       }
-      const signerAddress = ethers.utils.verifyMessage(message, signature)
-      if (signerAddress.toLowerCase() === address.toLowerCase()) {
-        this.$message.success('Connected')
-        await this.$store.dispatch('auth/login', {
-          chainId, address, message, signature,
-          protocol: this.protocol
-        })
-        this.verified = true
-        this.isVisible = false
-        this.pending = false
-        // global.location.reload()
-        this.$store.dispatch('_refreshApp')
-      } else {
-        this.$message.error('Wrong signature ...... ')
-      }
+      this.isVisible = false
+      this.pending = false
+      this.$store.dispatch('_refreshApp')
     },
     async switchToCurrentChain() {
       const chainId = this.$store.state.auth.chainId
