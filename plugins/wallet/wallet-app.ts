@@ -42,9 +42,9 @@ export class WalletApp implements WalletInterface {
    * enable 方法会弹出二维码或者浏览器插件的 popup
    */
   async setWalletConnector(protocol: any, connector: any) {
-    if (this._connector === connector) {
-      return
-    }
+    // if (this._connector === connector) {
+    //   return
+    // }
     if (this._connector) {
       this._connector.removeAllListeners()
     }
