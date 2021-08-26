@@ -22,7 +22,7 @@ const getSignerProtocolFromStorage = (expectChainId) => {
   try {
     const signerProtocol = global.localStorage.getItem(SIGNER_PROTOCOL_STORAGE_KEY)
     _require(
-      ['MetaMask', 'WalletConnect', null].includes(signerProtocol),
+      ['MetaMask', 'WalletConnect', 'Liquality', null].includes(signerProtocol),
       `signer protocol ${signerProtocol} not supported`
     )
     return signerProtocol
@@ -137,7 +137,7 @@ export const actions = {
     // if (state.chainId !== chainId) {
     //   throw new Error('chain id doesn\'t match')
     // }
-    if (!['MetaMask', 'WalletConnect', null].includes(protocol)) {
+    if (!['MetaMask', 'WalletConnect', 'Liquality', null].includes(protocol)) {
       throw new Error(`signer protocol ${protocol} not supported`)
     }
     if (state.isAuthenticated && state.walletAddress !== address) {

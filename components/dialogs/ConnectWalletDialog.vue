@@ -1,7 +1,7 @@
 <!-- dialog 返回的是整个对象, select 组件返回 id -->
 <template>
   <el-dialog
-    class="dialog--connect" :title="dialogTitle" width="540px" top="10vh"
+    class="dialog--connect" :title="dialogTitle" width="840px" top="10vh"
     :append-to-body="true" :modal-append-to-body="true"
     :close-on-click-modal="false" :close-on-press-escape="false"
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose"
@@ -18,6 +18,10 @@
           <button class="wallet-btn" @click="connectWalletConnect">
             <img class="wallet-icon" src="~/assets/icons/wallet-connect.png" alt="">
             <span> WalletConnect</span>
+          </button>
+          <button class="wallet-btn" @click="connectLiquality">
+            <img class="wallet-icon" src="~/assets/icons/logo-liquality.svg" alt="">
+            <span> Liquality</span>
           </button>
         </div>
         <el-link href="/" target="_blank">What is a wallet?</el-link>
@@ -139,15 +143,46 @@ export default {
       }
       this.pending = false
     },
+    async connectLiquality() {
+      if (!(typeof global.eth !== 'undefined' && global.eth.isLiquality)) {
+        this.$confirm('请先安装 Liquality 扩展应用', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          window.open('https://liquality.io/')
+        }).catch(() => {})
+        return
+      }
+      this.pending = true
+      this.protocol = 'Liquality'
+      try {
+        await this.switchToCurrentChain()
+        await this.$wallet.setWalletConnector(this.protocol, global.eth)
+        this.address = this.$wallet.getAddress()
+      } catch(error) {
+        console.log(error)
+        this.$message.error(error.message || error.toString())
+        this.isVisible = false
+      }
+      this.pending = false
+    },
     async verifyUserWallet() {
       const signer = this.$wallet.getSigner()
       const address = this.$wallet.getAddress()
       const tip = 'Please sign to let us verify that you are the owner of this address'
       const timestamp = (new Date()).valueOf()
+      // TODO 这里为了保证 ethereum 和 eth 的签名结果一致，把address开头的 0x 去掉
+      // const message = `${tip}\n${address.substr(2)}\n${timestamp}`
       const message = `${tip}\n${address}\n${timestamp}`
       this.pending = true
       try {
-        const signature = await signer.signMessage(message)
+        // const signature = await signer.signMessage(message)
+        const _connector = this.$wallet._connector
+        const signature = await _connector.request({
+          method: 'personal_sign',
+          params: [ message, address ]
+        })
         await this.$store.dispatch('auth/authenticate', { message, signature })
         this.verified = true
       } catch(error) {

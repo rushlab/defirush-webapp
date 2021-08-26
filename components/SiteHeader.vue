@@ -7,7 +7,9 @@
       <div class="wallet-status">
         <el-dropdown @command="handleAccountCommand">
           <div class="el-dropdown-link wallet-address-btn">
-            <img class="icon-metamask" src="~/assets/icons/metamask-fox.svg" alt="">
+            <img v-if="signerProtocol === 'WalletConnect'" class="wallet-icon" src="~/assets/icons/wallet-connect.png" alt="">
+            <img v-else-if="signerProtocol === 'Liquality'" class="wallet-icon" src="~/assets/icons/logo-liquality.svg" alt="">
+            <img v-else class="wallet-icon" src="~/assets/icons/metamask-fox.svg" alt="">
             <span class="wallet-address">{{ maskedWalletAddress }}</span> <i class="el-icon-arrow-down el-icon--right"></i>
           </div>
           <el-dropdown-menu slot="dropdown">
@@ -55,7 +57,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('auth', ['walletAddress', 'isAuthenticated']),
+    ...mapState('auth', ['walletAddress', 'isAuthenticated', 'signerProtocol']),
     maskedWalletAddress() {
       const walletAddress = this.walletAddress || ''
       if (!walletAddress) {
@@ -108,7 +110,7 @@ export default {
   color: $--color-text-primary;
   border: 1px solid $--border-color-base;
   cursor: pointer;
-  .icon-metamask {
+  .wallet-icon {
     position: absolute;
     width: 24px;
     height: 20px;
