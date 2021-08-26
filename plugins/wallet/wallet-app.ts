@@ -46,7 +46,8 @@ export class WalletApp implements WalletInterface {
     //   return
     // }
     if (this._connector) {
-      this._connector.removeAllListeners()
+      // TODO liquality 的方法目前只有 eth.on，没有 removeAllListeners 方法。因此也可能反复监听导致内存泄漏
+      this._connector.removeAllListeners && this._connector.removeAllListeners()
     }
     await this.$store.dispatch('auth/disconnectWallet')
     // setWalletConnector 只会在登录或者打开页面时候执行, 无论如何先 disconnect, 是合理的
@@ -58,7 +59,8 @@ export class WalletApp implements WalletInterface {
     this._connector.on('chainChanged', () => this.checkSignerStatus())
     this._connector.on('accountsChanged', () => this.checkSignerStatus())
     this._connector.on('disconnect', () => {
-      this._connector.removeAllListeners()
+      // TODO liquality 的方法目前只有 eth.on，没有 removeAllListeners 方法。因此也可能反复监听导致内存泄漏
+      this._connector.removeAllListeners && this._connector.removeAllListeners()
       this.$store.dispatch('auth/disconnectWallet')
     })
   }
