@@ -118,7 +118,7 @@ export default {
       // const res = await this.$axios.get('https://hardhat-dev.heidian.io/api/contracts.json')
       // const { EtherFaucet } = res.data
       this.EtherFaucet = {
-        address: '0x28DFF79Eb03cE08137e19C4eEE9298012518ECA2',
+        address: '0xB581C9264f59BF0289fA76D61B2D0746dCE3C30D',
         abi: [
           'function requestEther(uint256 amount)'
         ]
