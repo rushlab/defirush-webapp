@@ -300,7 +300,7 @@ export default {
       const quote = await this._getQuote()
       const signer = this.$wallet.getSigner()
       const nonce = await signer.getTransactionCount('latest')
-      const isETHSwap = this.$wallet.isETH(this.fromToken.symbol)
+      const isETHSwap = this.$wallet.isETH(this.fromToken.address)
       const txMsg = {
         nonce
       }
