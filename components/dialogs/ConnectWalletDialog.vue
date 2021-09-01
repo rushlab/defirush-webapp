@@ -144,7 +144,7 @@ export default {
       this.pending = false
     },
     async connectLiquality() {
-      if (!(typeof global.eth !== 'undefined' && global.eth.isLiquality)) {
+      if (!(typeof global.localhost !== 'undefined' && global.localhost.isLiquality)) {
         this.$confirm('请先安装 Liquality 扩展应用', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -157,8 +157,7 @@ export default {
       this.pending = true
       this.protocol = 'Liquality'
       try {
-        await this.switchToCurrentChain()
-        await this.$wallet.setWalletConnector(this.protocol, global.eth)
+        await this.$wallet.setWalletConnector(this.protocol, global.localhost)
         this.address = this.$wallet.getAddress()
       } catch(error) {
         console.log(error)
