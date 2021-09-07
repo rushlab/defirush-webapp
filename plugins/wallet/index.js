@@ -27,7 +27,7 @@ async function initWallet(store, $wallet) {
     // }
     // // https://github.com/WalletConnect/walletconnect-monorepo/blob/v1.0/packages/providers/web3-provider/src/index.ts
   } else if (signerProtocol === 'Liquality') {
-    walletConnector = global.localhost
+    walletConnector = global.rush
   }
   if (walletConnector) {
     await $wallet.setWalletConnector(signerProtocol, walletConnector)
