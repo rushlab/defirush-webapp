@@ -98,7 +98,7 @@ export default {
       this.walletBalance = await this.$wallet.getBalance()
       // TODO test for rushWalletProxy
       // const provide = this.$wallet.getProvider()
-      // const value = await provide.getBalance('0x6370898c421499da635Ba4dCc8526bB152A686eC')
+      // const value = await provide.getBalance('0x5E0324E5F9Dfe0a6cB6B0F07813A6Bf15fb54eeC')
       // this.walletBalance = ethers.utils.formatEther(value)
     },
     async getERC20TokensBalance(tokenAddres) {
@@ -117,7 +117,7 @@ export default {
       const erc20Contract = new ethers.Contract(token.address, this.ERC20_ABI, this.$wallet.getProvider())
       const balance = await erc20Contract.balanceOf(this.walletAddress)
       // TODO test for rushWalletProxy
-      // const balance = await erc20Contract.balanceOf('0x6370898c421499da635Ba4dCc8526bB152A686eC')
+      // const balance = await erc20Contract.balanceOf('0x5E0324E5F9Dfe0a6cB6B0F07813A6Bf15fb54eeC')
       return (new BigNumber(balance.toString())).shiftedBy(-token.decimals).toString()
     },
     async getEtherFaucetData() {

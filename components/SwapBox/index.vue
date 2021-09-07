@@ -88,7 +88,7 @@ const splitExchanges = [
     'CurvePax', 'CurveRenBtc', 'CurveTBtc', 'DforceSwap', 'Shellexchangers'
 ]
 
-const proxyAddress = '0x6370898c421499da635Ba4dCc8526bB152A686eC'
+const proxyAddress = '0x5E0324E5F9Dfe0a6cB6B0F07813A6Bf15fb54eeC'
 
 export default {
   name: 'Exchange',
