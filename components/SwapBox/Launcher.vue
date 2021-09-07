@@ -96,6 +96,10 @@ export default {
     },
     async getEtherBalance() {
       this.walletBalance = await this.$wallet.getBalance()
+      // TODO test for rushWalletProxy
+      // const provide = this.$wallet.getProvider()
+      // const value = await provide.getBalance('0x6370898c421499da635Ba4dCc8526bB152A686eC')
+      // this.walletBalance = ethers.utils.formatEther(value)
     },
     async getERC20TokensBalance(tokenAddres) {
       if (tokenAddres) {
@@ -112,13 +116,16 @@ export default {
     async getTokenBalance(token) {
       const erc20Contract = new ethers.Contract(token.address, this.ERC20_ABI, this.$wallet.getProvider())
       const balance = await erc20Contract.balanceOf(this.walletAddress)
+      // TODO test for rushWalletProxy
+      // const balance = await erc20Contract.balanceOf('0x6370898c421499da635Ba4dCc8526bB152A686eC')
       return (new BigNumber(balance.toString())).shiftedBy(-token.decimals).toString()
     },
     async getEtherFaucetData() {
       // const res = await this.$axios.get('https://hardhat-dev.heidian.io/api/contracts.json')
       // const { EtherFaucet } = res.data
       this.EtherFaucet = {
-        address: '0xB581C9264f59BF0289fA76D61B2D0746dCE3C30D',
+        // address: '0xB581C9264f59BF0289fA76D61B2D0746dCE3C30D',
+        address: '0x28DFF79Eb03cE08137e19C4eEE9298012518ECA2',
         abi: [
           'function requestEther(uint256 amount)'
         ]
