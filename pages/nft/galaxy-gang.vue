@@ -9,12 +9,18 @@
           type="dark" @click="handleRender"
           :disabled="pending" :loading="pending"
         >Render</el-button>
+        <el-button
+          type="danger" @click="handleMint"
+          :disabled="pending" :loading="pending"
+        >Mint</el-button>
       </el-form-item>
     </el-form>
     <!-- <img :src="imageSrc"></img> -->
     <div v-if="svg" v-html="svg" class="svg-wrapper"></div>
+    <h2>Name <small>{{ tokenData.name }}</small></h2>
+    <h2>Description <small>{{ tokenData.description }}</small></h2>
     <h2>Image <small>data:image/svg+xml;base64</small></h2>
-    <pre>{{ imageSrc }}</pre>
+    <pre>{{ tokenData.image }}</pre>
     <h2>tokenURI <small>data:application/json;base64</small></h2>
     <pre>{{ tokenURI }}</pre>
   </div>
@@ -23,13 +29,15 @@
 <script>
 import { ethers } from 'ethers'
 
+const ContractAddress = '0xC92B72ecf468D2642992b195bea99F9B9BB4A838'
+
 export default {
   data() {
     return {
       pending: false,
       tokenID: '',
       tokenURI: '',
-      imageSrc: '',
+      tokenData: {},
       svg: '',
     }
   },
@@ -38,6 +46,15 @@ export default {
   },
   computed: {},
   methods: {
+    async handleMint() {
+      this.pending = true
+      try {
+        await this.mintCaptain(this.tokenID)
+      } catch(err) {
+        console.log(err)
+      }
+      this.pending = false
+    },
     async handleRender() {
       this.pending = true
       try {
@@ -47,25 +64,28 @@ export default {
       }
       this.pending = false
     },
+    async mintCaptain(tokenID) {
+      const signer = this.$wallet.getSigner()
+      const avatar = new ethers.Contract(ContractAddress, [
+        'function mintCaptain(uint256 tokenId) payable'
+      ], signer)
+      await avatar.mintCaptain(tokenID).then(tx => tx.wait())
+    },
     async fetchTokenURI(tokenID) {
       const provider = this.$wallet.getProvider()
-      const address = '0x347a7991A3E6D1a6a066c1ABf676882a8CA3BF3F'
-      const abi = [
+      const avatar = new ethers.Contract(ContractAddress, [
         'function tokenURI(uint256 tokenId) view returns (string)'
-      ]
-      const avatar = new ethers.Contract(address, abi, provider)
+      ], provider)
       this.tokenURI = await avatar.tokenURI(tokenID)
-      this.imageSrc = this.parseImage(this.tokenURI)
-      this.svg = this.parseSVG(this.imageSrc)
+      this.tokenData = this.parseToken(this.tokenURI)
+      this.svg = this.parseSVG(this.tokenData.image)
     },
-    parseImage(tokenURI) {
+    parseToken(tokenURI) {
       if (!/^data:application\/json;base64,/.test(tokenURI)) {
         return ''
       }
       const raw = tokenURI.substr(29)
-      const data = JSON.parse(atob(raw))
-      const imageSrc = data.image
-      return imageSrc
+      return JSON.parse(atob(raw))
     },
     parseSVG(imageSrc) {
       if (!/^data:image\/svg\+xml;base64,/.test(imageSrc)) {
