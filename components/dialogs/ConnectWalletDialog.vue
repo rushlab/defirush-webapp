@@ -182,7 +182,12 @@ export default {
           method: 'personal_sign',
           params: [ message, address ]
         })
-        await this.$store.dispatch('auth/authenticate', { message, signature })
+        if (_connector === global.rush) {
+          // 如果是 rush钱包，暂时跳过 verify的过程
+          await this.$store.dispatch('auth/authenticateRush', { message, signature })
+        } else {
+          await this.$store.dispatch('auth/authenticate', { message, signature })
+        }
         this.verified = true
       } catch(error) {
         console.log(error)

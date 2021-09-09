@@ -157,6 +157,11 @@ export const actions = {
       throw new Error('invalid signature')
     }
   },
+  async authenticateRush({ dispatch, commit, state }, { message, signature }) {
+    const chainId = state.chainId
+    const address = state.walletAddress
+    commit('_setAuth', { chainId, address, message, signature })
+  },
   async logout({ dispatch, commit, state }) {
     commit('_setAddress', null)
     commit('_setAuth', null)

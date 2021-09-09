@@ -88,7 +88,6 @@ const splitExchanges = [
     'CurvePax', 'CurveRenBtc', 'CurveTBtc', 'DforceSwap', 'Shellexchangers'
 ]
 
-const proxyAddress = '0x5E0324E5F9Dfe0a6cB6B0F07813A6Bf15fb54eeC'
 
 export default {
   name: 'Exchange',
@@ -276,9 +275,6 @@ export default {
       const erc20Contract = new ethers.Contract(address, ERC20_ABI, this.$wallet.getSigner())
       const oneSplitAuditContract = this.getOneSplitAuditContract()
       const allowance = await erc20Contract.callStatic.allowance(this.senderAddress, oneSplitAuditContract.address)
-      // TODO test for rushWalletProxy
-      // const allowance = await erc20Contract.callStatic.allowance(proxyAddress, oneSplitAuditContract.address)
-      // console.log('@@@ current allowance to oneSplit', allowance)
       if (allowance.lt(amount)) {
         // allowance 已经足够完成这次交易的 amount, 则不再发起本次 approve
         return [erc20Contract, amount]
@@ -293,20 +289,10 @@ export default {
         if (!approveAmount) return;
         const tx = await erc20Contract.approve(oneSplitAuditContract.address, approveAmount)
         const res = await tx.wait()  // 等待交易确认
-        // this.getProxyAllowance()
       } catch (error) {
         console.log('@@@@@ handleApprove error', error)
         throw error
       }
-    },
-    async getProxyAllowance() {
-      // TODO test for rushWalletProxy
-      const oneSplitAuditContract = this.getOneSplitAuditContract()
-      const usdc = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-      const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545')
-      const usdcContract = new ethers.Contract(usdc, ['function allowance(address, address) view returns (uint256)'], provider)
-      const allowance = await usdcContract.allowance(proxyAddress, oneSplitAuditContract.address)
-      console.log('@@@ current USDC allowance', +allowance)
     },
     async getSwapPayload() {
       const amount = this.getTxAmount(this.amount, this.fromToken.decimals)
