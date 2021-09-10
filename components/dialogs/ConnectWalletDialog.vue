@@ -183,7 +183,7 @@ export default {
           params: [ message, address ]
         })
         if (_connector === global.rush) {
-          // 如果是 rush钱包，暂时跳过 verify的过程
+          // TODO 如果是 rush钱包，暂时跳过 verify的过程, getAuthFromStorage 里的 verify 也需要做特别处理
           await this.$store.dispatch('auth/authenticateRush', { message, signature })
         } else {
           await this.$store.dispatch('auth/authenticate', { message, signature })
