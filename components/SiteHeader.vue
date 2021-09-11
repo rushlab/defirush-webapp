@@ -8,7 +8,7 @@
         <el-dropdown @command="handleAccountCommand">
           <div class="el-dropdown-link wallet-address-btn">
             <img v-if="signerProtocol === 'WalletConnect'" class="wallet-icon" src="~/assets/icons/wallet-connect.png" alt="">
-            <img v-else-if="signerProtocol === 'Liquality'" class="wallet-icon" src="~/assets/icons/logo-liquality.svg" alt="">
+            <img v-else-if="signerProtocol === 'RushWallet'" class="wallet-icon" src="~/assets/icons/logo.svg" alt="">
             <img v-else class="wallet-icon" src="~/assets/icons/metamask-fox.svg" alt="">
             <span class="wallet-address">{{ maskedWalletAddress }}</span> <i class="el-icon-arrow-down el-icon--right"></i>
           </div>

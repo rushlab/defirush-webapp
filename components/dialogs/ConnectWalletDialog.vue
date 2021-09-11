@@ -19,9 +19,9 @@
             <img class="wallet-icon" src="~/assets/icons/wallet-connect.png" alt="">
             <span> WalletConnect</span>
           </button>
-          <button class="wallet-btn" @click="connectLiquality">
-            <img class="wallet-icon" src="~/assets/icons/logo-liquality.svg" alt="">
-            <span> Liquality</span>
+          <button class="wallet-btn" @click="connectRushWallet">
+            <img class="wallet-icon" src="~/assets/icons/logo.svg" alt="">
+            <span> RushWallet</span>
           </button>
         </div>
         <el-link href="/" target="_blank">What is a wallet?</el-link>
@@ -143,19 +143,19 @@ export default {
       }
       this.pending = false
     },
-    async connectLiquality() {
+    async connectRushWallet() {
       if (!(typeof global.rush !== 'undefined' && global.rush.isLiquality)) {
-        this.$confirm('请先安装 Liquality 扩展应用', '提示', {
+        this.$confirm('请先安装 RushWallet 扩展应用', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          window.open('https://liquality.io/')
+          window.open('https://defirush.io/')
         }).catch(() => {})
         return
       }
       this.pending = true
-      this.protocol = 'Liquality'
+      this.protocol = 'RushWallet'
       try {
         await this.$wallet.setWalletConnector(this.protocol, global.rush)
         this.address = this.$wallet.getAddress()
