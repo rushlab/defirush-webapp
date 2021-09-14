@@ -11,6 +11,7 @@
         <template slot-scope="{ row }">
           <el-button
             size="small" type="primary"
+            :disabled="+row.balance <= 0"
             @click.stop="() => handleOpenDialogSend(row)">Send</el-button>
           <el-button
             size="small" type="warning"
