@@ -7,19 +7,14 @@
           <div> {{ row.balance }} {{ row.symbol }}</div>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="VALUE">
-        <template slot-scope="{ row }">
-          <div> {{getBalance(row.address)}} {{ row.symbol }}</div>
-        </template>
-      </el-table-column> -->
       <el-table-column label="ACTIONS" width="200">
         <template slot-scope="{ row }">
           <el-button
             size="small" type="primary"
-            @click="() => handleOpenDialogSend(row)">Send</el-button>
+            @click.stop="() => handleOpenDialogSend(row)">Send</el-button>
           <el-button
-            size="small" type="primary" plain
-            @click="() => handleReceive(row)">Receive</el-button>
+            size="small" type="warning"
+            @click.stop="handleReceive">Receive</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -28,19 +23,16 @@
     <el-dialog
       title="Send fouds"
       :visible.sync="dialogSend.isVisible"
-      width="500px" top="10vh" :fullscreen="false" :append-to-body="true" :modal-append-to-body="true"
+      width="500px" top="10vh"
+      :fullscreen="false"
+      :append-to-body="true"
+      :modal-append-to-body="true"
       @close="resetDialogSend"
     >
       <el-form :model="dialogSend" label-position="top">
         <el-form-item label="Asset">
-          <!-- <div slot="label" class="form-item__label">
-            <div class="label-with-hint">
-              <div class="label-text">Asset</div>
-
-            </div>
-          </div> -->
           <el-input :value="dialogSend.assetData.symbol" readonly>
-            <el-button slot="append" icon="el-icon-copy-document" @click="copyAssetAddress"></el-button>
+            <el-button slot="append" icon="el-icon-copy-document" @click="execCopy(dialogSend.assetData.address)"></el-button>
           </el-input>
           <div class="input__hints">Balance: {{ dialogSend.assetData.balance }}</div>
         </el-form-item>
@@ -60,6 +52,28 @@
     </el-dialog>
     <!-- end send dialog -->
 
+    <!-- receive dialog -->
+    <el-dialog
+      title="Receive assets"
+      :visible.sync="dialogReceive.isVisible"
+      width="500px" top="10vh"
+      :fullscreen="false"
+      :append-to-body="true"
+      :modal-append-to-body="true"
+    >
+      <div class="receive-dialog__body">
+        <p>This is the address of your Proxy Wallet Address. Deposit funds by scanning the QR code or copying the address below. Only send Ether and assets to this address (e.g. ETH, ERC20, ERC721)!</p>
+        <div class="qrcode-wrapper">
+          <qrcode :value="proxyAddress" :options="{ width: 200 }"/>
+        </div>
+        <div class="proxy-address">{{ proxyAddress }} <a href="javascript:void(0);" @click="execCopy(proxyAddress)"><i class="el-icon-copy-document"></i></a></div>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogReceive.isVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- end receive dialog -->
+
   </el-card>
 </template>
 
@@ -68,6 +82,7 @@ import _ from 'lodash'
 import { mapState } from 'vuex'
 import { ethers } from "ethers"
 import { copyToClipboard } from '@/utils/copy'
+import VueQrcode from '@chenfengyuan/vue-qrcode'
 
 const ERC20_TOKENS = [
   { symbol: 'ETH', address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', decimals: 18 },
@@ -100,6 +115,9 @@ const proxyABI = [
 
 
 export default {
+  components: {
+    Qrcode: VueQrcode
+  },
   data() {
     return {
       ERC20_TOKENS,
@@ -120,7 +138,7 @@ export default {
         }
       },
       dialogReceive: {
-        isVialble: false,
+        isVisible: false,
       }
     }
   },
@@ -148,8 +166,8 @@ export default {
     this.fetchTableData()
   },
   methods: {
-    copyAssetAddress() {
-      copyToClipboard(this.dialogSend.assetData.address)
+    execCopy(content) {
+      copyToClipboard(content)
       this.$message({ type: 'success', message: 'Copied successfully!' })
     },
     async fetchTableData() {
@@ -280,10 +298,10 @@ export default {
       }
       this.pendingSend = false
     },
-    handleReceive(asset) {
-
+    handleReceive() {
+      console.log(12345)
+      this.dialogReceive.isVisible = true
     },
-
   },
 }
 </script>
@@ -302,5 +320,12 @@ export default {
   font-size: 16px;
   line-height: 1;
   margin-bottom: 10px;
+}
+.qrcode-wrapper {
+  text-align: center;
+  margin: 20px auto;
+}
+.proxy-address {
+  text-align: center;
 }
 </style>
