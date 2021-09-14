@@ -6,6 +6,9 @@
       </div>
     </div>
     <div class="sidebar__body">
+      <div class="proxy-wallet">
+        <wallet-overview :proxy-address="proxyAddress" @openProxyAddressDialog="openProxyAddressDialog"/>
+      </div>
       <el-menu
         :router="true"
         :default-active="defaultActive"
@@ -57,19 +60,39 @@
         </div>
       </div>
     </div>
-    <div class="sidebar__footer">
-      <div class="simulation-togger">
-        <span>Simulation</span>
-        <el-switch :value="isSimulationMode" @change="toggleSimulationMode"></el-switch>
+
+    <!-- receive dialog -->
+    <el-dialog
+      title="Receive assets"
+      :visible.sync="isVisible"
+      width="500px" top="10vh"
+      :fullscreen="false"
+      :append-to-body="true"
+      :modal-append-to-body="true"
+    >
+      <div class="receive-dialog__body">
+        <p>This is the address of your Proxy Wallet Address. Deposit funds by scanning the QR code or copying the address below. Only send Ether and assets to this address (e.g. ETH, ERC20, ERC721)!</p>
+        <div class="qrcode-wrapper">
+          <qrcode :value="proxyAddress" :options="{ width: 200 }"/>
+        </div>
+        <div class="proxy-address">{{ proxyAddress }} <a href="javascript:void(0);" @click="execCopy(proxyAddress)"><i class="el-icon-copy-document"></i></a></div>
       </div>
-    </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="isVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- end receive dialog -->
   </div>
 </template>
 
 <script>
 import { ethers } from "ethers"
 import { mapState } from 'vuex'
+import VueQrcode from '@chenfengyuan/vue-qrcode'
 import { chains } from '@/utils/chains'
+import { EventBus } from '@/utils/eventBus'
+import { copyToClipboard } from '@/utils/copy'
+import WalletOverview from './WalletOverview'
 
 export default {
   name: 'Sidebar',
@@ -79,13 +102,21 @@ export default {
       default: false
     }
   },
+  components: {
+    Qrcode: VueQrcode,
+    WalletOverview
+  },
   data() {
     return {
       chains,
+      isVisible: false
     }
   },
   computed: {
     ...mapState('auth', ['chainId']),
+    proxyAddress() {
+      return this.$route.params.proxyAddress || ''
+    },
     defaultActive() {
       const fullPath = this.$route.fullPath
       if (/\/portfolio\/\w+/.test(fullPath)) {
@@ -94,12 +125,21 @@ export default {
         return fullPath
       }
     },
-    isSimulationMode() {
-      const chain = _.find(this.chains, (chain) => +chain.chainId === +this.chainId)
-      return !!(chain && chain.forking)
-    }
+  },
+  created() {
+    EventBus.$on('openProxyAddressDialog', this.openProxyAddressDialog)
+  },
+  beforeDestroy() {
+    EventBus.$off('openProxyAddressDialog', this.openProxyAddressDialog)
   },
   methods: {
+    execCopy(content) {
+      copyToClipboard(content)
+      this.$message({ type: 'success', message: 'Copied successfully!' })
+    },
+    openProxyAddressDialog() {
+      this.isVisible = true
+    },
     toggleCollasped() {
       this.$emit('update:isCollasped', !this.isCollasped)
     },
@@ -268,5 +308,13 @@ export default {
   /deep/ .el-menu-item.is-active {
     border-radius: 0;
   }
+}
+
+.qrcode-wrapper {
+  text-align: center;
+  margin: 20px auto;
+}
+.proxy-address {
+  text-align: center;
 }
 </style>
