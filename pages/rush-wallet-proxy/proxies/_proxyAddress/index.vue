@@ -53,28 +53,6 @@
     </el-dialog>
     <!-- end send dialog -->
 
-    <!-- receive dialog -->
-    <el-dialog
-      title="Receive assets"
-      :visible.sync="dialogReceive.isVisible"
-      width="500px" top="10vh"
-      :fullscreen="false"
-      :append-to-body="true"
-      :modal-append-to-body="true"
-    >
-      <div class="receive-dialog__body">
-        <p>This is the address of your Proxy Wallet Address. Deposit funds by scanning the QR code or copying the address below. Only send Ether and assets to this address (e.g. ETH, ERC20, ERC721)!</p>
-        <div class="qrcode-wrapper">
-          <qrcode :value="proxyAddress" :options="{ width: 200 }"/>
-        </div>
-        <div class="proxy-address">{{ proxyAddress }} <a href="javascript:void(0);" @click="execCopy(proxyAddress)"><i class="el-icon-copy-document"></i></a></div>
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogReceive.isVisible = false">确 定</el-button>
-      </div>
-    </el-dialog>
-    <!-- end receive dialog -->
-
   </el-card>
 </template>
 
@@ -83,7 +61,7 @@ import _ from 'lodash'
 import { mapState } from 'vuex'
 import { ethers } from "ethers"
 import { copyToClipboard } from '@/utils/copy'
-import VueQrcode from '@chenfengyuan/vue-qrcode'
+import { EventBus } from '@/utils/eventBus'
 
 const ERC20_TOKENS = [
   { symbol: 'ETH', address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', decimals: 18 },
@@ -116,9 +94,7 @@ const proxyABI = [
 
 
 export default {
-  components: {
-    Qrcode: VueQrcode
-  },
+  layout: 'rushwallet',
   data() {
     return {
       ERC20_TOKENS,
@@ -300,8 +276,7 @@ export default {
       this.pendingSend = false
     },
     handleReceive() {
-      console.log(12345)
-      this.dialogReceive.isVisible = true
+      EventBus.$emit('openProxyAddressDialog')
     },
   },
 }
