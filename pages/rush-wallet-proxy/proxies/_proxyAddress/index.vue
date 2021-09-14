@@ -7,6 +7,11 @@
           <div> {{ row.balance }} {{ row.symbol }}</div>
         </template>
       </el-table-column>
+      <el-table-column label="VALUE">
+        <template slot-scope="{ row }">
+          <div> {{ row.balanceUSD || '0' }} USD</div>
+        </template>
+      </el-table-column>
       <el-table-column label="ACTIONS" width="200">
         <template slot-scope="{ row }">
           <el-button
@@ -153,10 +158,17 @@ export default {
         this.tableData = _.map(this.walletTokens, (token) => {
           const itemData = {
             ...token,
-            balance: '0.00'
+            balance: '0.00',
+            balanceUSD: '0.00'
           }
-          this.getBalance(token.address).then(value => {
-            itemData.balance = value
+          Promise.all([
+            this.getBalance(token.address),
+            this.getAssetPriceUSD(token.address)
+          ]).then(([balance, priceUSD]) => {
+            itemData.balance = balance
+            itemData.balanceUSD = ((+balance || 0) * (+priceUSD || 0)).toFixed(2)
+          }).catch(err => {
+            console.log(err)
           })
           return itemData
         })
@@ -164,6 +176,18 @@ export default {
 
       }
       this.pending = false
+    },
+    getAssetPriceUSD(asset) {
+      return new Promise((resolve) => {
+        if (!asset) {
+          resolve(0)
+        }
+        this.$wallet.getPriceUSD(asset).then(priceUSD => {
+          resolve(priceUSD)
+        }).catch(() => {
+          resolve(0)
+        })
+      })
     },
     async getBalance(asset) {
       const provider = this.$wallet.getProvider()
