@@ -39,7 +39,9 @@
 
             </div>
           </div> -->
-          <el-input :value="dialogSend.assetData.symbol" readonly></el-input>
+          <el-input :value="dialogSend.assetData.symbol" readonly>
+            <el-button slot="append" icon="el-icon-copy-document" @click="copyAssetAddress"></el-button>
+          </el-input>
           <div class="input__hints">Balance: {{ dialogSend.assetData.balance }}</div>
         </el-form-item>
         <el-form-item label="Recipient">
@@ -65,7 +67,7 @@
 import _ from 'lodash'
 import { mapState } from 'vuex'
 import { ethers } from "ethers"
-import { BigNumber } from 'bignumber.js'
+import { copyToClipboard } from '@/utils/copy'
 
 const ERC20_TOKENS = [
   { symbol: 'ETH', address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', decimals: 18 },
@@ -146,6 +148,10 @@ export default {
     this.fetchTableData()
   },
   methods: {
+    copyAssetAddress() {
+      copyToClipboard(this.dialogSend.assetData.address)
+      this.$message({ type: 'success', message: 'Copied successfully!' })
+    },
     async fetchTableData() {
       try {
         this.pending = true
