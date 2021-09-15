@@ -100,9 +100,11 @@ export default {
       this.result = res.toString()
     },
     async execQuery() {
+      this.pending = true
       const txOptions = _.map(this.formData, 'value')
       const res = await this.contract.callStatic[this.name](...txOptions)
       this.result = res.toString()
+      this.pending = false
     },
     _getSendTransactionPayload() {
       const payableAmount = _.find(this.formData, { name: 'payableAmount' }) ? _.find(this.formData, { name: 'payableAmount' }).value : null
