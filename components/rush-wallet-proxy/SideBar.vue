@@ -9,7 +9,7 @@
       <div class="proxy-wallet">
         <wallet-overview :proxy-address="proxyAddress" @openProxyAddressDialog="openProxyAddressDialog"/>
       </div>
-      <el-menu
+      <!-- <el-menu
         :router="true"
         :default-active="defaultActive"
         background-color="#000000"
@@ -58,7 +58,7 @@
         <div class="social-icon">
           <i class="rush-icon-twitter"></i>
         </div>
-      </div>
+      </div> -->
     </div>
 
     <!-- receive dialog -->
