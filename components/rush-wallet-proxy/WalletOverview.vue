@@ -8,11 +8,14 @@
       <div class="action-item" @click="execCopy(proxyAddress)">
         <i class="el-icon-copy-document"></i>
       </div>
-      <div class="action-item">
+      <a class="action-item" :href="'https://rinkeby.etherscan.io/address/' + proxyAddress" target="_blank">
         <i class="el-icon-view"></i>
-      </div>
+      </a>
     </div>
     <div class="balance">{{ totalBalanceInUSD.toFixed(2) }} USD</div>
+    <div class="transaction-btn-wrapper">
+      <el-button type="primary" @click="$router.push(`/rush-wallet-proxy/proxies/${proxyAddress}/contract-interaction`)">Contract Interaction</el-button>
+    </div>
   </div>
 </template>
 
@@ -83,8 +86,11 @@ export default {
       handler(newVal) {
         this.updateProxyWalletBalance()
       },
-      immediate: true,
+      immediate: true
     }
+  },
+  mounted() {
+    this.updateProxyWalletBalance()
   },
   methods: {
     execCopy(content) {
@@ -141,7 +147,7 @@ export default {
 
 <style lang="scss" scoped>
 .overview {
-  padding: 20px;
+  padding: 20px 10px;
   background-color: #f0f0f0;
   border-radius: 4px;
 }
@@ -167,5 +173,12 @@ export default {
   width: 100%;
   text-align: center;
   font-weight: 500;
+}
+.transaction-btn-wrapper {
+  margin-top: 20px;
+  width: 100%;
+  > .el-button {
+    width: 100%;
+  }
 }
 </style>
