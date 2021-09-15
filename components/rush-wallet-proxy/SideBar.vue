@@ -7,9 +7,9 @@
     </div>
     <div class="sidebar__body">
       <div class="proxy-wallet">
-        <wallet-overview :proxy-address="proxyAddress" @openProxyAddressDialog="openProxyAddressDialog"/>
+        <wallet-overview v-if="proxyAddress" :proxy-address="proxyAddress" @openProxyAddressDialog="openProxyAddressDialog"/>
       </div>
-      <!-- <el-menu
+      <el-menu
         :router="true"
         :default-active="defaultActive"
         background-color="#000000"
@@ -22,43 +22,11 @@
           <i class="rush-icon-home"></i>
           <strong slot="title">Home</strong>
         </el-menu-item>
-        <el-menu-item index="/portfolio">
+        <el-menu-item index="/rush-wallet-proxy/open">
           <i class="rush-icon-portfolio"></i>
-          <strong slot="title">Portfolio</strong>
-        </el-menu-item>
-        <el-menu-item index="/deposit">
-          <i class="rush-icon-deposit"></i>
-          <strong slot="title">Deposit</strong>
-        </el-menu-item>
-        <el-menu-item index="/borrow">
-          <i class="rush-icon-borrow"></i>
-          <strong slot="title">Borrow</strong>
-        </el-menu-item>
-        <el-menu-item index="/collateral-swap">
-          <i class="rush-icon-collateral-swap"></i>
-          <strong slot="title">Collateral Swap</strong>
-        </el-menu-item>
-        <el-menu-item index="/debt-swap">
-          <i class="rush-icon-debt-swap"></i>
-          <strong slot="title">Debt Swap</strong>
-        </el-menu-item>
-        <el-menu-item index="/refinance">
-          <i class="rush-icon-refinance"></i>
-          <strong slot="title">Refinance</strong>
-        </el-menu-item>
-        <el-menu-item index="/settings">
-          <i class="rush-icon-settings"></i>
-          <strong slot="title">Settings</strong>
+          <strong slot="title">Open Wallet</strong>
         </el-menu-item>
       </el-menu>
-      <div class="social-icons">
-        <div class="social-icon">
-          <i class="rush-icon-telegram"></i>
-        </div>
-        <div class="social-icon">
-          <i class="rush-icon-twitter"></i>
-        </div>
-      </div> -->
     </div>
 
     <!-- receive dialog -->
@@ -119,11 +87,7 @@ export default {
     },
     defaultActive() {
       const fullPath = this.$route.fullPath
-      if (/\/portfolio\/\w+/.test(fullPath)) {
-        return '/portfolio'
-      } else {
-        return fullPath
-      }
+      return fullPath
     },
   },
   created() {
