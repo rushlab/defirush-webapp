@@ -11,7 +11,6 @@
         <nuxt />
         <el-backtop target=".el-main.app__main"></el-backtop>
       </el-main>
-      <!-- <el-footer>Footer</el-footer> -->
     </el-container>
   </el-container>
 </template>

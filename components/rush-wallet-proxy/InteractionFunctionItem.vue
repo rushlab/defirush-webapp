@@ -119,7 +119,6 @@ export default {
       if (!!payableAmount) {
         result.value = payableAmount
       }
-      console.log('@@@ _getSendTransactionPayload', payableAmount, txOptions, result)
       return result
     },
     async execFunction() {

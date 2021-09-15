@@ -6,7 +6,7 @@
           <el-input v-model="contractAddress" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="Contract ABI">
-          <el-input v-model="contractABI" type="textarea" :rows="6" @blur="printABI"></el-input>
+          <el-input v-model="contractABI" type="textarea" :rows="6"></el-input>
         </el-form-item>
       </el-form>
     </div>
@@ -47,15 +47,12 @@ export default {
       return this.$route.params.proxyAddress
     },
     contractInstance() {
-      console.log(this.contractAddress)
       if (!this.contractAddress) return null
       let instance = null
-      console.log(222)
       try {
         const abi = JSON.parse(this.contractABI.replace(/[\n|\s+]/g, ' '))
         console.log(abi)
         instance = new ethers.Contract(this.contractAddress, abi, this.$wallet.getSigner())
-        console.log(12345, instance)
       } catch (error) {
         console.log(error)
       }
@@ -66,13 +63,7 @@ export default {
     },
     contractFunctions() {
       const res = this.contractInterface ? this.contractInterface.functions : []
-      console.log(res)
       return res
-    }
-  },
-  methods: {
-    printABI() {
-      console.log(this.parsedABI)
     }
   },
 }
