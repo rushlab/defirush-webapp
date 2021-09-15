@@ -291,7 +291,7 @@ export default {
           gasToken, // gasToken,
           refundReceiver, // refundReceiver,
           signatures, // signatures,
-        ).then(tx => tx.wait())
+        ).then(this.$wallet.waitForTx)
         this.resetDialogSend()
         this.fetchTableData()
       } catch (error) {
