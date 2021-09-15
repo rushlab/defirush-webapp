@@ -9,6 +9,7 @@
       </el-header>
       <el-main class="app__main" v-if="$store.state._appRefreshTimestamp >= 0">
         <nuxt />
+        <el-backtop target=".el-main.app__main"></el-backtop>
       </el-main>
       <!-- <el-footer>Footer</el-footer> -->
     </el-container>
