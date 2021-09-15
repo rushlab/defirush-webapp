@@ -1,6 +1,6 @@
 <template>
-  <div class="overview">
-    <nuxt-link class="address" :to="`/rush-wallet-proxy/proxies/${proxyAddress}`">{{ maskedWalletAddress }}</nuxt-link>
+  <div class="overview" v-loading="pending">
+    <nuxt-link class="address" :to="`/rush-wallet-proxy/proxies/${proxyAddress}`">{{ maskedWalletAddress }} <i class="el-icon-right"></i></nuxt-link>
     <div class="actions">
       <div class="action-item" @click="$emit('openProxyAddressDialog')">
         <i class="el-icon-film"></i>
@@ -126,7 +126,10 @@ export default {
       }
     },
     updateProxyWalletBalance() {
+      if (this.pending) return
+      this.pending = true
       this.totalBalanceInUSD = 0
+      let counter = 0
       if (!this.proxyAddress) {
         return
       }
@@ -136,8 +139,16 @@ export default {
           this.getAssetPriceUSD(token.address)
         ]).then(([balance, priceUSD]) => {
           this.totalBalanceInUSD += (+balance || 0) * (+priceUSD || 0)
+          counter += 1
+          if (counter === this.walletTokens.length) {
+            this.pending = false
+          }
         }).catch(err => {
           console.log(err)
+          counter += 1
+          if (counter === this.walletTokens.length) {
+            this.pending = false
+          }
         })
       })
     }

@@ -7,7 +7,7 @@
     </div>
     <div class="sidebar__body">
       <div class="proxy-wallet">
-        <wallet-overview v-if="proxyAddress" :proxy-address="proxyAddress" @openProxyAddressDialog="openProxyAddressDialog"/>
+        <wallet-overview v-if="proxyAddress && $wallet" :proxy-address="proxyAddress" @openProxyAddressDialog="openProxyAddressDialog"/>
       </div>
       <el-menu
         :router="true"
