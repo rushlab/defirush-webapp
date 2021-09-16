@@ -48,8 +48,8 @@ export default {
     async createProxy() {
       try {
         this.pending = true
-        const _factoryAddress = '0x72ed6e892932c90cDF3c2FDC436d06db4aF23EEC'
-        const _singletonAddress = '0x9A7848b9E60C7619f162880c7CA5Cbca80998034'  // TODO 合约钱包临时的合约地址
+        const _factoryAddress = '0x9A7848b9E60C7619f162880c7CA5Cbca80998034'
+        const _singletonAddress = '0x72ed6e892932c90cDF3c2FDC436d06db4aF23EEC'
         const signer = this.$wallet.getSigner()
         const rushWalletInterface = new ethers.utils.Interface([
           'function setup(address[] calldata _owners, uint256 _threshold, address to, bytes calldata data, address fallbackHandler, address paymentToken, uint256 payment, address payable paymentReceiver)'
