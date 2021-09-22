@@ -1,6 +1,9 @@
 <template>
   <div class="page">
-    <el-form label-width="80px">
+    <el-form label-width="150px">
+      <el-form-item label="Contract Address">
+        <el-input v-model="contractAddress"></el-input>
+      </el-form-item>
       <el-form-item label="tokenID">
         <el-input v-model="tokenID"></el-input>
       </el-form-item>
@@ -29,11 +32,10 @@
 <script>
 import { ethers } from 'ethers'
 
-const ContractAddress = '0xC92B72ecf468D2642992b195bea99F9B9BB4A838'
-
 export default {
   data() {
     return {
+      contractAddress: '0xC92B72ecf468D2642992b195bea99F9B9BB4A838',
       pending: false,
       tokenID: '',
       tokenURI: '',
@@ -66,14 +68,14 @@ export default {
     },
     async mintCaptain(tokenID) {
       const signer = this.$wallet.getSigner()
-      const avatar = new ethers.Contract(ContractAddress, [
+      const avatar = new ethers.Contract(this.contractAddress, [
         'function mintCaptain(uint256 tokenId) payable'
       ], signer)
       await avatar.mintCaptain(tokenID).then(tx => tx.wait())
     },
     async fetchTokenURI(tokenID) {
       const provider = this.$wallet.getProvider()
-      const avatar = new ethers.Contract(ContractAddress, [
+      const avatar = new ethers.Contract(this.contractAddress, [
         'function tokenURI(uint256 tokenId) view returns (string)'
       ], provider)
       this.tokenURI = await avatar.tokenURI(tokenID)

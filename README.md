@@ -1,3 +1,10 @@
+# TODO
+
+wallet connect 中间断掉了直接弹出扫码的时候重新连接, 连上了以后需要恢复 signer, 最好是刷新一下
+
+加一个 reconnect 按钮，然后直接调用 enable
+
+
 # Aggregation bank front
 
 ## Vue component 中的 $wallet 对象
