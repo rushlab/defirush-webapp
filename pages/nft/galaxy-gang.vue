@@ -16,6 +16,10 @@
           type="danger" @click="handleMint"
           :disabled="pending" :loading="pending"
         >Mint</el-button>
+        <el-button
+          type="danger" @click="handleTransfer"
+          :disabled="pending" :loading="pending"
+        >Transfer</el-button>
       </el-form-item>
     </el-form>
     <!-- <img :src="imageSrc"></img> -->
@@ -35,7 +39,7 @@ import { ethers } from 'ethers'
 export default {
   data() {
     return {
-      contractAddress: '0xC92B72ecf468D2642992b195bea99F9B9BB4A838',
+      contractAddress: this.$route.query.contract || '0xC92B72ecf468D2642992b195bea99F9B9BB4A838',
       pending: false,
       tokenID: '',
       tokenURI: '',
@@ -71,7 +75,7 @@ export default {
       const avatar = new ethers.Contract(this.contractAddress, [
         'function mintCaptain(uint256 tokenId) payable'
       ], signer)
-      await avatar.mintCaptain(tokenID).then(tx => tx.wait())
+      await avatar.mintCaptain(tokenID).then(this.$wallet.waitForTx)
     },
     async fetchTokenURI(tokenID) {
       const provider = this.$wallet.getProvider()
@@ -96,6 +100,20 @@ export default {
       const raw = imageSrc.substr(26)
       const svg = atob(raw)
       return svg
+    },
+    async handleTransfer() {
+      let toAddress = ''
+      try {
+        const res = await this.$prompt('请输入目标地址', '提示', {})
+        toAddress = res.value
+      } catch(error) {
+        return
+      }
+      const signer = this.$wallet.getSigner()
+      const avatar = new ethers.Contract(this.contractAddress, [
+        'function transferFrom(address from, address to, uint256 tokenId)'
+      ], signer)
+      await avatar.transferFrom(this.$wallet.getAddress(), toAddress, this.tokenID).then(this.$wallet.waitForTx)
     }
   }
 }
