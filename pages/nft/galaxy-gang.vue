@@ -24,6 +24,7 @@
     </el-form>
     <!-- <img :src="imageSrc"></img> -->
     <div v-if="svg" v-html="svg" class="svg-wrapper"></div>
+    <h2>Transfer Count <small>{{ transferCount }}</small></h2>
     <h2>Name <small>{{ tokenData.name }}</small></h2>
     <h2>Description <small>{{ tokenData.description }}</small></h2>
     <h2>Image <small>data:image/svg+xml;base64</small></h2>
@@ -45,6 +46,7 @@ export default {
       tokenURI: '',
       tokenData: {},
       svg: '',
+      transferCount: 0,
     }
   },
   mounted() {
@@ -65,6 +67,7 @@ export default {
       this.pending = true
       try {
         await this.fetchTokenURI(this.tokenID)
+        await this.fetchTransferCount(this.tokenID)
       } catch(err) {
         console.log(err)
       }
@@ -85,6 +88,13 @@ export default {
       this.tokenURI = await avatar.tokenURI(tokenID)
       this.tokenData = this.parseToken(this.tokenURI)
       this.svg = this.parseSVG(this.tokenData.image)
+    },
+    async fetchTransferCount(tokenID) {
+      const provider = this.$wallet.getProvider()
+      const avatar = new ethers.Contract(this.contractAddress, [
+        'function transfer_count(uint256 tokenID) view returns (uint256)'
+      ], provider)
+      this.transferCount = +(await avatar.transfer_count(tokenID))
     },
     parseToken(tokenURI) {
       if (!/^data:application\/json;base64,/.test(tokenURI)) {
