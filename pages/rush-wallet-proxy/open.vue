@@ -70,7 +70,8 @@ export default {
           'event ProxyCreation(address proxy, address singleton)',
           'function createProxyWithNonce(address _singleton, bytes memory initializer, uint256 saltNonce) returns (address proxy)'
         ], signer)
-        const saltNonce = '1';
+        // const saltNonce = '1';
+        const saltNonce = (new Date()).valueOf().toString()
         const result = await factory.createProxyWithNonce(
           _singletonAddress, initializer, saltNonce
         ).then((tx) => tx.wait())
