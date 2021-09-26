@@ -130,9 +130,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.page {
-  //
-}
+
 .svg-wrapper {
   width: 400px;
   height: 400px;
