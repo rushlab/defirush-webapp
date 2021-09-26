@@ -11,6 +11,17 @@
         "rpcURL": "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
     },
     {
+        "coingeckoId": "",
+        "chainId": 4,
+        "name": "Rinkeby Test Network",
+        "currencySymbol": "ETH",
+        "wrappedCurrency": {
+          "coingeckoId": "",
+          "symbol": "WETH"
+        },
+        "rpcURL": "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
+    },
+    {
         "coingeckoId": "binance-smart-chain",
         "chainId": 56,
         "name": "Binance Smart Chain",
