@@ -57,7 +57,7 @@ export default {
     async handleMint() {
       this.pending = true
       try {
-        await this.mintCaptain(this.tokenID)
+        await this.mintGhost(this.tokenID)
       } catch(err) {
         console.log(err)
       }
@@ -73,12 +73,12 @@ export default {
       }
       this.pending = false
     },
-    async mintCaptain(tokenID) {
+    async mintGhost(tokenID) {
       const signer = this.$wallet.getSigner()
       const avatar = new ethers.Contract(this.contractAddress, [
-        'function mintCaptain(uint256 tokenId) payable'
+        'function mintGhost(uint256 tokenId) payable'
       ], signer)
-      await avatar.mintCaptain(tokenID).then(this.$wallet.waitForTx)
+      await avatar.mintGhost(tokenID).then(this.$wallet.waitForTx)
     },
     async fetchTokenURI(tokenID) {
       const provider = this.$wallet.getProvider()
