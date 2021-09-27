@@ -25,6 +25,16 @@
 import { ethers } from 'ethers'
 import { mapState } from 'vuex'
 
+const proxyContractAddresses = {
+  '31337': {
+    factoryAddress: '0x9A7848b9E60C7619f162880c7CA5Cbca80998034',
+    singletonAddress: '0x72ed6e892932c90cDF3c2FDC436d06db4aF23EEC'
+  },
+  '4': {
+    factoryAddress: '0xD335BB310b4D4585561a9A5D50D5700FcA3cc960',
+    singletonAddress: '0x4002107488bFA0376890d0edbC52806572007272'
+  }
+}
 export default {
   layout: 'rushwallet',
   data() {
@@ -33,7 +43,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('auth', ['walletAddress', 'isAuthenticated', 'signerProtocol']),
+    ...mapState('auth', ['chainId', 'walletAddress', 'isAuthenticated', 'signerProtocol']),
   },
   methods: {
     handleClickSubmit() {
@@ -48,8 +58,9 @@ export default {
     async createProxy() {
       try {
         this.pending = true
-        const _factoryAddress = '0x9A7848b9E60C7619f162880c7CA5Cbca80998034'
-        const _singletonAddress = '0x72ed6e892932c90cDF3c2FDC436d06db4aF23EEC'
+        const { factoryAddress, singletonAddress } = proxyContractAddresses[this.chainId] || {}
+        const _factoryAddress = factoryAddress
+        const _singletonAddress = singletonAddress
         const signer = this.$wallet.getSigner()
         const rushWalletInterface = new ethers.utils.Interface([
           'function setup(address[] calldata _owners, uint256 _threshold, address to, bytes calldata data, address fallbackHandler, address paymentToken, uint256 payment, address payable paymentReceiver)'
