@@ -39,6 +39,15 @@ const chains = [{
   rpcUrl: 'https://http-mainnet-node.huobichain.com',
   icon: require('~/assets/icons/chains/icon-heco.svg'),
 }, {
+  chainId: 4,
+  chainName: 'Rinkeby Test Network',
+  nativeCurrency: {
+    name: 'Ethereum',
+    symbol: 'ETH',
+    decimals: 18
+  },
+  rpcUrl: 'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+}, {
   forking: true,
   chainId: 71337,
   chainName: 'hardhat-dev.defirush.io',
