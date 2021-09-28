@@ -47,9 +47,9 @@ export default {
   },
   methods: {
     handleClickSubmit() {
-      this.$confirm('您正在为当前链接的钱包账户创建合约钱包账户，确定继续吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+      this.$confirm('You are creating an contract wallet of Rush, click OK to continue', 'Notice', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
         type: 'warning'
       }).then(() => {
         this.createProxy()

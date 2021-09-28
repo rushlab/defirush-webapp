@@ -105,9 +105,9 @@ export default {
     },
     async connectMetaMask() {
       if (!(typeof global.ethereum !== 'undefined' && global.ethereum.isMetaMask)) {
-        this.$confirm('请先安装 MetaMask 扩展应用', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm('Please install MetaMask extension', 'Notice', {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
           type: 'warning'
         }).then(() => {
           window.open('https://metamask.io/download.html')
@@ -145,9 +145,9 @@ export default {
     },
     async connectRushWallet() {
       if (!(typeof global.rush !== 'undefined' && global.rush.isLiquality)) {
-        this.$confirm('请先安装 RushWallet 扩展应用', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm('Please install RushWallet extension', 'Notice', {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
           type: 'warning'
         }).then(() => {
           window.open('https://defirush.io/')
