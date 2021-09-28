@@ -144,7 +144,7 @@ export default {
       this.pending = false
     },
     async connectRushWallet() {
-      if (!(typeof global.rush !== 'undefined' && global.rush.isLiquality)) {
+      if (!(typeof global.rush !== 'undefined' && global.rush.isRushWallet)) {
         this.$confirm('Please install RushWallet extension', 'Notice', {
           confirmButtonText: 'OK',
           cancelButtonText: 'Cancel',
