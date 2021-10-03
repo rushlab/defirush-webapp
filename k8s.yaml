@@ -1,0 +1,100 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: defirush
+  name: aggregation-bank-front
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app-aggregation-bank-front
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: app-aggregation-bank-front
+    spec:
+      containers:
+      - image: '160196943889.dkr.ecr.us-west-1.amazonaws.com/aggregation-bank-front:latest'
+        imagePullPolicy: Always
+        name: app-aggregation-bank-front
+        ports:
+        - containerPort: 3000
+        env:
+        - name: HOST
+          value: '0.0.0.0'
+        - name: PORT
+          value: '3000'
+        - name: ADMIN_JWT_SECRET
+          value: ''
+        - name: DEFI_PULSE_API_KEY
+          value: ''
+        - name: ETHERSCAN_API_KEY
+          value: ''
+        - name: LEANCLOUD_APPID
+          value: ''
+        - name: LEANCLOUD_APPKEY
+          value: ''
+        - name: TELEGRAM_BOT_TOKEN
+          value: ''
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: defirush
+  name: telegram-bot
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app-telegram-bot
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: app-telegram-bot
+    spec:
+      containers:
+      - image: '160196943889.dkr.ecr.us-west-1.amazonaws.com/aggregation-bank-front:latest'
+        imagePullPolicy: Always
+        name: app-telegram-bot
+        env:
+        - name: TELEGRAM_BOT
+          value: '1'
+        - name: LEANCLOUD_APPID
+          value: ''
+        - name: LEANCLOUD_APPKEY
+          value: ''
+        - name: TELEGRAM_BOT_TOKEN
+          value: ''
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: defirush
+  name: service-aggregation-bank-front
+spec:
+  ports:
+  - port: 3000
+    targetPort: 3000
+    protocol: TCP
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: app-aggregation-bank-front
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  namespace: defirush
+  name: ingress-aggregation-bank-front
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /*
+            backend:
+              serviceName: service-aggregation-bank-front
+              servicePort: 3000
