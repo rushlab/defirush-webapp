@@ -40,7 +40,7 @@ import { ethers } from 'ethers'
 export default {
   data() {
     return {
-      contractAddress: this.$route.query.contract || '0xC92B72ecf468D2642992b195bea99F9B9BB4A838',
+      contractAddress: this.$route.query.contract || '0x37dD26d18abeC2d311e82177f9fa58E9DC14b579',
       pending: false,
       tokenID: '',
       tokenURI: '',
@@ -76,9 +76,9 @@ export default {
     async mintGhost(tokenID) {
       const signer = this.$wallet.getSigner()
       const avatar = new ethers.Contract(this.contractAddress, [
-        'function mintGhost(uint256 tokenId) payable'
+        'function mintGhost(uint256 numberOfTokens) payable'
       ], signer)
-      await avatar.mintGhost(tokenID).then(this.$wallet.waitForTx)
+      await avatar.mintGhost(1, {value: ethers.utils.parseEther("0.7")}).then(this.$wallet.waitForTx)
     },
     async fetchTokenURI(tokenID) {
       const provider = this.$wallet.getProvider()
