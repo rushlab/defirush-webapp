@@ -1,3 +1,4 @@
+const { ethers } = require('ethers')
 import { Telegraf, Context, Markup, session, deunionize } from 'telegraf'
 import { LeanCloudStorage } from '../leancloud'
 
@@ -16,6 +17,8 @@ export const bot = new Telegraf<SessionContext>(TELEGRAM_BOT_TOKEN)
 bot.use(session())
 
 export async function sendMessageToAccount(chainId: number, address: string, message: string) {
+  // 首先 force Checksum address, 很重要, 因为数据库里存的一定是 checksum address (见 utils/auth.js)
+  address = ethers.utils.getAddress(address)
   const query = new LeanCloudStorage.Query('UserProfile')
   query.equalTo('walletChainId', chainId)
   query.equalTo('walletAddress', address)

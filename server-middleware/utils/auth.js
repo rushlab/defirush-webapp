@@ -2,6 +2,8 @@ const { ethers } = require('ethers')
 const { LeanCloudStorage } = require('../leancloud')
 
 const getOrCreateUserProfile = async (walletChainId, walletAddress) => {
+  // 首先 force Checksum address, 很重要, 因为数据库里 (chainid, address) 要保持大小写不敏感的唯一
+  walletAddress = ethers.utils.getAddress(walletAddress)
   const telegramKey = 'T' + ethers.utils.id(`${(new Date().valueOf())}${walletAddress}`).substr(2, 16).toUpperCase()
   let profile
   try {
