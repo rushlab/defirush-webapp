@@ -78,7 +78,7 @@ export default {
       const avatar = new ethers.Contract(this.contractAddress, [
         'function mintGhost(uint256 numberOfTokens) payable'
       ], signer)
-      await avatar.mintGhost(1, {value: ethers.utils.parseEther("0.7")}).then(this.$wallet.waitForTx)
+      await avatar.mintGhost(1, {value: ethers.utils.parseEther("0.07")}).then(this.$wallet.waitForTx)
     },
     async fetchTokenURI(tokenID) {
       const provider = this.$wallet.getProvider()
