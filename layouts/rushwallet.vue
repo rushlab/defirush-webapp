@@ -1,7 +1,7 @@
 <template>
   <el-container class="app" v-loading="$store.state._appRefreshTimestamp < 0">
-    <el-aside class="app__aside" :width="!!isCollasped ? '64px' : '240px'">
-      <sidebar :isCollasped.sync="isCollasped"/>
+    <el-aside class="app__aside" :width="!!isCollapsed ? '64px' : '240px'">
+      <sidebar :isCollapsed.sync="isCollapsed"/>
     </el-aside>
     <el-container style="height: 100vh; overflow: auto;">
       <el-header class="app__header" height="75px">
@@ -25,7 +25,7 @@ export default {
   },
   data() {
     return {
-      isCollasped: false
+      isCollapsed: false
     }
   },
 }

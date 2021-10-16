@@ -1,8 +1,8 @@
 <template>
-  <div class="rush-wallet-proxy-sidebar-wrapper" :class="{'collasped': isCollasped}">
+  <div class="rush-wallet-proxy-sidebar-wrapper" :class="{'collapsed': isCollapsed}">
     <div class="sidebar__header">
       <div class="sidebar__logo"></div>
-      <div class="sidebar__toggle" @click="toggleCollasped">
+      <div class="sidebar__toggle" @click="toggleCollapsed">
       </div>
     </div>
     <div class="sidebar__body">
@@ -15,7 +15,7 @@
         background-color="#000000"
         text-color="#ffffff"
         active-text-color="#ffffff"
-        :collapse="isCollasped"
+        :collapse="isCollapsed"
         :collapse-transition="false"
       >
         <el-menu-item @click="goToHome">
@@ -65,7 +65,7 @@ import WalletOverview from './WalletOverview'
 export default {
   name: 'Sidebar',
   props: {
-    isCollasped: {
+    isCollapsed: {
       type: Boolean,
       default: false
     }
@@ -104,8 +104,8 @@ export default {
     openProxyAddressDialog() {
       this.isVisible = true
     },
-    toggleCollasped() {
-      this.$emit('update:isCollasped', !this.isCollasped)
+    toggleCollapsed() {
+      this.$emit('update:isCollapsed', !this.isCollapsed)
     },
     goToHome() {
       window.open('https://www.defirush.io')
@@ -185,7 +185,7 @@ export default {
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  background-image: url('~assets/icons/icon-collaspe.png');
+  background-image: url('~assets/icons/icon-collapse.png');
 }
 .sidebar__body {
   padding: 20px;
@@ -256,7 +256,7 @@ export default {
     }
   }
 }
-.collasped {
+.collapsed {
   .sidebar__logo,
   .sidebar__footer,
   .social-icons {

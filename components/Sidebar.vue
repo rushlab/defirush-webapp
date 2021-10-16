@@ -1,10 +1,10 @@
 <template>
   <!-- background-color="#ffffff" text-color="#2c3e50" active-text-color="#d35400" -->
-  <div class="sidebar-wrapper" :class="{'collasped': isCollasped}">
+  <div class="sidebar-wrapper" :class="{'collapsed': isCollapsed}">
     <div class="sidebar__header">
       <div class="sidebar__logo"></div>
-      <div class="sidebar__toggle" @click="toggleCollasped">
-        <!-- <i v-if="!isCollasped" class="el-icon-s-fold"></i>
+      <div class="sidebar__toggle" @click="toggleCollapsed">
+        <!-- <i v-if="!isCollapsed" class="el-icon-s-fold"></i>
         <i v-else class="el-icon-s-unfold"></i> -->
       </div>
     </div>
@@ -15,7 +15,7 @@
         background-color="#000000"
         text-color="#ffffff"
         active-text-color="#ffffff"
-        :collapse="isCollasped"
+        :collapse="isCollapsed"
         :collapse-transition="false"
       >
         <el-menu-item @click="goToHome">
@@ -77,7 +77,7 @@ import { chains } from '@/utils/chains'
 export default {
   name: 'Sidebar',
   props: {
-    isCollasped: {
+    isCollapsed: {
       type: Boolean,
       default: false
     }
@@ -103,8 +103,8 @@ export default {
     }
   },
   methods: {
-    toggleCollasped() {
-      this.$emit('update:isCollasped', !this.isCollasped)
+    toggleCollapsed() {
+      this.$emit('update:isCollapsed', !this.isCollapsed)
     },
     goToHome() {
       window.open('https://www.defirush.io')
@@ -184,7 +184,7 @@ export default {
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  background-image: url('~assets/icons/icon-collaspe.png');
+  background-image: url('~assets/icons/icon-collapse.png');
 }
 .sidebar__body {
   padding: 20px;
@@ -255,7 +255,7 @@ export default {
     }
   }
 }
-.collasped {
+.collapsed {
   .sidebar__logo,
   .sidebar__footer,
   .social-icons {
