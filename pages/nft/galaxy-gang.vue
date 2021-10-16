@@ -22,6 +22,29 @@
         >Transfer</el-button>
       </el-form-item>
     </el-form>
+
+    <el-form label-width="150px">
+      <el-form-item label="Base" type="textarea" autosize>
+        <el-input v-model="contractAddress"></el-input>
+      </el-form-item>
+      <el-form-item label="Hair" type="textarea" autosize>
+        <el-input v-model="tokenID"></el-input>
+      </el-form-item>
+      <el-form-item label="Eyes" type="textarea" autosize>
+        <el-input v-model="tokenID"></el-input>
+      </el-form-item>
+      <el-form-item label="Mouth" type="textarea" autosize>
+        <el-input v-model="tokenID"></el-input>
+      </el-form-item>
+      <el-form-item label="">
+        <el-button
+          type="dark" @click="handleRender"
+          :disabled="pending" :loading="pending"
+        >Upload</el-button>
+      </el-form-item>
+    </el-form>
+
+
     <!-- <img :src="imageSrc"></img> -->
     <div v-if="svg" v-html="svg" class="svg-wrapper"></div>
     <h2>Transfer Count <small>{{ transferCount }}</small></h2>
