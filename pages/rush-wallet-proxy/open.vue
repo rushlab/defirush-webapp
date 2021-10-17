@@ -3,10 +3,25 @@
     <el-card shadow="naver">
       <el-form label-position="top" style="max-width: 800px;">
         <el-form-item label="Owner Address">
-          <el-input :value="walletAddress" readonly></el-input>
+          <div class="owner-item">
+            <el-input :value="walletAddress" readonly></el-input>
+          </div>
+          <div 
+            class="owner-item"
+            v-for="(ownerItem, index) in otherOwners"
+            :key="`owner-item-${index}`"
+          >
+            <el-input v-model="ownerItem.address"></el-input>
+            <el-button class="btn--remove-owner" type="danger" size="small" circle plain @click="() => removeOwner(index)">
+              <i class="el-icon-delete"></i>
+            </el-button>
+          </div>
+          <div class="text-center">
+            <el-button type="text" @click="addOwner">Add Owner</el-button>
+          </div>
         </el-form-item>
         <el-form-item label="Any transaction requires the confirmation of">
-          <el-input-number :value="1" readonly disabled></el-input-number>
+          <el-input-number v-model="threshold" :min="1" :max="validOwnersLength" :step="1" step-strictly></el-input-number> out of {{ validOwnersLength }} owner(s)
         </el-form-item>
         <el-form-item>
           <p class="hint-text">You're about to create a new Proxy Wallet and will have to confirm a transaction with your currently connected wallet. </p>
@@ -40,12 +55,43 @@ export default {
   data() {
     return {
       pending: false,
+      otherOwners: [],
+      threshold: 1,
     }
   },
   computed: {
     ...mapState('auth', ['chainId', 'walletAddress', 'isAuthenticated', 'signerProtocol']),
+    validOtherOwners() {
+      return this.otherOwners.filter(owner => !!owner.address)
+    },
+    validOtherOwnerAddresses() {
+      return this.validOtherOwners.map(owner => owner.address)
+    },
+    validOwnersLength() {
+      return this.validOtherOwners.length + 1
+    }
+  },
+  watch: {
+    otherOwners: {
+      handler(val) {
+        const thresholdMax = this.validOwnersLength
+        if (this.threshold > thresholdMax) {
+          this.threshold = thresholdMax
+        }
+      },
+      deep: true
+    }
   },
   methods: {
+    inputOwnerAddress(index, address) {
+      this.$set(this.otherOwners, index, { address })
+    },
+    addOwner() {
+      this.$set(this.otherOwners, this.otherOwners.length, { address: '' })
+    },
+    removeOwner(index) {
+      this.otherOwners.splice(index, 1)
+    },
     handleClickSubmit() {
       this.$confirm('You are creating an contract wallet of Rush, click OK to continue', 'Notice', {
         confirmButtonText: 'OK',
@@ -66,8 +112,8 @@ export default {
           'function setup(address[] calldata _owners, uint256 _threshold, address to, bytes calldata data, address fallbackHandler, address paymentToken, uint256 payment, address payable paymentReceiver)'
         ]);
         const initializerParams = [
-          [this.$wallet.getAddress()],  // _owners
-          ethers.BigNumber.from('1'),  // _threshold
+          [this.$wallet.getAddress(), ...this.validOtherOwnerAddresses],  // _owners
+          ethers.BigNumber.from(this.threshold.toString()),  // _threshold
           '0x0000000000000000000000000000000000000000',  // to
           '0x',  // data
           '0x0000000000000000000000000000000000000000',  // fallbackHandler
@@ -104,5 +150,16 @@ export default {
   line-height: 22px;
   opacity: 0.8;
   font-weight: 200;
+}
+.owner-item {
+  position: relative;
+  margin-bottom: 10px;
+  padding-right: 40px;
+}
+.btn--remove-owner {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
 }
 </style>
