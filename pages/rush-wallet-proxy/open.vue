@@ -27,8 +27,8 @@ import { mapState } from 'vuex'
 
 const proxyContractAddresses = {
   '31337': {
-    factoryAddress: '0x9A7848b9E60C7619f162880c7CA5Cbca80998034',
-    singletonAddress: '0x72ed6e892932c90cDF3c2FDC436d06db4aF23EEC'
+    factoryAddress: '0x322619fcCcc741880ee7071cBE4e877Fb919eCf8',
+    singletonAddress: '0x62DB6c1678Ca81ea0d946EA3dd75b4F71421A2aE'
   },
   '4': {
     factoryAddress: '0xD335BB310b4D4585561a9A5D50D5700FcA3cc960',
