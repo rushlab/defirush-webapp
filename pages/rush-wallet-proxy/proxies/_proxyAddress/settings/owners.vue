@@ -119,7 +119,6 @@ export default {
       ]
       const signer = this.$wallet.getSigner()
       this.proxyInstance = new ethers.Contract(this.proxyAddress, abi, signer)
-      console.log('--- this.proxyInstance', this.proxyInstance)
     },
     async getOwners() {
       this.ownersTable.pending = true
@@ -157,7 +156,6 @@ export default {
     },
     replaceOwner(ownerItem) {
       const { address } = ownerItem
-      console.log(ownerItem)
       if (!address) return
       this.selectedOwnerAddress = address
       this.replaceOwnerDialogVisible = true
@@ -165,7 +163,9 @@ export default {
     onReplaceOwnerSuccess() {
 
     },
-    onAddOwnerSuccess() {}
+    onAddOwnerSuccess() {
+      this.getOwners()
+    }
   },
 }
 </script>

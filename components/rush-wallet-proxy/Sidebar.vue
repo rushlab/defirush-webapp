@@ -26,6 +26,10 @@
           <i class="rush-icon-portfolio"></i>
           <strong slot="title">Open Wallet</strong>
         </el-menu-item>
+        <el-menu-item :index="`/rush-wallet-proxy/proxies/${$route.params.proxyAddress}/settings/owners`">
+          <i class="rush-icon-portfolio"></i>
+          <strong slot="title">Owners</strong>
+        </el-menu-item>
       </el-menu>
     </div>
 
