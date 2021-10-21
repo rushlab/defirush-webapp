@@ -29,18 +29,18 @@
           <!-- <el-tooltip effect="dark" content="Edit owner" placement="top">
             <a class="row-action" href="javascript: void(0);" @click="() => editOwner(row)"><i class="el-icon-edit" ></i></a>
           </el-tooltip> -->
-          <!-- <template slot-scope="{ row }">
-            <el-tooltip effect="dark" content="Replace owner" placement="top">
+          <template slot-scope="{ row }">
+            <!-- <el-tooltip effect="dark" content="Replace owner" placement="top">
               <el-button type="text" class="row-action" :disabled="!proxyInstance" @click="() => replaceOwner(row)">
                 <i class="el-icon-refresh"></i>
               </el-button>
-            </el-tooltip>
+            </el-tooltip> -->
             <el-tooltip effect="dark" content="Remove owner" placement="top">
-              <el-button type="text" class="row-action" :disabled="!!proxyInstance" @click="() => removeOwner(row)">
+              <el-button type="text" class="row-action" :disabled="!proxyInstance" @click="() => removeOwner(row)">
                 <i class="el-icon-delete"></i>
               </el-button>
             </el-tooltip>
-          </template> -->
+          </template>
         </el-table-column>
       </el-table>
     </el-card>
@@ -51,6 +51,15 @@
       :proxy-address="proxyAddress"
       @success="onAddOwnerSuccess"
     />
+    <remove-owner-dialog 
+      v-if="removeOwnerDialogVisible"
+      :visible.sync="removeOwnerDialogVisible"
+      :proxy-instance="proxyInstance"
+      :owners="ownersTable.data"
+      :owner-address="selectedOwnerAddress"
+      @success="onRemoveOwnerSuccess"
+    />
+
     <!-- <replace-owner-dialog 
       v-if="replaceOwnerDialogVisible"
       :visible.sync="replaceOwnerDialogVisible"
@@ -68,12 +77,15 @@ import { mapState } from 'vuex'
 import { copyToClipboard } from '@/utils/copy'
 // import ReplaceOwnerDialog from '@/components/rush-wallet-proxy/dialogs/ReplaceOwnerDialog'
 import AddOwnerDialog from '@/components/rush-wallet-proxy/dialogs/AddOwnerDialog'
+import RemoveOwnerDialog from '@/components/rush-wallet-proxy/dialogs/RemoveOwnerDialog'
+
 
 export default {
   layout: 'rushwallet',
   components: {
     // ReplaceOwnerDialog,
     AddOwnerDialog,
+    RemoveOwnerDialog,
   },
   head() {
     return {
@@ -93,7 +105,9 @@ export default {
       selectedOwnerAddress: null,
 
       addOwnerDialogVisible: false,
+
       replaceOwnerDialogVisible: false,
+
       removeOwnerDialogVisible: false,
     }
   },
@@ -161,9 +175,13 @@ export default {
       this.replaceOwnerDialogVisible = true
     },
     onReplaceOwnerSuccess() {
-
+      
     },
     onAddOwnerSuccess() {
+      this.getOwners()
+    },
+    onRemoveOwnerSuccess() {
+      this.selectedOwnerAddress = null
       this.getOwners()
     }
   },
