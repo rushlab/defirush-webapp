@@ -150,7 +150,7 @@ export default {
         const gasToken = '0x0000000000000000000000000000000000000000'
         const refundReceiver = '0x0000000000000000000000000000000000000000'
         const signatures = await this._signPreValidated()  // ethers.utils.arrayify('0x')
-        const res = await userProxy.execTransaction(
+        await userProxy.execTransaction(
           to, // to,
           value, // value,
           data, // data,
@@ -162,7 +162,6 @@ export default {
           refundReceiver, // refundReceiver,
           signatures, // signatures,
         ).then(this.$wallet.waitForTx)
-        console.log('@@@ execTransaction.res', res)
       } catch (error) {
         this.$message.error(error.message || error.toString())
       }
