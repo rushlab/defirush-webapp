@@ -36,7 +36,7 @@
               </el-button>
             </el-tooltip> -->
             <el-tooltip effect="dark" content="Remove owner" placement="top">
-              <el-button type="text" class="row-action" :disabled="!proxyInstance" @click="() => removeOwner(row)">
+              <el-button type="text" class="row-action" :disabled="!proxyInstance || ownersLength <= 1" @click="() => removeOwner(row)">
                 <i class="el-icon-delete"></i>
               </el-button>
             </el-tooltip>
@@ -113,6 +113,9 @@ export default {
   },
   computed: {
     ...mapState('auth', ['chainId', 'walletAddress']),
+    ownersLength() {
+      return this.ownersTable.data.length
+    }
   },
   mounted() {
     this.proxyAddress = this.$route.params.proxyAddress

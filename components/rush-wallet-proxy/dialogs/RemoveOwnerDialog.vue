@@ -8,16 +8,16 @@
     <div v-loading="pending">
       <div class="hints">Review the owner you want to remove from the active Proxy:</div>
 
-      <div class="current-owner">
+      <!-- <div class="current-owner">
         <span>{{ ownerAddress }} </span>
         <el-tooltip class="item" effect="dark" content="Click to copy" placement="top">
           <a href="javascript: void(0);" @click="() => copyToClipboard(ownerAddress)"><i class="el-icon-copy-document" ></i></a>
         </el-tooltip>
-      </div>
+      </div> -->
       <el-form :model="form" label-position="top">
-        <!-- <el-form-item label="Owner will be removed" prop="address">
+        <el-form-item label="Owner will be removed" prop="address">
           <el-input :value="ownerAddress" readonly></el-input>
-        </el-form-item> -->
+        </el-form-item>
         <el-form-item label="Any transaction requires the confirmation of">
           <el-input-number v-model="form.threshold" :min="1" :max="maxThreshold" :step="1" step-strictly @change="handleEstimateGas"></el-input-number> out of {{ maxThreshold }} owner(s)
         </el-form-item>
