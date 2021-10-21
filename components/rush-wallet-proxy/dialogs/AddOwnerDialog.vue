@@ -6,7 +6,7 @@
     :visible.sync="isVisible" @open="onDialogOpen" @close="onDialogClose"
   > 
     <div v-loading="pending">
-      <div class="hints">Review the owner you want to replace from the active proxy wallet. Then specify the new owner you want to replace it with:</div>
+      <div class="hints">Add a new owner to the active Safe</div>
 
       <el-form :model="form" :rules="formRules" label-position="top">
         <!-- <el-form-item label="Owner Name">
@@ -54,13 +54,13 @@ export default {
     }
     return {
       isVisible: this.visible,
-      step: 1,
       pending: false,
       form: {
         name: '',
         address: '',
         threshold: 1,
       },
+      owners: [],
       currThreshold: 0,
 
       formRules: {
@@ -75,13 +75,17 @@ export default {
     }
   },
   computed: {
+    ownerCount() {
+      return this.owners.length
+    },
     maxThreshold() {
       const isValidOwner = ethers.utils.isAddress(this.form.address)
-      return isValidOwner ? this.currThreshold + 1 : this.currThreshold
+      return isValidOwner ? this.ownerCount + 1 : this.ownerCount
     }
   },
   mounted() {
     this.getThreshold()
+    this.getOwners()
   },
   methods: {
     copyToClipboard,
@@ -96,6 +100,14 @@ export default {
       }
       this.$emit('close')
       this.$emit('update:visible', false)
+    },
+    async getOwners() {
+      try {
+        const owners = await this.proxyInstance.getOwners()
+        this.owners = [ ...owners ]
+      } catch (error) {
+        this.$message.error('Getting owners failed')
+      }
     },
     async getThreshold() {
       try {
