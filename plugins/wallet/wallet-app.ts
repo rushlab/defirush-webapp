@@ -123,7 +123,7 @@ export class WalletApp implements WalletInterface {
    *  const tx = await contract.method(args)
    *  await this.$waitForTx(tx)
    */
-  async waitForTx(tx: any) {
+  async waitForTx(tx: any): Promise<any> {
     const hash = tx.hash
     const notify: any = {
       dangerouslyUseHTMLString: true,
@@ -134,13 +134,14 @@ export class WalletApp implements WalletInterface {
     }
     const pending = Notification.warning({ ...notify, title: 'Transaction is pending' })
     try {
-      await tx.wait()
+      const result = await tx.wait()
       pending.close()
       Notification.success({
         ...notify,
         title: 'Transaction confirmed',
         duration: 10 * 1000
       })
+      return result
     } catch(err) {
       pending.close()
       Notification.error({ ...notify, title: 'Transaction reverted' })

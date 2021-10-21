@@ -25,7 +25,7 @@
         </el-form-item>
         <el-form-item>
           <p class="hint-text">You're about to create a new Proxy Wallet and will have to confirm a transaction with your currently connected wallet. </p>
-          <p class="hint-text">The creation will cost approximately 0.04071 Ether.</p>
+          <p class="hint-text">The creation will cost approximately {{ estimatedGas }} gas.</p>
           <p class="hint-text">The exact amount will be determined by your wallet.</p>
         </el-form-item>
         <el-form-item>
@@ -57,6 +57,7 @@ export default {
       pending: false,
       otherOwners: [],
       threshold: 1,
+      estimatedGas: 'NA'
     }
   },
   computed: {
@@ -77,10 +78,18 @@ export default {
         const thresholdMax = this.validOwnersLength
         if (this.threshold > thresholdMax) {
           this.threshold = thresholdMax
+        } else {
+          this.estimateGas()
         }
       },
       deep: true
+    },
+    threshold() {
+      this.estimateGas()
     }
+  },
+  mounted() {
+    this.estimateGas()
   },
   methods: {
     inputOwnerAddress(index, address) {
@@ -101,37 +110,56 @@ export default {
         this.createProxy()
       }).catch(() => {})
     },
+    getCreationOptions() {
+      const { factoryAddress, singletonAddress } = proxyContractAddresses[this.chainId] || {}
+      const _factoryAddress = factoryAddress
+      const _singletonAddress = singletonAddress
+      const signer = this.$wallet.getSigner()
+      const rushWalletInterface = new ethers.utils.Interface([
+        'function setup(address[] calldata _owners, uint256 _threshold, address to, bytes calldata data, address fallbackHandler, address paymentToken, uint256 payment, address payable paymentReceiver)'
+      ]);
+      const initializerParams = [
+        [this.$wallet.getAddress(), ...this.validOtherOwnerAddresses],  // _owners
+        ethers.BigNumber.from(this.threshold.toString()),  // _threshold
+        '0x0000000000000000000000000000000000000000',  // to
+        '0x',  // data
+        '0x0000000000000000000000000000000000000000',  // fallbackHandler
+        '0x0000000000000000000000000000000000000000',  // paymentToken
+        ethers.BigNumber.from('0'),  // payment
+        '0x0000000000000000000000000000000000000000',  // paymentReceiver
+      ]
+      const initializer = rushWalletInterface.encodeFunctionData('setup', initializerParams)
+      const saltNonce = (new Date()).valueOf().toString()
+      const factory = new ethers.Contract(_factoryAddress, [
+        'event ProxyCreation(address proxy, address singleton)',
+        'function createProxyWithNonce(address _singleton, bytes memory initializer, uint256 saltNonce) returns (address proxy)'
+      ], signer)
+      return {
+        factory,
+        params: [
+          _singletonAddress, 
+          initializer, 
+          saltNonce
+        ]
+      }
+    },
+    async estimateGas() {
+      try {
+        // const saltNonce = '1';
+        const { factory, params } = this.getCreationOptions()
+        const res = await factory.estimateGas.createProxyWithNonce(...params)
+        console.log('@@@ gas estimated is ', +res)
+        this.estimatedGas = +res
+      } catch (error) {
+        console.log(error)
+      }
+    },
     async createProxy() {
       try {
         this.pending = true
-        const { factoryAddress, singletonAddress } = proxyContractAddresses[this.chainId] || {}
-        const _factoryAddress = factoryAddress
-        const _singletonAddress = singletonAddress
-        const signer = this.$wallet.getSigner()
-        const rushWalletInterface = new ethers.utils.Interface([
-          'function setup(address[] calldata _owners, uint256 _threshold, address to, bytes calldata data, address fallbackHandler, address paymentToken, uint256 payment, address payable paymentReceiver)'
-        ]);
-        const initializerParams = [
-          [this.$wallet.getAddress(), ...this.validOtherOwnerAddresses],  // _owners
-          ethers.BigNumber.from(this.threshold.toString()),  // _threshold
-          '0x0000000000000000000000000000000000000000',  // to
-          '0x',  // data
-          '0x0000000000000000000000000000000000000000',  // fallbackHandler
-          '0x0000000000000000000000000000000000000000',  // paymentToken
-          ethers.BigNumber.from('0'),  // payment
-          '0x0000000000000000000000000000000000000000',  // paymentReceiver
-        ]
-        const initializer = rushWalletInterface.encodeFunctionData('setup', initializerParams)
-
-        const factory = new ethers.Contract(_factoryAddress, [
-          'event ProxyCreation(address proxy, address singleton)',
-          'function createProxyWithNonce(address _singleton, bytes memory initializer, uint256 saltNonce) returns (address proxy)'
-        ], signer)
         // const saltNonce = '1';
-        const saltNonce = (new Date()).valueOf().toString()
-        const result = await factory.createProxyWithNonce(
-          _singletonAddress, initializer, saltNonce
-        ).then((tx) => tx.wait())
+        const { factory, params } = this.getCreationOptions()
+        const result = await factory.createProxyWithNonce(...params).then(this.$wallet.waitForTx)
         // 初始化 contract 的时候, ABI 里放了 ProxyCreation, 会被提前解析
         const proxyCreationEvent = result.events.find((event) => event.event === 'ProxyCreation');
         const proxyAddress = proxyCreationEvent.args.proxy
