@@ -1,5 +1,5 @@
 FROM node:erbium-buster
-MAINTAINER XD(dxd.spirits@gmail.com)
+MAINTAINER Anonymous
 
 RUN mkdir /workspace/ -p
 COPY . /workspace/

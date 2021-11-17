@@ -2,7 +2,7 @@
   "name": "aggregation-bank-front",
   "version": "1.0.0",
   "description": "Front project for aggregation-bank",
-  "author": "liran319@gmail.com",
+  "author": "Anonymous",
   "private": true,
   "scripts": {
     "dev": "nuxt",
